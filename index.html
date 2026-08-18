@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeiaNET</title>
 <meta name="description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Hosteados desde casa, IPs listas para copiar y jugar.">
+<meta name="theme-color" content="#0f0f11">
+<meta property="og:title" content="LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball">
+<meta property="og:description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Copiá la IP y jugá.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/logo_leianetwork.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball">
+<meta name="twitter:description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Copiá la IP y jugá.">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
@@ -33,7 +41,95 @@
   }
 
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth;scroll-padding-top:76px;}
+
+  ::selection{background:rgba(199,199,204,.28);color:#fff;}
+
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:#2c2c31;border-radius:10px;border:2px solid var(--bg);}
+  ::-webkit-scrollbar-thumb:hover{background:#3a3a40;}
+  html{scrollbar-color:#2c2c31 var(--bg);scrollbar-width:thin;}
+
+  a:focus-visible, button:focus-visible, summary:focus-visible{
+    outline:2px solid var(--accent);outline-offset:3px;border-radius:4px;
+  }
+
+  /* page load veil — brief fade so the very first paint isn't jarring */
+  .load-veil{
+    position:fixed;inset:0;z-index:999;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    transition:opacity .5s ease .1s, visibility .5s ease .1s;
+  }
+  .load-veil::before{
+    content:'';width:34px;height:34px;border-radius:50%;
+    border:2px solid var(--border);border-top-color:var(--accent);
+    animation:load-spin .7s linear infinite;
+  }
+  body.loaded .load-veil{opacity:0;visibility:hidden;}
+  @keyframes load-spin{to{transform:rotate(360deg);}}
+
+  /* grain: a very light film-grain layer for texture / non-flatness */
+  .grain{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* cursor spotlight — a very soft glow that follows the pointer across the whole page */
+  .cursor-glow{
+    position:fixed;top:0;left:0;width:520px;height:520px;z-index:0;pointer-events:none;
+    background:radial-gradient(circle, rgba(199,199,204,.05), transparent 68%);
+    transform:translate(calc(var(--cx,50vw) - 50%), calc(var(--cy,50vh) - 50%));
+    transition:opacity .3s ease;opacity:0;
+  }
+  .cursor-glow.active{opacity:1;}
+  @media (max-width:880px){.cursor-glow{display:none;}}
+
+  /* back to top */
+  .to-top{
+    position:fixed;right:20px;bottom:20px;z-index:40;width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
+    cursor:pointer;opacity:0;transform:translateY(10px) scale(.9);pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease, border-color .2s, color .2s;
+    box-shadow:0 10px 26px -12px rgba(0,0,0,.6);
+  }
+  .to-top.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+  .to-top:hover{border-color:var(--accent);color:var(--accent);}
+  .to-top svg{width:18px;height:18px;}
+  @media (max-width:880px){
+    .to-top{right:16px;bottom:calc(76px + env(safe-area-inset-bottom));width:40px;height:40px;}
+  }
+
+  /* section divider glow — thin animated gradient line between sections instead of a flat border */
+  section.game{border-top:none;position:relative;}
+  section.game::before{
+    content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:min(600px,70%);height:1px;
+    background:linear-gradient(90deg, transparent, var(--border) 25%, var(--border) 75%, transparent);
+  }
+
+  /* mobile bottom quick-nav — thumb-reachable shortcuts to each section */
+  .quick-nav{
+    display:none;
+  }
+  @media (max-width:880px){
+    .quick-nav{
+      display:flex;position:fixed;left:0;right:0;bottom:0;z-index:45;
+      background:rgba(15,15,17,.92);backdrop-filter:blur(14px);
+      border-top:1px solid var(--border-soft);
+      padding:8px clamp(8px,3vw,20px) calc(8px + env(safe-area-inset-bottom));
+      justify-content:space-between;gap:4px;
+    }
+    .quick-nav a{
+      flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+      text-decoration:none;color:var(--text-mute);font-family:var(--mono);font-size:10px;
+      letter-spacing:.02em;padding:6px 2px;border-radius:8px;transition:color .15s, background .15s;
+    }
+    .quick-nav a svg{width:18px;height:18px;}
+    .quick-nav a:active, .quick-nav a.active{color:var(--accent);background:rgba(255,255,255,.04);}
+    body{padding-bottom:64px;}
+  }
   body{
     margin:0;
     background:
@@ -464,6 +560,9 @@
   nav a:hover::after{width:100%;}
 
   main{position:relative;z-index:1;}
+  section.game{scroll-margin-top:84px;}
+  nav a.active{color:var(--text);}
+  nav a.active::after{width:100%;}
 
   /* ---------- HERO ---------- */
   .hero{
@@ -570,6 +669,25 @@
     letter-spacing:.01em;transition:letter-spacing .35s ease;
   }
   .sec-head:hover h2{letter-spacing:.02em;}
+
+  /* touch devices: ignore :hover entirely for this effect (it "sticks" after
+     a tap since there's no real hover state) — instead .icon-badge.peek is
+     toggled briefly by JS as the badge scrolls through the viewport center */
+  @media (hover:none), (pointer:coarse){
+    .sec-head:hover .icon-badge,
+    .sec-head:hover h2{
+      border-color:var(--border);transform:none;box-shadow:none;letter-spacing:.01em;
+    }
+    .sec-head:hover .icon-badge img.icon-gray{opacity:1;transform:scale(1);}
+    .sec-head:hover .icon-badge img.icon-color{opacity:0;transform:scale(.85);}
+
+    .sec-head .icon-badge.peek{
+      border-color:#3d3d43;transform:translateY(-2px);
+      box-shadow:0 8px 22px -8px rgba(255,255,255,.12);
+    }
+    .sec-head .icon-badge.peek img.icon-gray{opacity:0;transform:scale(1.12);}
+    .sec-head .icon-badge.peek img.icon-color{opacity:1;transform:scale(1.12);}
+  }
   .sec-head .count{
     font-family:var(--mono);font-size:12px;color:var(--text-mute);
     border:1px solid var(--border);padding:3px 9px;border-radius:20px;margin-left:auto;
@@ -699,17 +817,247 @@
   }
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+  /* ---------- REVEAL ON SCROLL ---------- */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+  .cards .reveal{transition-delay:calc(var(--i,0) * 70ms);}
+  .faq-list .reveal{transition-delay:calc(var(--i,0) * 55ms);}
+  .social-row .reveal{transition-delay:calc(var(--i,0) * 60ms);}
+
+  /* ---------- CARD GLOW / HOVER UPGRADE ---------- */
+  .card{
+    overflow:hidden;isolation:isolate;
+  }
+  .card::before{
+    content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;z-index:-1;
+    background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(199,199,204,.55), transparent 60%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;
+    opacity:0;transition:opacity .3s ease;
+  }
+  .card::after{
+    content:'';position:absolute;inset:0;border-radius:inherit;z-index:-2;
+    background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(199,199,204,.06), transparent 65%);
+    opacity:0;transition:opacity .3s ease;
+  }
+  .card:hover::before, .card:hover::after{opacity:1;}
+  .card{transition:border-color .18s, transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s ease;}
+  .card:hover{transform:translateY(-4px);box-shadow:0 18px 40px -18px rgba(0,0,0,.55);}
+
+  /* ---------- BUTTON SHINE ---------- */
+  .btn, .link-btn{position:relative;overflow:hidden;}
+  .btn::after, .link-btn::after{
+    content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(115deg, transparent, rgba(255,255,255,.16), transparent);
+    transform:skewX(-18deg);transition:left .55s ease;pointer-events:none;
+  }
+  .btn:hover::after, .link-btn:hover::after{left:120%;}
+
+  /* ---------- HERO ENTRANCE ---------- */
+  .hero .eyebrow, .hero h1, .hero p.lead, .hero .hero-cta, .status-card{
+    opacity:0;transform:translateY(16px);
+    animation:hero-in .7s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .hero .eyebrow{animation-delay:.05s;}
+  .hero h1{animation-delay:.12s;}
+  .hero p.lead{animation-delay:.22s;}
+  .hero .hero-cta{animation-delay:.3s;}
+  .status-card{animation-delay:.2s;}
+  @keyframes hero-in{to{opacity:1;transform:translateY(0);}}
+
+  h1 span{
+    background:linear-gradient(100deg, var(--accent) 20%, #fff 50%, var(--accent) 80%);
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shine-text 6s linear infinite;
+  }
+  @keyframes shine-text{to{background-position:-220% center;}}
+
+  /* ---------- MOBILE NAV ---------- */
+  .nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:60;}
+  .nav-toggle span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .25s ease, opacity .25s ease;}
+  .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .nav-toggle.open span:nth-child(2){opacity:0;}
+  .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
   @media (max-width:880px){
     .hero{grid-template-columns:1fr;gap:36px;}
-    nav{display:none;}
+    nav{
+      position:fixed;top:0;right:0;height:100vh;width:min(78vw,320px);
+      background:rgb(15,15,17);
+      border-left:1px solid var(--border-soft);
+      flex-direction:column;align-items:flex-start;gap:0;
+      padding:90px 28px 28px;
+      transform:translateX(100%);
+      z-index:55;
+      display:none;
+    }
+    nav.open{transform:translateX(0);display:flex;}
+    nav a{width:100%;padding:16px 0;border-bottom:1px solid var(--border-soft);font-size:14px;}
+    .nav-toggle{display:flex;}
+    .nav-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;
+      z-index:49;
+    }
+    .nav-backdrop.open{opacity:1;pointer-events:auto;}
+  }
+
+  /* ---------- GRAIN / NOISE (adds the subtle "premium" texture) ---------- */
+  .grain{
+    position:fixed;inset:-100px;pointer-events:none;z-index:2;opacity:.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- CURSOR GLOW (desktop) ---------- */
+  .cursor-glow{
+    position:fixed;top:0;left:0;width:520px;height:520px;z-index:0;pointer-events:none;
+    transform:translate(calc(var(--cx,50vw) - 50%), calc(var(--cy,50vh) - 50%));
+    background:radial-gradient(circle, rgba(255,255,255,.05), transparent 70%);
+    transition:opacity .3s ease;opacity:0;
+  }
+  .cursor-glow.active{opacity:1;}
+  @media (hover:none), (pointer:coarse){.cursor-glow{display:none;}}
+
+  /* ---------- SCROLL PROGRESS BAR ---------- */
+  .scroll-progress{
+    position:fixed;top:0;left:0;height:2px;width:100%;z-index:70;
+    background:transparent;
+  }
+  .scroll-progress .bar{
+    height:100%;width:var(--progress,0%);
+    background:linear-gradient(90deg, var(--accent), #fff, var(--accent));
+    box-shadow:0 0 8px rgba(199,199,204,.5);
+    transition:width .08s linear;
+  }
+
+  /* ---------- PAGE LOAD TRANSITION ---------- */
+  body{opacity:0;}
+  body.loaded{opacity:1;transition:opacity .5s ease;}
+
+  /* ---------- SECTION INDEX NUMBER (pro touch) ---------- */
+  .sec-head .sec-index{
+    font-family:var(--mono);font-size:11px;color:var(--text-mute);
+    border:1px solid var(--border-soft);border-radius:20px;padding:3px 10px;
+    letter-spacing:.06em;order:-1;
+  }
+  .sec-head.center .sec-index{order:0;}
+
+  /* section separators — a soft horizontal glow line to punctuate sections */
+  section.game{position:relative;}
+  section.game::before{
+    content:'';position:absolute;top:0;left:50%;width:min(70%,640px);height:1px;
+    transform:translateX(-50%);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+  }
+
+  /* ---------- POLISHED SCROLLBAR ---------- */
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;border:2px solid var(--bg);}
+  ::-webkit-scrollbar-thumb:hover{background:#3d3d43;}
+  html{scrollbar-color:var(--border) var(--bg);scrollbar-width:thin;}
+
+  /* selection color, small but real detail */
+  ::selection{background:rgba(199,199,204,.28);color:#fff;}
+
+  /* focus rings, accessible + tidy */
+  a:focus-visible, button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px;}
+
+  /* ================= MOBILE REFINEMENT PASS ================= */
+  @media (max-width:640px){
+    header{padding:12px 16px;}
+    .brand img{height:36px;}
+    .hero{padding:44px 16px 28px;gap:28px;}
+    .eyebrow{font-size:11px;margin-bottom:14px;}
+    h1{font-size:clamp(30px,9vw,40px);letter-spacing:-.01em;}
+    .hero p.lead{font-size:14.5px;max-width:none;}
+    .hero-cta{gap:10px;}
+    .btn{flex:1 1 auto;justify-content:center;padding:14px 16px;font-size:12px;}
+    .status-card{border-radius:12px;}
+    .status-head{padding:14px 16px;}
+    .status-row{padding:12px 14px;}
+    section.game{padding:40px 16px;}
+    .sec-head{gap:12px;margin-bottom:22px;}
+    .sec-head .icon-badge{width:38px;height:38px;border-radius:9px;}
+    .sec-head h2{font-size:18px;}
+    .sec-head .count, .sec-head .sec-index{font-size:10.5px;padding:3px 8px;}
+    .cards{grid-template-columns:1fr;gap:12px;}
+    .card{padding:18px 16px 16px;}
+    .card:hover{transform:none;}
+    .ip-row{flex-wrap:wrap;}
+    .ip-row code{font-size:12.5px;}
+    .copy-btn{padding:8px 10px;}
+    .faq-item summary{padding:15px 16px;font-size:14px;}
+    .faq-a{padding:0 16px;}
+    .faq-item[open] .faq-a{padding:0 16px 16px;}
+    .social-row{gap:10px;}
+    .social-btn{padding:11px 14px;font-size:12.5px;flex:1 1 calc(50% - 10px);justify-content:center;}
+    footer{padding:26px 16px 32px;flex-direction:column;text-align:center;gap:10px;}
+    #toast{bottom:16px;font-size:12px;padding:10px 16px;max-width:90vw;}
+    .grain{opacity:.025;}
+  }
+
+  @media (max-width:380px){
+    .social-btn{flex:1 1 100%;}
+  }
+
+  /* ---------- PERFORMANCE: LIGHTEN HEAVY BACKGROUND EFFECTS ON MOBILE ----------
+     Continuously-animating large blur() filters (nebula, ambient glows) are
+     the main cause of jank on phone GPUs — every other animation (like the
+     FAQ opening) has to compete with them for compositor budget each frame.
+     On small/touch screens we drop the heaviest layers and keep only cheap,
+     already-optimized effects, so interactions stay smooth. */
+  @media (max-width:640px), (pointer:coarse){
+    .nebula, .nebula-mono, .ambient, .grain{display:none;}
+    .grid-overlay{animation:none;}
+    .stars-layer{animation:none !important;}
+    .sparkle{animation:none;opacity:.4;}
+    .card::before, .card::after{display:none;} /* cursor-glow tracking, pointless on touch */
+  }
+
+  /* mobile/touch FAQ: instant open/close, no transition at all — matches
+     the JS above which now toggles [open] directly without waiting on
+     any transitionend event. */
+  @media (max-width:640px), (pointer:coarse){
+    .faq-item .faq-a{
+      display:block;
+      grid-template-rows:unset;
+      max-height:none;
+      transition:none;
+      overflow:visible;
+    }
+    .faq-item:not([open]) .faq-a{display:none;}
+    .faq-item[open] .faq-a{padding:0 16px 16px;}
+  }
+
+  /* ---------- MOBILE: STRIP DECORATIVE ANIMATIONS ----------
+     Per request — on phones, motion is minimized across the board. Content
+     still fades/slides in on scroll (cheap, opacity+transform only) but
+     everything else (shine sweeps, floating planets/asteroids, hover-lift,
+     shimmering text, cursor glow) is turned off. */
+  @media (max-width:640px), (pointer:coarse){
+    .hero .eyebrow, .hero h1, .hero p.lead, .hero .hero-cta, .status-card{
+      animation:none !important;opacity:1;transform:none;
+    }
+    h1 span{animation:none;background:none;-webkit-text-fill-color:initial;color:var(--accent);}
+    .btn::after, .link-btn::after{display:none;}
+    .card{transition:border-color .15s ease;}
+    .card:hover, .card:active{transform:none;box-shadow:none;}
+    .planet-wrap, .planet-wrap-2, .asteroid-wrap, .satellite-wrap{animation:none;}
+    .eyebrow .dot{animation:none;}
+    .pulse-dot::after{animation:none;display:none;}
+    .cursor-glow{display:none;}
+    .reveal{transition-duration:.3s;}
   }
 
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important; transition:none !important;}
+    .reveal{opacity:1;transform:none;}
+    body{opacity:1;}
   }
 </style>
 </head>
 <body>
+<noscript><style>body{opacity:1 !important;}</style></noscript>
 <div class="grid-overlay"></div>
 <div class="depth-veil"></div>
 <div class="nebula"><span></span><span></span><span></span><span></span></div>
@@ -751,18 +1099,25 @@
   </div>
 </div>
 <div class="ambient"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<div class="grain"></div>
+<div class="cursor-glow" id="cursor-glow"></div>
+<div class="scroll-progress"><div class="bar" id="scroll-progress-bar"></div></div>
 
 <header>
   <a href="#" class="brand" id="brand-home" aria-label="Ir al inicio">
     <img src="assets/logo_leianetwork.png" alt="LeiaNETWORK">
   </a>
-  <nav>
+  <nav id="main-nav">
     <a href="#minecraft">Minecraft</a>
     <a href="#cs16">CS 1.6</a>
     <a href="#haxball">Haxball</a>
     <a href="#faq">FAQ</a>
   </nav>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </header>
+<div class="nav-backdrop" id="nav-backdrop"></div>
 
 <main>
 
@@ -810,7 +1165,8 @@
 
   <!-- MINECRAFT -->
   <section class="game" id="minecraft">
-    <div class="sec-head">
+    <div class="sec-head reveal">
+      <span class="sec-index">01 / SERVIDORES</span>
             <div class="icon-badge">
         <img class="icon-gray" src="assets/logo_minecraft.png" alt="Minecraft">
         <img class="icon-color" src="assets/minecraft_color.png" alt="Minecraft">
@@ -820,7 +1176,7 @@
     </div>
     <div class="cards">
 
-      <div class="card">
+      <div class="card reveal" style="--i:0">
         <span class="tag">Survival</span>
         <h3>Survival</h3>
         <p class="desc">SemiOP · versión 1.12.2 - 26.2</p>
@@ -833,7 +1189,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card reveal" style="--i:1">
         <span class="tag">Creativo</span>
         <h3>Creativo</h3>
         <p class="desc">Modo creativo libre · versión 1.21.1</p>
@@ -846,7 +1202,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card reveal" style="--i:2">
         <span class="tag">PVP</span>
         <h3>PVP</h3>
         <p class="desc">Combate PVP clásico · versión 1.8.9</p>
@@ -864,7 +1220,8 @@
 
   <!-- CS 1.6 -->
   <section class="game" id="cs16">
-    <div class="sec-head">
+    <div class="sec-head reveal">
+      <span class="sec-index">02 / SERVIDORES</span>
             <div class="icon-badge">
         <img class="icon-gray" src="assets/logo_cs_transparent.png" alt="Counter-Strike 1.6">
         <img class="icon-color" src="assets/logo_cs2.png" alt="Counter-Strike 1.6">
@@ -874,7 +1231,7 @@
     </div>
     <div class="cards">
 
-      <div class="card">
+      <div class="card reveal" style="--i:0">
         <span class="tag">Mixto</span>
         <h3>CS 1.6</h3>
         <p class="desc">Rotación de mapas estándar</p>
@@ -887,7 +1244,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card reveal" style="--i:1">
         <span class="tag">Only Dust2</span>
         <h3>Only Dust2</h3>
         <p class="desc">Solo de_dust2, sin rotación</p>
@@ -900,7 +1257,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card reveal" style="--i:2">
         <span class="tag">Deathmatch</span>
         <h3>Deathmatch</h3>
         <p class="desc">Respawn instantáneo, acción directa</p>
@@ -918,7 +1275,8 @@
 
   <!-- HAXBALL -->
   <section class="game" id="haxball">
-    <div class="sec-head">
+    <div class="sec-head reveal">
+      <span class="sec-index">03 / SALAS</span>
             <div class="icon-badge">
         <img class="icon-gray" src="assets/logo_leianet_star.png" alt="Haxball">
         <img class="icon-color" src="assets/logo_leianet_star_color.png" alt="Haxball">
@@ -928,7 +1286,7 @@
     </div>
     <div class="cards">
 
-      <div class="card">
+      <div class="card reveal" style="--i:0">
         <span class="tag">Abierta</span>
         <h3>Sala Pública</h3>
         <p class="desc">Entrada libre, se juega al toque</p>
@@ -942,7 +1300,7 @@
         <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=J8xYQTHmJig" target="_blank" rel="noopener">Entrar a la sala →</a>
       </div>
 
-      <div class="card">
+      <div class="card reveal" style="--i:1">
         <span class="tag">Privada</span>
         <h3>Sala Privada</h3>
         <p class="desc">Solo con invitación</p>
@@ -961,38 +1319,39 @@
 
   <!-- FAQ -->
   <section class="game" id="faq">
-    <div class="sec-head center">
+    <div class="sec-head center reveal">
+      <span class="sec-index">04 / AYUDA</span>
       <h2>Preguntas frecuentes</h2>
       <span class="count">FAQ</span>
     </div>
     <div class="faq-list">
 
-<details class="faq-item">
+<details class="faq-item reveal" style="--i:0">
   <summary>¿Qué es LeiaNET?<span class="plus"></span></summary>
   <div class="faq-a"><p class="faq-a-inner">LeiaNET o LeiaNETWORK es una red de servidores y proyectos online creada para reunir distintos servicios y comunidades bajo una misma plataforma. Actualmente está enfocada principalmente en servidores de Minecraft, CS 1.6 y otros proyectos relacionados con gaming, administrados y mantenidos de forma independiente.</p></div>
 </details>
 
-<details class="faq-item">
+<details class="faq-item reveal" style="--i:1">
   <summary>¿Cómo surgió LeiaNET?<span class="plus"></span></summary>
   <div class="faq-a"><p class="faq-a-inner">LeiaNET surgió a partir de la idea de crear y administrar servidores propios, empezando con proyectos de Minecraft y expandiéndose progresivamente a otros juegos y servicios. Con el tiempo, el proyecto fue creciendo hasta convertirse en una red con infraestructura propia, dominio y distintos servidores bajo una misma identidad.</p></div>
 </details>
 
-<details class="faq-item">
+<details class="faq-item reveal" style="--i:2">
   <summary>¿Los servidores son gratuitos?<span class="plus"></span></summary>
   <div class="faq-a"><p class="faq-a-inner">Sí. Los servidores de LeiaNET están pensados para que cualquiera pueda jugar sin tener que pagar una membresía para acceder a ellos. El proyecto es independiente y su infraestructura es administrada por el equipo de LeiaNET.</p></div>
 </details>
 
-<details class="faq-item">
+<details class="faq-item reveal" style="--i:3">
   <summary>¿Cómo me conecto a los servidores?<span class="plus"></span></summary>
   <div class="faq-a"><p class="faq-a-inner">Cada servidor cuenta con su propia dirección de conexión. Próximamente podrás encontrar todas las direcciones, versiones y datos necesarios para conectarte desde la sección de servidores de la web. La idea es que puedas entrar fácilmente sin tener que buscar IPs por distintos lugares.</p></div>
 </details>
 
-<details class="faq-item">
+<details class="faq-item reveal" style="--i:4">
   <summary>¿Dónde reporto un problema o bug?<span class="plus"></span></summary>
   <div class="faq-a"><p class="faq-a-inner">Si encontrás un problema, bug o comportamiento extraño en alguno de los servidores, podés reportarlo por nuestro discord oficial. Al informar un problema, intentá indicar qué ocurrió, en qué servidor sucedió y, si es posible, incluir capturas o información adicional que ayude a encontrar la causa.</p></div>
 </details>
 
-<details class="faq-item">
+<details class="faq-item reveal" style="--i:5">
   <summary>¿Van a agregar más servidores?<span class="plus"></span></summary>
   <div class="faq-a"><p class="faq-a-inner">Sí. LeiaNET es un proyecto en constante expansión, por lo que está previsto incorporar nuevos servidores y servicios con el tiempo. La idea es seguir sumando juegos y proyectos a la red a medida que la infraestructura y la comunidad crezcan.</p></div>
 </details>
@@ -1002,28 +1361,29 @@
 
   <!-- REDES SOCIALES -->
   <section class="game" id="social">
-    <div class="sec-head center">
+    <div class="sec-head center reveal">
+      <span class="sec-index">05 / COMUNIDAD</span>
       <h2>Redes sociales</h2>
       <span class="count">Seguinos</span>
     </div>
     <div class="social-row">
-      <a class="social-btn" href="https://www.instagram.com/leia_network/" target="_blank" rel="noopener">
+      <a class="social-btn reveal" style="--i:0" href="https://www.instagram.com/leia_network/" target="_blank" rel="noopener">
         <img src="assets/icon_instagram.png" alt="Instagram">
         Instagram
       </a>
-      <a class="social-btn" href="https://twitter.com/leianetwork" target="_blank" rel="noopener">
+      <a class="social-btn reveal" style="--i:1" href="https://twitter.com/leianetwork" target="_blank" rel="noopener">
         <img src="assets/icon_x.png" alt="X">
         X
       </a>
-      <a class="social-btn" href="https://www.tiktok.com/@leianetwork" target="_blank" rel="noopener">
+      <a class="social-btn reveal" style="--i:2" href="https://www.tiktok.com/@leianetwork" target="_blank" rel="noopener">
         <img src="assets/icon_tiktok.png" alt="TikTok">
         TikTok
       </a>
-      <a class="social-btn" href="https://whatsapp.com/channel/0029Vb8fIWJJP212BGepxK0j" target="_blank" rel="noopener">
+      <a class="social-btn reveal" style="--i:3" href="https://whatsapp.com/channel/0029Vb8fIWJJP212BGepxK0j" target="_blank" rel="noopener">
         <img src="assets/icon_whatsapp.png" alt="WhatsApp">
         WhatsApp
       </a>
-      <a class="social-btn" href="https://discord.gg/3Hsy6JrSMH" target="_blank" rel="noopener">
+      <a class="social-btn reveal" style="--i:4" href="https://discord.gg/3Hsy6JrSMH" target="_blank" rel="noopener">
         <img src="assets/icon_discord.png" alt="Discord">
         Discord
       </a>
@@ -1358,6 +1718,9 @@
       });
     }
 
+    const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches
+      || window.matchMedia('(max-width: 640px)').matches;
+
     document.querySelectorAll('.faq-item').forEach(item=>{
       const summary = item.querySelector('summary');
       const answer = item.querySelector('.faq-a');
@@ -1371,6 +1734,21 @@
 
         const isOpen = item.hasAttribute('open');
 
+        // Mobile/touch: skip the whole transition dance — instant toggle.
+        // No inline style writes, no forced reflow, no transitionend
+        // listener left hanging — that combo is what caused the close lag.
+        if(isTouchDevice){
+          if(isOpen){
+            playClose();
+            item.removeAttribute('open');
+            item.classList.remove('closing');
+          } else {
+            playClick();
+            item.setAttribute('open', '');
+          }
+          return;
+        }
+
         if(isOpen){
           playClose(); // closing sound only
           // The CSS grid-template-rows transition on .faq-a handles the
@@ -1378,7 +1756,7 @@
           // <details> until the transition finishes (native details
           // hides its content immediately otherwise), then remove it.
           answer.addEventListener('transitionend', function handler(ev){
-            if(ev.propertyName !== 'grid-template-rows') return;
+            if(ev.propertyName !== 'grid-template-rows' && ev.propertyName !== 'max-height') return;
             item.removeAttribute('open');
             answer.removeEventListener('transitionend', handler);
           });
@@ -1428,6 +1806,157 @@
     allButtons.forEach(el=>{
       el.addEventListener('click', ()=> playClick());
     });
+
+    // mobile nav toggle
+    const navToggle = document.getElementById('nav-toggle');
+    const mainNav = document.getElementById('main-nav');
+    const navBackdrop = document.getElementById('nav-backdrop');
+    function closeNav(){
+      const wasOpen = mainNav.classList.contains('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded','false');
+      mainNav.classList.remove('open');
+      navBackdrop.classList.remove('open');
+      if(wasOpen) playClick();
+    }
+    if(navToggle && mainNav){
+      navToggle.addEventListener('click', ()=>{
+        const isOpen = mainNav.classList.toggle('open');
+        navToggle.classList.toggle('open', isOpen);
+        navToggle.setAttribute('aria-expanded', String(isOpen));
+        navBackdrop.classList.toggle('open', isOpen);
+        playClick();
+      });
+      navBackdrop.addEventListener('click', closeNav);
+      mainNav.querySelectorAll('a').forEach(a=> a.addEventListener('click', closeNav));
+    }
+  })();
+</script>
+<script>
+  // scroll-reveal: fade/slide elements in as they enter the viewport
+  (function(){
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const targets = document.querySelectorAll('.reveal');
+    if(reduceMotion || !('IntersectionObserver' in window)){
+      targets.forEach(el=> el.classList.add('in'));
+      return;
+    }
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    targets.forEach(el=> io.observe(el));
+  })();
+</script>
+<script>
+  // card cursor-glow: track pointer position per card for the radial highlight
+  (function(){
+    if(window.matchMedia('(pointer: coarse)').matches) return; // skip on touch
+    document.querySelectorAll('.card').forEach(card=>{
+      card.addEventListener('mousemove', (e)=>{
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+        card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  })();
+</script>
+<script>
+  // touch devices: the icon-badge color reveal used to be a :hover effect,
+  // which "sticks" after a tap (no real hover state on touch). Instead,
+  // briefly flip to the color icon while the badge scrolls through the
+  // center band of the screen, then flip back — like it peeks awake as
+  // you scroll past it.
+  (function(){
+    const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    if(!isTouch || !('IntersectionObserver' in window)) return;
+    const badges = document.querySelectorAll('.sec-head .icon-badge');
+    if(!badges.length) return;
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        entry.target.classList.toggle('peek', entry.isIntersecting);
+      });
+    }, { threshold: 0, rootMargin: '-42% 0px -42% 0px' }); // narrow center band
+    badges.forEach(b=> io.observe(b));
+  })();
+</script>
+<script>
+  // page load fade-in
+  window.addEventListener('load', ()=>{
+    requestAnimationFrame(()=> document.body.classList.add('loaded'));
+  });
+  // fallback in case load already fired / is slow
+  if(document.readyState === 'complete'){
+    document.body.classList.add('loaded');
+  }
+</script>
+<script>
+  // scroll progress bar
+  (function(){
+    const bar = document.getElementById('scroll-progress-bar');
+    if(!bar) return;
+    let ticking = false;
+    function update(){
+      const h = document.documentElement;
+      const scrolled = h.scrollTop;
+      const max = h.scrollHeight - h.clientHeight;
+      const pct = max > 0 ? (scrolled / max) * 100 : 0;
+      bar.style.setProperty('--progress', pct.toFixed(2)+'%');
+      bar.style.width = pct.toFixed(2)+'%';
+      ticking = false;
+    }
+    window.addEventListener('scroll', ()=>{
+      if(!ticking){ requestAnimationFrame(update); ticking = true; }
+    }, {passive:true});
+    update();
+  })();
+</script>
+<script>
+  // large ambient glow that softly follows the cursor across the whole page
+  (function(){
+    if(window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+    const glow = document.getElementById('cursor-glow');
+    if(!glow) return;
+    let raf = null, tx = window.innerWidth/2, ty = window.innerHeight/2, cx = tx, cy = ty;
+    function loop(){
+      cx += (tx - cx) * 0.08;
+      cy += (ty - cy) * 0.08;
+      glow.style.setProperty('--cx', cx+'px');
+      glow.style.setProperty('--cy', cy+'px');
+      raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener('mousemove', (e)=>{
+      tx = e.clientX; ty = e.clientY;
+      glow.classList.add('active');
+    }, {passive:true});
+    document.addEventListener('mouseleave', ()=> glow.classList.remove('active'));
+    loop();
+  })();
+</script>
+<script>
+  // highlight the current section's link in the nav while scrolling
+  (function(){
+    const links = document.querySelectorAll('nav a[href^="#"]');
+    if(!links.length || !('IntersectionObserver' in window)) return;
+    const map = new Map();
+    links.forEach(a=>{
+      const id = a.getAttribute('href').slice(1);
+      const sec = document.getElementById(id);
+      if(sec) map.set(sec, a);
+    });
+    if(!map.size) return;
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        const link = map.get(entry.target);
+        if(!link) return;
+        if(entry.isIntersecting) links.forEach(a=> a.classList.remove('active')), link.classList.add('active');
+      });
+    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+    map.forEach((link, sec)=> io.observe(sec));
   })();
 </script>
 
