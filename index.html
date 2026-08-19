@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball</title>
 <meta name="description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Hosteados desde casa, IPs listas para copiar y jugar.">
-<link rel="canonical" href="https://leianet.ar/">
 <meta name="theme-color" content="#0f0f11">
+<link rel="canonical" href="https://leianet.ar/">
 <meta property="og:title" content="LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball">
 <meta property="og:description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Copiá la IP y jugá.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://leianet.ar/">
 <meta property="og:image" content="https://leianet.ar/assets/logo_leianetwork.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball">
 <meta name="twitter:description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Copiá la IP y jugá.">
-<meta name="twitter:image" content="https://leianet.ar/assets/logo_leianetwork.png">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<meta name="twitter:image" content="https://leianet.ar/assets/logo_leianetwork.png"><link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 
@@ -617,6 +617,12 @@
   .status-head .all-ok{
     font-family:var(--mono);font-size:11px;color:var(--ok);display:flex;align-items:center;gap:6px;
   }
+  .status-head .all-ok.bad{color:#ff5468;}
+  .status-head .all-ok.bad .pulse-dot{background:#ff5468;}
+  .status-head .all-ok.bad .pulse-dot::after{background:#ff5468;}
+  .status-head .all-ok.warn{color:#f5b942;}
+  .status-head .all-ok.warn .warn-icon{width:14px;height:14px;flex-shrink:0;animation:warnBlink 1.6s ease-in-out infinite;}
+  .low-perf .status-head .all-ok.warn .warn-icon{animation:none;}
   .status-list{padding:8px 6px;}
   .status-row{
     display:flex;align-items:center;justify-content:space-between;
@@ -635,6 +641,16 @@
     content:'';position:absolute;inset:-6px;border-radius:50%;
     background:var(--ok);opacity:.5;animation:pulse-ring 1.8s ease-out infinite;
   }
+  .status-pill.offline{color:#ff5468;}
+  .status-pill.offline .pulse-dot{background:#ff5468;animation:none;}
+  .status-pill.offline .pulse-dot::after{background:#ff5468;animation:none;opacity:0;}
+  .status-pill.warn{color:#f5b942;}
+  .status-pill.warn .warn-icon{width:14px;height:14px;flex-shrink:0;animation:warnBlink 1.6s ease-in-out infinite;}
+  @keyframes warnBlink{
+    0%,100%{opacity:1;}
+    50%{opacity:.45;}
+  }
+  .low-perf .status-pill.warn .warn-icon{animation:none;}
   @keyframes pulse-ring{
     0%{transform:scale(.4);opacity:.6;}
     100%{transform:scale(1.9);opacity:0;}
@@ -772,32 +788,73 @@
   .donor-title h4{font-family:var(--display);font-weight:600;font-size:14px;margin:0;letter-spacing:.02em;color:var(--text);}
   .donor-title svg{width:16px;height:16px;color:var(--coffee);flex-shrink:0;}
 
-  .donor-list{display:flex;flex-direction:column;gap:8px;}
-  .donor-row{
-    display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;
+  .donor-foot{margin-top:14px;font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--text-mute);border-top:1px solid var(--border-soft);padding-top:12px;}
+
+  .perk-list{display:flex;flex-direction:column;gap:12px;}
+  .perk-row{
+    display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:9px;
     background:var(--bg);border:1px solid var(--border-soft);
     transition:transform .18s ease, border-color .18s ease, background .18s ease;
   }
-  .donor-row:hover{transform:translateX(4px);border-color:#3a3a40;background:var(--bg-elev-2);}
-  .donor-rank{
-    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  .perk-row:hover{transform:translateX(4px);border-color:#4a3a1f;background:var(--bg-elev-2);}
+  .perk-icon{
+    width:32px;height:32px;border-radius:8px;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
-    font-family:var(--display);font-weight:700;font-size:11.5px;
-    background:var(--bg-elev-2);color:var(--text-mute);border:1px solid var(--border);
+    background:var(--coffee-soft);border:1px solid rgba(217,164,65,.3);color:var(--coffee);
+    transition:transform .18s ease;
   }
-  .donor-row.gold .donor-rank{background:linear-gradient(135deg,#f6d27a,#c9922f);color:#241a06;border-color:#f6d27a;box-shadow:0 0 14px -3px rgba(246,210,122,.6);}
-  .donor-row.silver .donor-rank{background:linear-gradient(135deg,#e7e7eb,#aaaab2);color:#1c1c1e;border-color:#e7e7eb;box-shadow:0 0 12px -3px rgba(231,231,235,.45);}
-  .donor-row.bronze .donor-rank{background:linear-gradient(135deg,#d6935b,#a15f2c);color:#241405;border-color:#d6935b;box-shadow:0 0 12px -3px rgba(214,147,91,.45);}
-  .donor-name{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .donor-amount{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--text-mute);flex-shrink:0;}
-  .donor-row.gold .donor-amount{color:#f6d27a;}
-  .donor-row.silver .donor-amount{color:#e7e7eb;}
-  .donor-row.bronze .donor-amount{color:#d6935b;}
-  .donor-foot{margin-top:14px;font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--text-mute);border-top:1px solid var(--border-soft);padding-top:12px;}
+  .perk-icon svg{width:16px;height:16px;}
+  .perk-row:hover .perk-icon{transform:scale(1.08);}
+  .perk-name{font-size:13px;font-weight:600;color:var(--text);font-family:var(--display);letter-spacing:.01em;}
+  .perk-desc{font-size:12px;color:var(--text-mute);line-height:1.5;margin-top:2px;}
 
   @media (max-width:520px){
     .cafecito-card{padding:20px 18px;}
   }
+
+  /* ---------- LOCKED / UNAVAILABLE SERVER CARDS ---------- */
+  .card.locked{position:relative;overflow:hidden;border-color:rgba(226,45,68,.35);}
+  .card.locked:hover{border-color:rgba(226,45,68,.5);}
+  .card.locked > *{filter:saturate(.6) brightness(.62);}
+  .card.locked .copy-btn{pointer-events:none;}
+  .card.locked .link-btn{pointer-events:none;}
+
+  .chain-band{
+    position:absolute;left:-25%;width:150%;height:30px;z-index:2;opacity:.94;
+    background:repeating-linear-gradient(45deg,#c4193a 0 14px,#f1f1f1 14px 28px);
+    box-shadow:0 0 16px -2px rgba(196,25,58,.6);
+    transform:rotate(-9deg);
+  }
+  .chain-band.top{top:10%;}
+  .chain-band.bottom{bottom:10%;}
+
+  .lock-overlay{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .lock-badge{
+    display:flex;flex-direction:column;align-items:center;gap:7px;
+    padding:14px 20px;border-radius:12px;
+    background:rgba(10,6,7,.82);border:1px solid rgba(226,45,68,.55);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    box-shadow:0 0 28px -6px rgba(226,45,68,.55);
+    filter:none !important;
+  }
+  .lock-icon-wrap{
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(226,45,68,.15);border:1px solid rgba(226,45,68,.65);color:#ff4d63;
+    animation:lockPulse 2.2s ease-in-out infinite;
+  }
+  .lock-icon-wrap svg{width:17px;height:17px;}
+  .lock-title{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.05em;color:#fff;white-space:nowrap;}
+  .lock-sub{font-family:var(--mono);font-size:10px;color:#ffb3bd;letter-spacing:.03em;}
+
+  @keyframes lockPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(226,45,68,.55);}
+    50%{box-shadow:0 0 0 7px rgba(226,45,68,0);}
+  }
+
+  .low-perf .chain-band{box-shadow:none;}
+  .low-perf .lock-badge{box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .low-perf .lock-icon-wrap{animation:none;}
 
   /* ---------- FOOTER ---------- */
   footer{
@@ -1204,7 +1261,10 @@
     <div class="status-card">
       <div class="status-head">
         <span class="lbl">Estado de los servidores</span>
-        <span class="all-ok"><span class="pulse-dot" style="position:relative;"></span> Todo activo</span>
+        <span class="all-ok warn">
+          <svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+          A medias
+        </span>
       </div>
       <div class="status-list">
         <div class="status-row">
@@ -1212,21 +1272,24 @@
             <div class="name">Minecraft</div>
             <div class="sub">3 servidores</div>
           </div>
-          <div class="status-pill"><span class="pulse-dot"></span> Online</div>
+          <div class="status-pill offline"><span class="pulse-dot"></span> Offline</div>
         </div>
         <div class="status-row">
           <div>
             <div class="name">Counter-Strike 1.6</div>
             <div class="sub">3 servidores</div>
           </div>
-          <div class="status-pill"><span class="pulse-dot"></span> Online</div>
+          <div class="status-pill offline"><span class="pulse-dot"></span> Offline</div>
         </div>
         <div class="status-row">
           <div>
             <div class="name">Haxball</div>
             <div class="sub">2 salas</div>
           </div>
-          <div class="status-pill"><span class="pulse-dot"></span> Online</div>
+          <div class="status-pill warn">
+            <svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+            A medias
+          </div>
         </div>
       </div>
     </div>
@@ -1245,7 +1308,7 @@
     </div>
     <div class="cards">
 
-      <div class="card reveal" style="--i:0">
+      <div class="card locked reveal" style="--i:0">
         <span class="tag">Survival</span>
         <h3>Survival</h3>
         <p class="desc">SemiOP · versión 1.12.2 - 26.2</p>
@@ -1256,9 +1319,20 @@
             Copiar
           </button>
         </div>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
+        </div>
       </div>
 
-      <div class="card reveal" style="--i:1">
+      <div class="card locked reveal" style="--i:1">
         <span class="tag">Creativo</span>
         <h3>Creativo</h3>
         <p class="desc">Modo creativo libre · versión 1.21.1</p>
@@ -1269,9 +1343,20 @@
             Copiar
           </button>
         </div>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
+        </div>
       </div>
 
-      <div class="card reveal" style="--i:2">
+      <div class="card locked reveal" style="--i:2">
         <span class="tag">PVP</span>
         <h3>PVP</h3>
         <p class="desc">Combate PVP clásico · versión 1.8.9</p>
@@ -1281,6 +1366,17 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar
           </button>
+        </div>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
         </div>
       </div>
 
@@ -1300,7 +1396,7 @@
     </div>
     <div class="cards">
 
-      <div class="card reveal" style="--i:0">
+      <div class="card locked reveal" style="--i:0">
         <span class="tag">Mixto</span>
         <h3>CS 1.6</h3>
         <p class="desc">Rotación de mapas estándar</p>
@@ -1311,9 +1407,20 @@
             Copiar
           </button>
         </div>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
+        </div>
       </div>
 
-      <div class="card reveal" style="--i:1">
+      <div class="card locked reveal" style="--i:1">
         <span class="tag">Only Dust2</span>
         <h3>Only Dust2</h3>
         <p class="desc">Solo de_dust2, sin rotación</p>
@@ -1324,9 +1431,20 @@
             Copiar
           </button>
         </div>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
+        </div>
       </div>
 
-      <div class="card reveal" style="--i:2">
+      <div class="card locked reveal" style="--i:2">
         <span class="tag">Deathmatch</span>
         <h3>Deathmatch</h3>
         <p class="desc">Respawn instantáneo, acción directa</p>
@@ -1336,6 +1454,17 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar
           </button>
+        </div>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
         </div>
       </div>
 
@@ -1369,7 +1498,7 @@
         <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=J8xYQTHmJig" target="_blank" rel="noopener">Entrar a la sala →</a>
       </div>
 
-      <div class="card reveal" style="--i:1">
+      <div class="card locked reveal" style="--i:1">
         <span class="tag">Privada</span>
         <h3>Sala Privada</h3>
         <p class="desc">Solo con invitación</p>
@@ -1381,12 +1510,22 @@
           </button>
         </div>
         <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=sVHGufqz2xM" target="_blank" rel="noopener">Entrar a la sala →</a>
+        <div class="chain-band top"></div>
+        <div class="chain-band bottom"></div>
+        <div class="lock-overlay">
+          <div class="lock-badge">
+            <div class="lock-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+            <div class="lock-title">NO DISPONIBLE</div>
+            <div class="lock-sub">Por ahora</div>
+          </div>
+        </div>
       </div>
 
     </div>
   </section>
 
-  <!-- FAQ -->
   <!-- CAFECITO -->
   <section class="game" id="cafecito">
     <div class="sec-head reveal">
@@ -1407,7 +1546,7 @@
       <div class="cafecito-card main reveal" style="--i:0">
         <div class="cafecito-msg">
           <p>Bienvenido al Cafecito de <a class="inline-link" href="https://leianet.ar">LeiaNET</a>.</p>
-          <p>Acá podés apoyar el costo del dominio y el hosting de los servidores — <strong>cualquier cantidad ayuda</strong> a mantener todo online.</p>
+          <p>Acá podés apoyar el costo del dominio y el hosting de los servidores, <strong>cualquier cantidad ayuda</strong> a mantener todo online.</p>
           <p>En un futuro se darán recompensas a los usuarios que donen. Al donar, poné tu nombre de Discord en la descripción de la donación para aparecer en el top. ☕</p>
         </div>
         <div>
@@ -1420,38 +1559,51 @@
           </a>
           <div class="cafecito-note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-            Poné tu Discord en la descripción para entrar al top
+            Asegurate de estar en el Discord para las recompensas
           </div>
         </div>
       </div>
 
       <div class="cafecito-card donor-card reveal" style="--i:1">
         <div class="donor-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16"></path><path d="M6 21V10l6-6 6 6v11"></path><path d="M9 21v-6h6v6"></path></svg>
-          <h4>Top donadores</h4>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"></path></svg>
+          <h4>¿A dónde va tu cafecito?</h4>
         </div>
-        <div class="donor-list">
-          <div class="donor-row gold">
-            <div class="donor-rank">1</div>
-            <div class="donor-name">Por ahora nadie</div>
-            <div class="donor-amount">—</div>
+        <div class="perk-list">
+          <div class="perk-row">
+            <div class="perk-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <div>
+              <div class="perk-name">Dominio &amp; hosting</div>
+              <div class="perk-desc">Mantiene leianet.ar y los servidores online todo el año.</div>
+            </div>
           </div>
-          <div class="donor-row silver">
-            <div class="donor-rank">2</div>
-            <div class="donor-name">¿Serás vos?</div>
-            <div class="donor-amount">—</div>
+          <div class="perk-row">
+            <div class="perk-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8a2 2 0 0 1 2-2h2l2-3h4l2 3h2a2 2 0 0 1 2 2v13"></path><path d="M9 21v-6h6v6"></path></svg>
+            </div>
+            <div>
+              <div class="perk-name">Mejoras de infraestructura</div>
+              <div class="perk-desc">Mejor hardware y ancho de banda para menos lag.</div>
+            </div>
           </div>
-          <div class="donor-row bronze">
-            <div class="donor-rank">3</div>
-            <div class="donor-name">Esperando cafecitos</div>
-            <div class="donor-amount">—</div>
+          <div class="perk-row">
+            <div class="perk-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><path d="M8.5 13.5 6 21l6-3 6 3-2.5-7.5"></path></svg>
+            </div>
+            <div>
+              <div class="perk-name">Recompensas futuras</div>
+              <div class="perk-desc">Beneficios in-game para quienes apoyan el proyecto.</div>
+            </div>
           </div>
         </div>
-        <div class="donor-foot">Se actualiza a mano con cada donación · nombre según Discord informado en Cafecito</div>
+        <div class="donor-foot">100% del aporte se reinvierte en la red · sin fines de lucro</div>
       </div>
     </div>
   </section>
 
+  <!-- FAQ -->
   <section class="game" id="faq">
     <div class="sec-head center reveal">
       <span class="sec-index">05 / AYUDA</span>
