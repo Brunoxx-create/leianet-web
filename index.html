@@ -16,7 +16,7 @@
       var mem = navigator.deviceMemory || 8;   // GB, undefined on some browsers -> assume fine
       var cores = navigator.hardwareConcurrency || 8;
       var saveData = navigator.connection && navigator.connection.saveData;
-      if(mem <= 4 || cores <= 4 || saveData){
+      if(mem <= 2 || cores <= 2 || saveData){
         document.documentElement.classList.add('low-perf');
       }
     }catch(e){}
@@ -1477,8 +1477,8 @@
       <div class="cafecito-card main reveal" style="--i:0">
         <div class="cafecito-msg">
           <p>Bienvenido al Cafecito de <a class="inline-link" href="https://leianet.ar">LeiaNET</a>.</p>
-          <p>Acá podés apoyar el costo del dominio y el hosting de los servidores — <strong>cualquier cantidad ayuda</strong> a mantener todo online.</p>
-          <p>En un futuro se darán recompensas a los usuarios que donen. Al donar, poné tu nombre de Discord en la descripción de la donación para cuando se habiliten recibir las recompensas. ☕</p>
+          <p>Acá podés apoyar el costo del dominio y el hosting de los servidores, <strong>cualquier cantidad ayuda</strong> a mantener todo online.</p>
+          <p>En un futuro se darán recompensas a los usuarios que donen. Al donar, poné tu nombre de Discord en la descripción de la donación para aparecer en el top. ☕</p>
         </div>
         <div>
           <a class="btn coffee" href="https://cafecito.app/leianet" target="_blank" rel="noopener">
@@ -1490,7 +1490,7 @@
           </a>
           <div class="cafecito-note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-            Te recomendamos unirte al discord para estar al tanto de las recompensas
+            Poné tu Discord en la descripción para entrar al top
           </div>
         </div>
       </div>
@@ -2207,7 +2207,7 @@
       }
       const fps = frames / ((ts - start) / 1000);
       try{
-        if(fps < 42){
+        if(fps < 20){
           document.documentElement.classList.add('low-perf');
           localStorage.setItem('lnet_perf', 'low');
         } else {
