@@ -1,40 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<script>
-  // ---------- PERFORMANCE: DETECT LOW-END DEVICES ----------
-  // Adds a "low-perf" class to <html> as early as possible (blocking, before
-  // first paint) so heavy background effects (nebula blur, starfield,
-  // parallax planets, cursor glow, etc.) never render on weak hardware.
-  // Good PCs are completely unaffected — this only ever adds restrictions,
-  // never removes anything from the default experience.
-  (function(){
-    try{
-      var stored = localStorage.getItem('lnet_perf');
-      if(stored === 'low'){ document.documentElement.classList.add('low-perf'); return; }
-      if(stored === 'high') return;
-      var mem = navigator.deviceMemory || 8;   // GB, undefined on some browsers -> assume fine
-      var cores = navigator.hardwareConcurrency || 8;
-      var saveData = navigator.connection && navigator.connection.saveData;
-      if(mem <= 2 || cores <= 2 || saveData){
-        document.documentElement.classList.add('low-perf');
-      }
-    }catch(e){}
-  })();
-</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LeiaNET</title>
+<title>LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball</title>
 <meta name="description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Hosteados desde casa, IPs listas para copiar y jugar.">
+<link rel="canonical" href="https://leianet.ar/">
 <meta name="theme-color" content="#0f0f11">
 <meta property="og:title" content="LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball">
 <meta property="og:description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Copiá la IP y jugá.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="assets/logo_leianetwork.png">
+<meta property="og:image" content="https://leianet.ar/assets/logo_leianetwork.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LeiaNET — Servidores de Minecraft, CS 1.6 y Haxball">
 <meta name="twitter:description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Copiá la IP y jugá.">
+<meta name="twitter:image" content="https://leianet.ar/assets/logo_leianetwork.png">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
@@ -815,24 +795,6 @@
   .donor-row.bronze .donor-amount{color:#d6935b;}
   .donor-foot{margin-top:14px;font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--text-mute);border-top:1px solid var(--border-soft);padding-top:12px;}
 
-  .perk-list{display:flex;flex-direction:column;gap:12px;}
-  .perk-row{
-    display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:9px;
-    background:var(--bg);border:1px solid var(--border-soft);
-    transition:transform .18s ease, border-color .18s ease, background .18s ease;
-  }
-  .perk-row:hover{transform:translateX(4px);border-color:#4a3a1f;background:var(--bg-elev-2);}
-  .perk-icon{
-    width:32px;height:32px;border-radius:8px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-    background:var(--coffee-soft);border:1px solid rgba(217,164,65,.3);color:var(--coffee);
-    transition:transform .18s ease;
-  }
-  .perk-icon svg{width:16px;height:16px;}
-  .perk-row:hover .perk-icon{transform:scale(1.08);}
-  .perk-name{font-size:13px;font-weight:600;color:var(--text);font-family:var(--display);letter-spacing:.01em;}
-  .perk-desc{font-size:12px;color:var(--text-mute);line-height:1.5;margin-top:2px;}
-
   @media (max-width:520px){
     .cafecito-card{padding:20px 18px;}
   }
@@ -1160,38 +1122,6 @@
     .reveal{opacity:1;transform:none;}
     body{opacity:1;}
   }
-
-  /* ---------- PERFORMANCE: LOW-END DEVICE MODE ----------
-     Applied via the "low-perf" class on <html> (set by JS, either from a
-     quick hardware heuristic on load or a measured-FPS check shortly after).
-     Strips the same heavy layers the mobile media query already strips,
-     but based on actual device performance rather than screen size — so a
-     weak desktop/laptop gets the light version too, while any device that
-     tests out as capable (including phones/tablets that pass the check)
-     keeps the full effect. */
-  .low-perf .nebula,
-  .low-perf .nebula-mono,
-  .low-perf .ambient,
-  .low-perf .grain{display:none;}
-  .low-perf .grid-overlay{animation:none;}
-  .low-perf .stars-layer{animation:none !important;}
-  .low-perf .sparkle{display:none;}
-  .low-perf .shooting-star, .low-perf .meteor{display:none;}
-  .low-perf .card::before, .low-perf .card::after{display:none;}
-  .low-perf .cursor-glow{display:none !important;}
-  .low-perf .planet-wrap, .low-perf .planet-wrap-2,
-  .low-perf .asteroid-wrap, .low-perf .satellite-wrap{animation:none;}
-  .low-perf .planet-parallax, .low-perf .planet-parallax-2,
-  .low-perf .asteroid-parallax, .low-perf .satellite-parallax{display:none;}
-  .low-perf .btn::after, .low-perf .link-btn::after{display:none;}
-  .low-perf .card{transition:border-color .15s ease;}
-  .low-perf .card:hover{transform:none;box-shadow:none;}
-  .low-perf .eyebrow .dot{animation:none;}
-  .low-perf .pulse-dot::after{animation:none;display:none;}
-  .low-perf h1 span{animation:none;background:none;-webkit-text-fill-color:initial;color:var(--accent);}
-  .low-perf .reveal{transition-duration:.3s;}
-  .low-perf .quick-nav, .low-perf #main-nav{backdrop-filter:none;background:rgba(15,15,17,.98);}
-  .low-perf .sec-head .icon-badge, .low-perf .sec-head h2{transition:none;}
 </style>
 </head>
 <body>
@@ -1477,7 +1407,7 @@
       <div class="cafecito-card main reveal" style="--i:0">
         <div class="cafecito-msg">
           <p>Bienvenido al Cafecito de <a class="inline-link" href="https://leianet.ar">LeiaNET</a>.</p>
-          <p>Acá podés apoyar el costo del dominio y el hosting de los servidores, <strong>cualquier cantidad ayuda</strong> a mantener todo online.</p>
+          <p>Acá podés apoyar el costo del dominio y el hosting de los servidores — <strong>cualquier cantidad ayuda</strong> a mantener todo online.</p>
           <p>En un futuro se darán recompensas a los usuarios que donen. Al donar, poné tu nombre de Discord en la descripción de la donación para aparecer en el top. ☕</p>
         </div>
         <div>
@@ -1497,39 +1427,27 @@
 
       <div class="cafecito-card donor-card reveal" style="--i:1">
         <div class="donor-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"></path></svg>
-          <h4>¿A dónde va tu cafecito?</h4>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16"></path><path d="M6 21V10l6-6 6 6v11"></path><path d="M9 21v-6h6v6"></path></svg>
+          <h4>Top donadores</h4>
         </div>
-        <div class="perk-list">
-          <div class="perk-row">
-            <div class="perk-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-            </div>
-            <div>
-              <div class="perk-name">Dominio &amp; hosting</div>
-              <div class="perk-desc">Mantiene leianet.ar y los servidores online todo el año.</div>
-            </div>
+        <div class="donor-list">
+          <div class="donor-row gold">
+            <div class="donor-rank">1</div>
+            <div class="donor-name">Por ahora nadie</div>
+            <div class="donor-amount">—</div>
           </div>
-          <div class="perk-row">
-            <div class="perk-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8a2 2 0 0 1 2-2h2l2-3h4l2 3h2a2 2 0 0 1 2 2v13"></path><path d="M9 21v-6h6v6"></path></svg>
-            </div>
-            <div>
-              <div class="perk-name">Mejoras de infraestructura</div>
-              <div class="perk-desc">Mejor hardware y ancho de banda para menos lag.</div>
-            </div>
+          <div class="donor-row silver">
+            <div class="donor-rank">2</div>
+            <div class="donor-name">¿Serás vos?</div>
+            <div class="donor-amount">—</div>
           </div>
-          <div class="perk-row">
-            <div class="perk-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><path d="M8.5 13.5 6 21l6-3 6 3-2.5-7.5"></path></svg>
-            </div>
-            <div>
-              <div class="perk-name">Recompensas futuras</div>
-              <div class="perk-desc">Beneficios in-game para quienes apoyan el proyecto.</div>
-            </div>
+          <div class="donor-row bronze">
+            <div class="donor-rank">3</div>
+            <div class="donor-name">Esperando cafecitos</div>
+            <div class="donor-amount">—</div>
           </div>
         </div>
-        <div class="donor-foot">100% del aporte se reinvierte en la red · sin fines de lucro</div>
+        <div class="donor-foot">Se actualiza a mano con cada donación · nombre según Discord informado en Cafecito</div>
       </div>
     </div>
   </section>
@@ -1622,7 +1540,6 @@
   // starfield generator — random dots per layer via box-shadow (cheap, no DOM bloat)
   (function(){
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lowPerf = document.documentElement.classList.contains('low-perf');
     const layers = [
       {id:'stars-s1', count:130, size:1, opacity:.9},
       {id:'stars-s2', count:80, size:2, opacity:.7},
@@ -1647,7 +1564,7 @@
     });
 
     // sparkle stars — a handful of stars that flare brightly at random moments, like a glint/reflection
-    if(!reduceMotion && !lowPerf){
+    if(!reduceMotion){
       const container = document.getElementById('sparkles');
       if(container){
         const count = 14;
@@ -1668,7 +1585,7 @@
 
     // shooting stars — spawn at irregular random intervals, travelling along
     // a real curved arc (like a comet) through the middle of the screen
-    if(!reduceMotion && !lowPerf){
+    if(!reduceMotion){
       const starfield = document.querySelector('.starfield');
       const supportsOffsetPath = window.CSS && CSS.supports && CSS.supports('offset-path', "path('M0,0')");
 
@@ -2073,7 +1990,6 @@
   // card cursor-glow: track pointer position per card for the radial highlight
   (function(){
     if(window.matchMedia('(pointer: coarse)').matches) return; // skip on touch
-    if(document.documentElement.classList.contains('low-perf')) return; // skip on weak hardware
     document.querySelectorAll('.card').forEach(card=>{
       card.addEventListener('mousemove', (e)=>{
         const r = card.getBoundingClientRect();
@@ -2137,7 +2053,6 @@
   // large ambient glow that softly follows the cursor across the whole page
   (function(){
     if(window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
-    if(document.documentElement.classList.contains('low-perf')) return; // skip on weak hardware
     const glow = document.getElementById('cursor-glow');
     if(!glow) return;
     let raf = null, tx = window.innerWidth/2, ty = window.innerHeight/2, cx = tx, cy = ty;
@@ -2180,47 +2095,5 @@
 </script>
 
 
-<script>
-  // ---------- PERFORMANCE: MEASURED FPS FALLBACK ----------
-  // The heuristic in <head> catches most weak devices instantly (no flash of
-  // heavy effects). This is a secondary safety net for machines that pass
-  // the hardware heuristic (e.g. enough cores/RAM on paper) but still choke
-  // in practice — a short real FPS sample after load, and if it's bad we
-  // switch to low-perf mode and remember the result for next visit.
-  (function(){
-    try{
-      if(document.documentElement.classList.contains('low-perf')) return; // already low
-      if(localStorage.getItem('lnet_perf')) return; // already decided before
-      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    }catch(e){}
-
-    let frames = 0;
-    let start = null;
-    const sampleMs = 1200;
-
-    function tick(ts){
-      if(start === null) start = ts;
-      frames++;
-      if(ts - start < sampleMs){
-        requestAnimationFrame(tick);
-        return;
-      }
-      const fps = frames / ((ts - start) / 1000);
-      try{
-        if(fps < 20){
-          document.documentElement.classList.add('low-perf');
-          localStorage.setItem('lnet_perf', 'low');
-        } else {
-          localStorage.setItem('lnet_perf', 'high');
-        }
-      }catch(e){}
-    }
-    // wait until things have settled (load event) before sampling, so initial
-    // page-construction jank doesn't get mistaken for sustained low FPS
-    window.addEventListener('load', ()=>{
-      setTimeout(()=> requestAnimationFrame(tick), 400);
-    });
-  })();
-</script>
 </body>
 </html>
