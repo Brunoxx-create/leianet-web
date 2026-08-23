@@ -713,6 +713,26 @@
 
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
 
+  .card.card-wide{
+    grid-column:1 / -1;
+    display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;
+    padding:22px 26px;
+  }
+  .card.card-wide .card-wide-info{flex:1 1 220px;min-width:200px;}
+  .card.card-wide .card-wide-info .tag{margin-bottom:10px;}
+  .card.card-wide .card-wide-info h3{margin-bottom:4px;}
+  .card.card-wide .card-wide-info .desc{margin-bottom:0;}
+  .card.card-wide .card-wide-actions{
+    display:flex;align-items:center;gap:12px;flex:1 1 460px;max-width:560px;
+  }
+  .card.card-wide .card-wide-actions .ip-row{flex:1;min-width:0;}
+  .card.card-wide .card-wide-actions .link-btn{flex-shrink:0;white-space:nowrap;}
+  @media (max-width:720px){
+    .card.card-wide{flex-direction:column;align-items:stretch;gap:16px;}
+    .card.card-wide .card-wide-actions{flex-direction:column;max-width:none;width:100%;}
+    .card.card-wide .card-wide-actions .link-btn{width:100%;}
+  }
+
   .card{
     background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
     padding:20px 20px 18px;position:relative;transition:border-color .18s, transform .18s;
@@ -1485,20 +1505,6 @@
     <div class="cards">
 
       <div class="card reveal" style="--i:0">
-        <span class="tag">Abierta</span>
-        <h3>Sala Pública</h3>
-        <p class="desc">Entrada libre, se juega al toque</p>
-        <div class="ip-row">
-          <code style="font-size:12px;">haxball.com/play?c=J8xYQTHmJig</code>
-          <button class="copy-btn" data-copy="https://www.haxball.com/play?c=1oUqPDvrLrY">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copiar
-          </button>
-        </div>
-        <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=J8xYQTHmJig" target="_blank" rel="noopener">Entrar a la sala →</a>
-      </div>
-
-      <div class="card reveal" style="--i:1">
         <span class="tag">Gana y Sigue</span>
         <h3>2v2 Gana y Sigue</h3>
         <p class="desc">El que gana se queda, el que pierde va a la cola</p>
@@ -1512,7 +1518,7 @@
         <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=kL8H2wAvVgQ" target="_blank" rel="noopener">Entrar a la sala →</a>
       </div>
 
-      <div class="card reveal" style="--i:2">
+      <div class="card reveal" style="--i:1">
         <span class="tag">Gana y Sigue</span>
         <h3>3v3 Gana y Sigue</h3>
         <p class="desc">El que gana se queda, el que pierde va a la cola</p>
@@ -1526,7 +1532,7 @@
         <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=C5VoSeOgVAg" target="_blank" rel="noopener">Entrar a la sala →</a>
       </div>
 
-      <div class="card reveal" style="--i:3">
+      <div class="card reveal" style="--i:2">
         <span class="tag">Gana y Sigue</span>
         <h3>4v4 Gana y Sigue</h3>
         <p class="desc">El que gana se queda, el que pierde va a la cola</p>
@@ -1538,6 +1544,24 @@
           </button>
         </div>
         <a class="link-btn" style="margin-top:10px;" href="https://www.haxball.com/play?c=sYiP0d27sEc" target="_blank" rel="noopener">Entrar a la sala →</a>
+      </div>
+
+      <div class="card card-wide reveal" style="--i:3">
+        <div class="card-wide-info">
+          <span class="tag">Abierta</span>
+          <h3>Sala Pública</h3>
+          <p class="desc">Entrada libre, se juega al toque</p>
+        </div>
+        <div class="card-wide-actions">
+          <div class="ip-row">
+            <code style="font-size:12px;">haxball.com/play?c=J8xYQTHmJig</code>
+            <button class="copy-btn" data-copy="https://www.haxball.com/play?c=1oUqPDvrLrY">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
+            </button>
+          </div>
+          <a class="link-btn" href="https://www.haxball.com/play?c=J8xYQTHmJig" target="_blank" rel="noopener">Entrar a la sala →</a>
+        </div>
       </div>
 
     </div>
