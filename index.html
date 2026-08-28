@@ -11,15 +11,39 @@
   // that can only be known once frames are actually being rendered.
   (function(){
     var root = document.documentElement;
+    var KEY = 'leianet-perf';
     window.__LOW_PERF__ = false;
+    window.__PERF_KEY = KEY;
 
     function enableLowPerf(reason){
       if(window.__LOW_PERF__) return;
       window.__LOW_PERF__ = true;
       root.classList.add('low-perf');
+      root.classList.remove('force-full-fx');
       try{ window.dispatchEvent(new CustomEvent('lowperf:on', {detail:{reason: reason}})); }catch(e){}
     }
+    function disableLowPerf(){
+      window.__LOW_PERF__ = false;
+      root.classList.remove('low-perf');
+    }
     window.__enableLowPerf = enableLowPerf;
+    window.__disableLowPerf = disableLowPerf;
+
+    // manual override, set via the header's performance toggle. 'low' and
+    // 'full' are explicit user choices and skip auto-detection entirely;
+    // anything else (nothing stored yet) falls through to the automatic
+    // hardware/fps checks below.
+    var manual = null;
+    try{ manual = localStorage.getItem(KEY); }catch(e){}
+
+    if(manual === 'low'){
+      enableLowPerf('manual');
+      return;
+    }
+    if(manual === 'full'){
+      root.classList.add('force-full-fx');
+      return;
+    }
 
     // 1) hardware check — RAM <= 3GB or <= 3 CPU cores.
     // Skipped on Brave (and any other browser exposing the same signal)
@@ -55,30 +79,6 @@
       }
       requestAnimationFrame(tick);
     })();
-  })();
-</script>
-<script>
-  // ---- theme (light/dark) --------------------------------------------
-  // Applied as early as possible (before <body> renders) to avoid a flash
-  // of the wrong theme. Persisted in localStorage; defaults to the site's
-  // original dark space theme when nothing is stored yet.
-  (function(){
-    var root = document.documentElement;
-    var KEY = 'leianet-theme';
-
-    function apply(theme){
-      if(theme === 'light'){ root.setAttribute('data-theme', 'light'); }
-      else { root.removeAttribute('data-theme'); }
-      var meta = document.querySelector('meta[name="theme-color"]');
-      if(meta) meta.setAttribute('content', theme === 'light' ? '#f4f4f6' : '#0f0f11');
-    }
-
-    var stored = null;
-    try{ stored = localStorage.getItem(KEY); }catch(e){}
-    apply(stored === 'light' ? 'light' : 'dark');
-
-    window.__applyTheme = apply;
-    window.__themeStorageKey = KEY;
   })();
 </script>
 <title>LeiaNET</title>
@@ -120,43 +120,6 @@
     --display: 'Chakra Petch', sans-serif;
     --body: 'Inter', sans-serif;
   }
-
-  /* ---------- LIGHT THEME ----------
-     Toggled via the header button; persisted in localStorage. The space
-     imagery (starfield, nebula, planets, cursor glow) is built for a dark
-     backdrop and looks broken on a light one, so it's hidden in light mode
-     rather than half-heartedly re-themed — a flat light surface instead. */
-  html[data-theme="light"]{
-    --bg: #f4f4f6;
-    --bg-elev: #ffffff;
-    --bg-elev-2: #ececef;
-    --border: #dcdce1;
-    --border-soft: #e7e7ea;
-    --text: #17171a;
-    --text-dim: #47474d;
-    --text-mute: #83838a;
-    --accent: #2f2f33;
-    --accent-soft: rgba(23,23,26,.07);
-    --ok: #2f9e4f;
-    --header-bg: rgba(255,255,255,.85);
-  }
-  html[data-theme="light"] ::selection{background:rgba(23,23,26,.14);color:#000;}
-  html[data-theme="light"] ::-webkit-scrollbar-track{background:var(--bg);}
-  html[data-theme="light"] ::-webkit-scrollbar-thumb{background:#d3d3d8;border:2px solid var(--bg);}
-  html[data-theme="light"] ::-webkit-scrollbar-thumb:hover{background:#bcbcc2;}
-  html[data-theme="light"]{scrollbar-color:#d3d3d8 var(--bg);}
-  html[data-theme="light"] .starfield,
-  html[data-theme="light"] .nebula,
-  html[data-theme="light"] .nebula-mono,
-  html[data-theme="light"] .cursor-glow,
-  html[data-theme="light"] .depth-veil,
-  html[data-theme="light"] .grid-overlay,
-  html[data-theme="light"] .grain,
-  html[data-theme="light"] .planet-parallax,
-  html[data-theme="light"] .planet-parallax-2,
-  html[data-theme="light"] .asteroid-parallax,
-  html[data-theme="light"] .satellite-parallax{display:none !important;}
-  html[data-theme="light"] .card.locked > *{filter:saturate(.75) brightness(.85);}
 
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;scroll-padding-top:76px;}
@@ -678,20 +641,17 @@
   nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--accent);transition:width .2s;}
   nav a:hover::after{width:100%;}
 
-  /* theme toggle — small circular button that swaps a sun/moon icon */
-  .theme-toggle{
+  /* icon button — small circular button, used by the performance toggle */
+  .icon-btn{
     position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     width:34px;height:34px;border-radius:50%;
     background:transparent;border:1px solid var(--border);color:var(--text-dim);
     cursor:pointer;transition:border-color .15s, color .15s, transform .15s;
   }
-  .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
-  .theme-toggle:active{transform:scale(.9);}
-  .theme-toggle svg{position:absolute;width:16px;height:16px;transition:opacity .25s ease, transform .35s ease;}
-  .theme-toggle .icon-sun{opacity:1;transform:scale(1) rotate(0deg);}
-  .theme-toggle .icon-moon{opacity:0;transform:scale(.4) rotate(-45deg);}
-  html[data-theme="light"] .theme-toggle .icon-sun{opacity:0;transform:scale(.4) rotate(45deg);}
-  html[data-theme="light"] .theme-toggle .icon-moon{opacity:1;transform:scale(1) rotate(0deg);}
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .icon-btn:active{transform:scale(.9);}
+  .icon-btn svg{width:16px;height:16px;}
+  .perf-toggle.active{border-color:var(--ok);color:var(--ok);background:rgba(107,191,123,.1);}
 
   main{position:relative;z-index:1;}
   section.game{scroll-margin-top:84px;}
@@ -1485,9 +1445,8 @@
       <a href="#cafecito">Cafecito</a>
       <a href="#faq">FAQ</a>
     </nav>
-    <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    <button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
     </button>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -2402,14 +2361,24 @@
       });
     }
 
-    // theme toggle: flip light/dark, persist choice, play the click sound
-    const themeToggle = document.getElementById('theme-toggle');
-    if(themeToggle && window.__applyTheme){
-      themeToggle.addEventListener('click', ()=>{
-        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-        const next = isLight ? 'dark' : 'light';
-        window.__applyTheme(next);
-        try{ localStorage.setItem(window.__themeStorageKey, next); }catch(e){}
+    // performance toggle: force low-perf (fewer effects) or full effects,
+    // overriding the automatic hardware/fps detection; persisted like theme
+    const perfToggle = document.getElementById('perf-toggle');
+    if(perfToggle){
+      const syncPerfToggle = ()=> perfToggle.classList.toggle('active', !!window.__LOW_PERF__);
+      syncPerfToggle();
+      window.addEventListener('lowperf:on', syncPerfToggle);
+      perfToggle.addEventListener('click', ()=>{
+        const goingLow = !window.__LOW_PERF__;
+        if(goingLow){
+          window.__enableLowPerf('manual');
+          try{ localStorage.setItem(window.__PERF_KEY, 'low'); }catch(e){}
+        } else {
+          window.__disableLowPerf();
+          document.documentElement.classList.add('force-full-fx');
+          try{ localStorage.setItem(window.__PERF_KEY, 'full'); }catch(e){}
+        }
+        syncPerfToggle();
         playClick();
       });
     }
