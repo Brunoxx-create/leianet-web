@@ -1211,6 +1211,110 @@
     .back-to-top{right:14px;bottom:14px;width:40px;height:40px;}
   }
 
+  /* ---------- TWITCH CHAT WIDGET ---------- */
+  :root{ --twitch:#9146FF; --twitch-soft:rgba(145,70,255,.14); }
+
+  .twitch-chat-toggle{
+    position:fixed;left:20px;bottom:20px;z-index:70;
+    width:56px;height:56px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
+    cursor:pointer;box-shadow:0 12px 28px -12px rgba(0,0,0,.55);
+    transition:border-color .2s ease, color .2s ease, transform .18s ease, background .2s ease, box-shadow .25s ease;
+  }
+  .twitch-chat-toggle:hover{border-color:var(--twitch);color:var(--twitch);background:var(--bg-elev-2);}
+  .twitch-chat-toggle:active{transform:scale(.9);}
+  .twitch-chat-toggle.open{
+    border-color:var(--twitch);color:var(--twitch);background:var(--twitch-soft);
+    box-shadow:0 12px 30px -10px rgba(145,70,255,.5);
+  }
+  .twitch-chat-toggle svg{position:absolute;width:23px;height:23px;transition:opacity .22s ease, transform .3s cubic-bezier(.2,.8,.2,1);}
+  .twitch-chat-toggle .twitch-icon{opacity:1;transform:scale(1) rotate(0deg);}
+  .twitch-chat-toggle .close-icon{opacity:0;transform:scale(.5) rotate(-40deg);}
+  .twitch-chat-toggle.open .twitch-icon{opacity:0;transform:scale(.5) rotate(40deg);}
+  .twitch-chat-toggle.open .close-icon{opacity:1;transform:scale(1) rotate(0deg);}
+  .twitch-chat-toggle .chat-badge{
+    position:absolute;top:3px;right:3px;width:10px;height:10px;border-radius:50%;
+    background:var(--twitch);border:2px solid var(--bg-elev);
+    animation:twitchBadgePulse 2.4s ease-in-out infinite;
+  }
+  .twitch-chat-toggle.open .chat-badge{display:none;}
+  @keyframes twitchBadgePulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(145,70,255,.55);}
+    50%{box-shadow:0 0 0 5px rgba(145,70,255,0);}
+  }
+  @media (max-width:880px){
+    .twitch-chat-toggle{left:14px;bottom:calc(76px + env(safe-area-inset-bottom));width:50px;height:50px;}
+  }
+
+  .twitch-chat-panel{
+    position:fixed;left:20px;bottom:88px;z-index:69;
+    width:340px;height:min(500px,68vh);
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.65), 0 0 0 1px rgba(145,70,255,.06);
+    overflow:hidden;display:flex;flex-direction:column;
+    transform-origin:bottom left;
+    transform:scale(.9) translateY(16px);opacity:0;visibility:hidden;pointer-events:none;
+    transition:transform .38s cubic-bezier(.2,.8,.2,1), opacity .26s ease, visibility .38s;
+  }
+  .twitch-chat-panel.open{
+    transform:scale(1) translateY(0);opacity:1;visibility:visible;pointer-events:auto;
+  }
+  .twitch-chat-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;background:var(--bg-elev-2);border-bottom:1px solid var(--border-soft);flex-shrink:0;
+  }
+  .twitch-chat-title{
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.02em;color:var(--text);
+  }
+  .twitch-dot{width:7px;height:7px;border-radius:50%;background:var(--twitch);box-shadow:0 0 0 3px rgba(145,70,255,.18);flex-shrink:0;}
+  .twitch-chat-link{
+    display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;
+    color:var(--text-dim);transition:color .15s ease,background .15s ease;
+  }
+  .twitch-chat-link:hover{color:var(--twitch);background:rgba(145,70,255,.12);}
+  .twitch-chat-link svg{width:15px;height:15px;}
+  .twitch-chat-body{flex:1;min-height:0;background:#18181b;position:relative;}
+  .twitch-chat-body iframe{width:100%;height:100%;border:0;display:block;}
+  .twitch-chat-loading{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11.5px;color:var(--text-mute);gap:8px;pointer-events:none;
+  }
+  .twitch-chat-loading::before{
+    content:'';width:14px;height:14px;border-radius:50%;
+    border:2px solid var(--border);border-top-color:var(--twitch);
+    animation:load-spin .7s linear infinite;
+  }
+  .twitch-chat-panel.iframe-ready .twitch-chat-loading{display:none;}
+
+  .twitch-chat-fallback{
+    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+    gap:12px;padding:24px;text-align:center;
+  }
+  .twitch-chat-panel.iframe-error .twitch-chat-loading{display:none;}
+  .twitch-chat-panel.iframe-error .twitch-chat-fallback{display:flex;}
+  .twitch-chat-panel.iframe-error iframe{display:none;}
+  .twitch-chat-fallback p{
+    margin:0;font-size:12.5px;line-height:1.6;color:var(--text-mute);max-width:26ch;
+  }
+  .twitch-chat-fallback .btn{padding:10px 18px;font-size:12px;}
+
+  @media (max-width:880px){
+    .twitch-chat-panel{
+      left:12px;right:12px;width:auto;bottom:calc(136px + env(safe-area-inset-bottom));
+      height:min(60vh,460px);
+    }
+  }
+  @media (max-width:420px){
+    .twitch-chat-panel{height:52vh;}
+  }
+
+  /* low-perf: the global html.low-perf * { transition:none } rule already
+     kills the scale/slide animation and box-shadow; this just makes sure
+     the badge pulse (a keyframe animation) is also fully off. */
+  html.low-perf .chat-badge{animation:none !important;}
+
   /* ---------- PAGE LOAD TRANSITION ---------- */
   body{opacity:0;}
   body.loaded{opacity:1;transition:opacity .5s ease;}
@@ -1923,6 +2027,33 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
 
+<!-- ---------- TWITCH CHAT WIDGET ---------- -->
+<button id="twitch-chat-toggle" class="twitch-chat-toggle" aria-label="Abrir chat de Twitch" aria-expanded="false" aria-controls="twitch-chat-panel" title="Chat de Twitch">
+  <svg class="twitch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.2 0-2.35-.27-3.37-.76L3 21l1.76-6.13A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01" stroke-width="2.4"/></svg>
+  <svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  <span class="chat-badge" id="twitch-chat-badge" aria-hidden="true"></span>
+</button>
+
+<div id="twitch-chat-panel" class="twitch-chat-panel" role="dialog" aria-modal="false" aria-label="Chat de Twitch de leian3t">
+  <div class="twitch-chat-head">
+    <div class="twitch-chat-title">
+      <span class="twitch-dot"></span>
+      <span>Chat en vivo</span>
+    </div>
+    <a href="https://www.twitch.tv/leian3t" target="_blank" rel="noopener" class="twitch-chat-link" title="Ver canal en Twitch" aria-label="Ver canal en Twitch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+    </a>
+  </div>
+  <div class="twitch-chat-body">
+    <div class="twitch-chat-loading">Cargando chat…</div>
+    <div class="twitch-chat-fallback">
+      <p>No se pudo cargar el chat embebido acá. Podés abrirlo directo en Twitch:</p>
+      <a class="btn primary" href="https://www.twitch.tv/popout/leian3t/chat" target="_blank" rel="noopener">Abrir chat en Twitch</a>
+    </div>
+    <iframe id="twitch-chat-iframe" title="Chat de Twitch de leian3t" scrolling="no" loading="lazy"></iframe>
+  </div>
+</div>
+
 <script>
   // starfield generator — random dots per layer via box-shadow (cheap, no DOM bloat)
   (function(){
@@ -2563,6 +2694,141 @@
   })();
 </script>
 
+<script>
+  // Twitch chat widget: floating toggle (bottom-left) that opens/closes a
+  // side chat panel with the same open/close sounds used elsewhere on the
+  // site (assets/clicksound.mp3 for open, assets/volversound.wav for
+  // close, faded via Web Audio to avoid a clicky tail). The iframe src is
+  // only set the first time the panel opens, so the chat doesn't load
+  // (and doesn't cost bandwidth) until the visitor actually wants it.
+  (function(){
+    const TWITCH_CHANNEL = 'leian3t';
+
+    const toggle = document.getElementById('twitch-chat-toggle');
+    const panel = document.getElementById('twitch-chat-panel');
+    const iframe = document.getElementById('twitch-chat-iframe');
+    if(!toggle || !panel || !iframe) return;
+
+    // ---- sounds (mirrors the FAQ accordion's sound setup) ----
+    const clickSound = new Audio('assets/clicksound.mp3');
+    clickSound.volume = 0.5;
+    function playOpenSound(){
+      try{
+        const s = clickSound.cloneNode();
+        s.volume = clickSound.volume;
+        s.play().catch(()=>{});
+      }catch(e){}
+    }
+
+    let audioCtx = null;
+    let closeBuffer = null;
+    let closeBufferPromise = null;
+    function getAudioCtx(){
+      if(!audioCtx){
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if(Ctx) audioCtx = new Ctx();
+      }
+      return audioCtx;
+    }
+    function loadCloseBuffer(){
+      const ctx = getAudioCtx();
+      if(!ctx) return Promise.resolve(null);
+      if(closeBuffer) return Promise.resolve(closeBuffer);
+      if(closeBufferPromise) return closeBufferPromise;
+      closeBufferPromise = fetch('assets/volversound.wav')
+        .then(r => r.arrayBuffer())
+        .then(data => ctx.decodeAudioData(data))
+        .then(buf => { closeBuffer = buf; return buf; })
+        .catch(() => null);
+      return closeBufferPromise;
+    }
+    loadCloseBuffer(); // start loading early so the first close isn't delayed
+
+    function playCloseSound(){
+      const ctx = getAudioCtx();
+      if(!ctx){
+        try{ new Audio('assets/volversound.wav').play().catch(()=>{}); }catch(e){}
+        return;
+      }
+      if(ctx.state === 'suspended') ctx.resume();
+      loadCloseBuffer().then(buf=>{
+        if(!buf) return;
+        const source = ctx.createBufferSource();
+        source.buffer = buf;
+        const gain = ctx.createGain();
+        source.connect(gain).connect(ctx.destination);
+        const volume = 0.5, fadeTime = 0.02, dur = buf.duration, now = ctx.currentTime;
+        gain.gain.setValueAtTime(volume, now);
+        if(dur > fadeTime){
+          gain.gain.setValueAtTime(volume, now + dur - fadeTime);
+          gain.gain.linearRampToValueAtTime(0, now + dur);
+        }
+        source.start(now);
+      });
+    }
+
+    // ---- iframe: build the parent list from the real hostname so this
+    // keeps working whether it's served from leianet.ar or a preview URL ----
+    let chatLoadTimeout = null;
+    function loadChatIframe(){
+      if(iframe.src) return; // already loaded once, keep it alive
+      const parents = new Set(['leianet.ar', 'www.leianet.ar']);
+      if(location.hostname) parents.add(location.hostname);
+      const parentParams = Array.from(parents).map(p => 'parent=' + encodeURIComponent(p)).join('&');
+      iframe.src = `https://www.twitch.tv/embed/${TWITCH_CHANNEL}/chat?${parentParams}&darkpopout`;
+
+      const onReady = ()=>{
+        clearTimeout(chatLoadTimeout);
+        panel.classList.add('iframe-ready');
+        panel.classList.remove('iframe-error');
+      };
+      iframe.addEventListener('load', onReady, { once:true });
+      iframe.addEventListener('error', ()=> panel.classList.add('iframe-error'), { once:true });
+
+      // if the iframe never fires "load" (blocked parent domain, network
+      // block, sandboxed preview, etc.) don't leave the spinner forever —
+      // show a link to open the chat directly on Twitch instead.
+      chatLoadTimeout = setTimeout(()=>{
+        if(!panel.classList.contains('iframe-ready')) panel.classList.add('iframe-error');
+      }, 7000);
+    }
+
+    let open = false;
+    function openChat(){
+      open = true;
+      loadChatIframe();
+      panel.classList.add('open');
+      toggle.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Cerrar chat de Twitch');
+      playOpenSound();
+    }
+    function closeChat(){
+      open = false;
+      panel.classList.remove('open');
+      toggle.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Abrir chat de Twitch');
+      playCloseSound();
+    }
+
+    toggle.addEventListener('click', ()=>{
+      if(open) closeChat(); else openChat();
+    });
+
+    // close on outside click / tap
+    document.addEventListener('pointerdown', (e)=>{
+      if(!open) return;
+      if(panel.contains(e.target) || toggle.contains(e.target)) return;
+      closeChat();
+    });
+
+    // close on Escape
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && open) closeChat();
+    });
+  })();
+</script>
 
 </body>
 </html>
