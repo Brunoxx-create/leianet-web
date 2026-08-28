@@ -3,6 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  // ---- low performance mode ---------------------------------------------
+  // Runs as early as possible so the "low-perf" class lands on <html>
+  // before first paint whenever we can tell from hardware alone. FPS is
+  // checked separately during the first seconds of the page's life, since
+  // that can only be known once frames are actually being rendered.
+  (function(){
+    var root = document.documentElement;
+    window.__LOW_PERF__ = false;
+
+    function enableLowPerf(reason){
+      if(window.__LOW_PERF__) return;
+      window.__LOW_PERF__ = true;
+      root.classList.add('low-perf');
+      try{ window.dispatchEvent(new CustomEvent('lowperf:on', {detail:{reason: reason}})); }catch(e){}
+    }
+    window.__enableLowPerf = enableLowPerf;
+
+    // 1) hardware check — RAM <= 3GB or <= 3 CPU cores
+    try{
+      var mem = navigator.deviceMemory;   // GB, undefined on unsupported browsers
+      var cores = navigator.hardwareConcurrency; // undefined on some browsers
+      if((typeof mem === 'number' && mem <= 3) || (typeof cores === 'number' && cores <= 3)){
+        enableLowPerf('hardware');
+      }
+    }catch(e){}
+
+    // 2) fps check — sample real frames for the first 5s of the page's life.
+    // Runs even if hardware already tripped it (cheap) but skips flipping
+    // anything on again since enableLowPerf() is a no-op once active.
+    (function(){
+      var frames = 0, start = null, DURATION = 5000;
+      function tick(ts){
+        if(start === null) start = ts;
+        frames++;
+        if(ts - start < DURATION){
+          requestAnimationFrame(tick);
+        } else {
+          var fps = frames / ((ts - start) / 1000);
+          if(fps < 30) enableLowPerf('fps');
+        }
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
 <title>LeiaNET</title>
 <meta name="description" content="Servidores de Minecraft, Counter-Strike 1.6 y Haxball de LeiaNET. Hosteados desde casa, IPs listas para copiar y jugar.">
 <meta name="theme-color" content="#0f0f11">
@@ -1202,6 +1248,36 @@
     .reveal{opacity:1;transform:none;}
     body{opacity:1;}
   }
+
+  /* ---- low performance mode --------------------------------------------
+     Activated via JS (see early <head> script) when: RAM <= 3GB,
+     CPU cores <= 3, or measured FPS < 30 during the first 5s. Strips out
+     every purely-decorative effect: animations, transitions, blurs and
+     glows, background starfield extras, and the cursor-following glow. */
+  html.low-perf *{
+    animation:none !important;
+    transition:none !important;
+  }
+  html.low-perf .reveal{opacity:1;transform:none;}
+  html.low-perf body{opacity:1;}
+
+  html.low-perf .cursor-glow{display:none !important;}
+  html.low-perf .nebula,
+  html.low-perf .nebula-mono,
+  html.low-perf .depth-veil,
+  html.low-perf .grid-overlay{display:none !important;}
+  html.low-perf .starfield #sparkles,
+  html.low-perf .starfield .sparkle,
+  html.low-perf .starfield .shooting-star,
+  html.low-perf .starfield .meteor{display:none !important;}
+
+  html.low-perf *{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    filter:none !important;
+    box-shadow:none !important;
+    text-shadow:none !important;
+  }
 </style>
 </head>
 <body>
@@ -1760,7 +1836,7 @@
     });
 
     // sparkle stars — a handful of stars that flare brightly at random moments, like a glint/reflection
-    if(!reduceMotion){
+    if(!reduceMotion && !window.__LOW_PERF__){
       const container = document.getElementById('sparkles');
       if(container){
         const count = 14;
@@ -1781,7 +1857,7 @@
 
     // shooting stars — spawn at irregular random intervals, travelling along
     // a real curved arc (like a comet) through the middle of the screen
-    if(!reduceMotion){
+    if(!reduceMotion && !window.__LOW_PERF__){
       const starfield = document.querySelector('.starfield');
       const supportsOffsetPath = window.CSS && CSS.supports && CSS.supports('offset-path', "path('M0,0')");
 
@@ -1913,6 +1989,14 @@
           scheduleNextMeteor();
         }
       });
+
+      // low-perf mode can activate mid-flight (the fps check finishes at
+      // ~5s, after these timers are already scheduled) — stop everything
+      // and wipe any stray elements the moment that happens
+      window.addEventListener('lowperf:on', ()=>{
+        clearStarTimers();
+        starfield.querySelectorAll('.shooting-star, .meteor').forEach(el => el.remove());
+      });
     }
 
     // scroll depth — background layers drift at different rates and the
@@ -1937,6 +2021,14 @@
       update();
       window.addEventListener('scroll', onScroll, {passive:true});
     })();
+
+    // if low-perf activates late (fps check), also clear any sparkles
+    // already spawned into the DOM — CSS hides them, but no reason to
+    // keep them sitting around getting animated under the hood
+    window.addEventListener('lowperf:on', ()=>{
+      const sparkles = document.getElementById('sparkles');
+      if(sparkles) sparkles.innerHTML = '';
+    });
   })();
 </script>
 <script>
@@ -2249,10 +2341,12 @@
   // large ambient glow that softly follows the cursor across the whole page
   (function(){
     if(window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+    if(window.__LOW_PERF__) return; // skip entirely on already-known low-end devices
     const glow = document.getElementById('cursor-glow');
     if(!glow) return;
-    let raf = null, tx = window.innerWidth/2, ty = window.innerHeight/2, cx = tx, cy = ty;
+    let raf = null, stopped = false, tx = window.innerWidth/2, ty = window.innerHeight/2, cx = tx, cy = ty;
     function loop(){
+      if(stopped) return;
       cx += (tx - cx) * 0.08;
       cy += (ty - cy) * 0.08;
       glow.style.setProperty('--cx', cx+'px');
@@ -2264,6 +2358,12 @@
       glow.classList.add('active');
     }, {passive:true});
     document.addEventListener('mouseleave', ()=> glow.classList.remove('active'));
+    // fps check can flip low-perf on a few seconds in — stop the rAF loop then
+    window.addEventListener('lowperf:on', ()=>{
+      stopped = true;
+      if(raf) cancelAnimationFrame(raf);
+      glow.classList.remove('active');
+    });
     loop();
   })();
 </script>
