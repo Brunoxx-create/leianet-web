@@ -21,12 +21,20 @@
     }
     window.__enableLowPerf = enableLowPerf;
 
-    // 1) hardware check — RAM <= 3GB or <= 3 CPU cores
+    // 1) hardware check — RAM <= 3GB or <= 3 CPU cores.
+    // Skipped on Brave (and any other browser exposing the same signal)
+    // because its anti-fingerprinting "Shields" deliberately randomize/
+    // lower navigator.deviceMemory and navigator.hardwareConcurrency —
+    // those numbers are fake there, not the machine's real specs, so
+    // trusting them causes false positives on powerful hardware.
     try{
-      var mem = navigator.deviceMemory;   // GB, undefined on unsupported browsers
-      var cores = navigator.hardwareConcurrency; // undefined on some browsers
-      if((typeof mem === 'number' && mem <= 3) || (typeof cores === 'number' && cores <= 3)){
-        enableLowPerf('hardware');
+      var isBrave = !!(navigator.brave && typeof navigator.brave.isBrave === 'function');
+      if(!isBrave){
+        var mem = navigator.deviceMemory;   // GB, undefined on unsupported browsers
+        var cores = navigator.hardwareConcurrency; // undefined on some browsers
+        if((typeof mem === 'number' && mem <= 3) || (typeof cores === 'number' && cores <= 3)){
+          enableLowPerf('hardware');
+        }
       }
     }catch(e){}
 
@@ -47,6 +55,30 @@
       }
       requestAnimationFrame(tick);
     })();
+  })();
+</script>
+<script>
+  // ---- theme (light/dark) --------------------------------------------
+  // Applied as early as possible (before <body> renders) to avoid a flash
+  // of the wrong theme. Persisted in localStorage; defaults to the site's
+  // original dark space theme when nothing is stored yet.
+  (function(){
+    var root = document.documentElement;
+    var KEY = 'leianet-theme';
+
+    function apply(theme){
+      if(theme === 'light'){ root.setAttribute('data-theme', 'light'); }
+      else { root.removeAttribute('data-theme'); }
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.setAttribute('content', theme === 'light' ? '#f4f4f6' : '#0f0f11');
+    }
+
+    var stored = null;
+    try{ stored = localStorage.getItem(KEY); }catch(e){}
+    apply(stored === 'light' ? 'light' : 'dark');
+
+    window.__applyTheme = apply;
+    window.__themeStorageKey = KEY;
   })();
 </script>
 <title>LeiaNET</title>
@@ -82,11 +114,49 @@
     --accent: #c7c7cc;
     --accent-soft: rgba(199,199,204,.12);
     --ok: #6bbf7b;
+    --header-bg: rgba(15,15,17,.78);
     --radius: 10px;
     --mono: 'JetBrains Mono', monospace;
     --display: 'Chakra Petch', sans-serif;
     --body: 'Inter', sans-serif;
   }
+
+  /* ---------- LIGHT THEME ----------
+     Toggled via the header button; persisted in localStorage. The space
+     imagery (starfield, nebula, planets, cursor glow) is built for a dark
+     backdrop and looks broken on a light one, so it's hidden in light mode
+     rather than half-heartedly re-themed — a flat light surface instead. */
+  html[data-theme="light"]{
+    --bg: #f4f4f6;
+    --bg-elev: #ffffff;
+    --bg-elev-2: #ececef;
+    --border: #dcdce1;
+    --border-soft: #e7e7ea;
+    --text: #17171a;
+    --text-dim: #47474d;
+    --text-mute: #83838a;
+    --accent: #2f2f33;
+    --accent-soft: rgba(23,23,26,.07);
+    --ok: #2f9e4f;
+    --header-bg: rgba(255,255,255,.85);
+  }
+  html[data-theme="light"] ::selection{background:rgba(23,23,26,.14);color:#000;}
+  html[data-theme="light"] ::-webkit-scrollbar-track{background:var(--bg);}
+  html[data-theme="light"] ::-webkit-scrollbar-thumb{background:#d3d3d8;border:2px solid var(--bg);}
+  html[data-theme="light"] ::-webkit-scrollbar-thumb:hover{background:#bcbcc2;}
+  html[data-theme="light"]{scrollbar-color:#d3d3d8 var(--bg);}
+  html[data-theme="light"] .starfield,
+  html[data-theme="light"] .nebula,
+  html[data-theme="light"] .nebula-mono,
+  html[data-theme="light"] .cursor-glow,
+  html[data-theme="light"] .depth-veil,
+  html[data-theme="light"] .grid-overlay,
+  html[data-theme="light"] .grain,
+  html[data-theme="light"] .planet-parallax,
+  html[data-theme="light"] .planet-parallax-2,
+  html[data-theme="light"] .asteroid-parallax,
+  html[data-theme="light"] .satellite-parallax{display:none !important;}
+  html[data-theme="light"] .card.locked > *{filter:saturate(.75) brightness(.85);}
 
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;scroll-padding-top:76px;}
@@ -594,18 +664,34 @@
     position:sticky;top:0;z-index:50;
     display:flex;align-items:center;justify-content:space-between;
     padding:14px clamp(18px,4vw,48px);
-    background:rgba(15,15,17,.78);
+    background:var(--header-bg);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--border-soft);
   }
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;transition:transform .16s ease;}
   .brand img{height:46px;width:auto;display:block;}
   .brand.pressed{transform:scale(.92);}
+  .header-right{display:flex;align-items:center;gap:18px;}
   nav{display:flex;gap:26px;font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;}
   nav a{text-decoration:none;color:var(--text-dim);transition:color .15s;position:relative;}
   nav a:hover, nav a:focus-visible{color:var(--text);}
   nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--accent);transition:width .2s;}
   nav a:hover::after{width:100%;}
+
+  /* theme toggle — small circular button that swaps a sun/moon icon */
+  .theme-toggle{
+    position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    width:34px;height:34px;border-radius:50%;
+    background:transparent;border:1px solid var(--border);color:var(--text-dim);
+    cursor:pointer;transition:border-color .15s, color .15s, transform .15s;
+  }
+  .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+  .theme-toggle:active{transform:scale(.9);}
+  .theme-toggle svg{position:absolute;width:16px;height:16px;transition:opacity .25s ease, transform .35s ease;}
+  .theme-toggle .icon-sun{opacity:1;transform:scale(1) rotate(0deg);}
+  .theme-toggle .icon-moon{opacity:0;transform:scale(.4) rotate(-45deg);}
+  html[data-theme="light"] .theme-toggle .icon-sun{opacity:0;transform:scale(.4) rotate(45deg);}
+  html[data-theme="light"] .theme-toggle .icon-moon{opacity:1;transform:scale(1) rotate(0deg);}
 
   main{position:relative;z-index:1;}
   section.game{scroll-margin-top:84px;}
@@ -787,6 +873,22 @@
     padding:20px 20px 18px;position:relative;transition:border-color .18s, transform .18s;
   }
   .card:hover{border-color:#3a3a40;transform:translateY(-2px);}
+
+  /* ---- skeleton shimmer (brief "loading" state before a card settles in) ---- */
+  .card-skeleton{
+    position:absolute;inset:0;z-index:6;border-radius:inherit;overflow:hidden;
+    background:linear-gradient(100deg, var(--bg-elev) 30%, var(--bg-elev-2) 50%, var(--bg-elev) 70%);
+    background-size:200% 100%;
+    animation:skeletonShimmer 1.3s ease-in-out infinite;
+    opacity:1;transition:opacity .3s ease;pointer-events:none;
+  }
+  .card-skeleton.out{opacity:0;}
+  @keyframes skeletonShimmer{
+    0%{background-position:200% 0;}
+    100%{background-position:-200% 0;}
+  }
+  /* low-perf: no shimmer animation at all — CSS + JS both skip it */
+  html.low-perf .card-skeleton{display:none !important;}
   .card .tag{
     font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
     color:var(--accent);background:var(--accent-soft);display:inline-block;
@@ -809,6 +911,14 @@
   .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
   .copy-btn.copied{border-color:var(--ok);color:var(--ok);}
   .copy-btn svg{width:13px;height:13px;flex-shrink:0;}
+  /* pop-in on the checkmark that replaces the copy icon; low-perf mode
+     already nukes all animations globally, so nothing extra needed there */
+  .copy-btn.copied svg{animation:copyPop .35s cubic-bezier(.2,.8,.3,1.35);}
+  @keyframes copyPop{
+    0%{transform:scale(.4);opacity:0;}
+    65%{transform:scale(1.2);opacity:1;}
+    100%{transform:scale(1);opacity:1;}
+  }
 
   .link-btn{
     display:flex;align-items:center;justify-content:center;gap:8px;
@@ -1077,7 +1187,7 @@
     .hero{grid-template-columns:1fr;gap:36px;}
     nav{
       position:fixed;top:0;right:0;height:100vh;width:min(78vw,320px);
-      background:rgb(15,15,17);
+      background:var(--bg);
       border-left:1px solid var(--border-soft);
       flex-direction:column;align-items:flex-start;gap:0;
       padding:90px 28px 28px;
@@ -1121,6 +1231,24 @@
     background:linear-gradient(90deg, var(--accent), #fff, var(--accent));
     box-shadow:0 0 8px rgba(199,199,204,.5);
     transition:width .08s linear;
+  }
+
+  /* ---------- BACK TO TOP ---------- */
+  .back-to-top{
+    position:fixed;right:20px;bottom:20px;z-index:60;
+    width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
+    cursor:pointer;opacity:0;visibility:hidden;transform:translateY(10px);
+    transition:opacity .25s ease, transform .25s ease, visibility .25s, border-color .15s, color .15s;
+    box-shadow:0 10px 24px -10px rgba(0,0,0,.5);
+  }
+  .back-to-top.show{opacity:1;visibility:visible;transform:translateY(0);}
+  .back-to-top:hover{border-color:var(--accent);color:var(--accent);}
+  .back-to-top:active{transform:scale(.92);}
+  .back-to-top svg{width:19px;height:19px;}
+  @media (max-width:640px){
+    .back-to-top{right:14px;bottom:14px;width:40px;height:40px;}
   }
 
   /* ---------- PAGE LOAD TRANSITION ---------- */
@@ -1349,16 +1477,22 @@
   <a href="#" class="brand" id="brand-home" aria-label="Ir al inicio">
     <img src="assets/logo_leianetwork.png" alt="LeiaNETWORK">
   </a>
-  <nav id="main-nav">
-    <a href="#minecraft">Minecraft</a>
-    <a href="#cs16">CS 1.6</a>
-    <a href="#haxball">Haxball</a>
-    <a href="#cafecito">Cafecito</a>
-    <a href="#faq">FAQ</a>
-  </nav>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
+  <div class="header-right">
+    <nav id="main-nav">
+      <a href="#minecraft">Minecraft</a>
+      <a href="#cs16">CS 1.6</a>
+      <a href="#haxball">Haxball</a>
+      <a href="#cafecito">Cafecito</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema claro/oscuro" title="Cambiar tema">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    </button>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </header>
 <div class="nav-backdrop" id="nav-backdrop"></div>
 
@@ -1826,6 +1960,10 @@
 
 <div id="toast">IP copiada ✓</div>
 
+<button id="back-to-top" class="back-to-top" aria-label="Volver arriba" title="Volver arriba">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
 <script>
   // starfield generator — random dots per layer via box-shadow (cheap, no DOM bloat)
   (function(){
@@ -2050,6 +2188,31 @@
   })();
 </script>
 <script>
+  // skeleton shimmer: brief perceived-loading state on the server/cafecito
+  // cards before the real content settles in, instead of everything just
+  // appearing at once. Skipped entirely in low-perf mode — CSS already
+  // hides the overlay, this just avoids doing the DOM/timer work for nothing.
+  (function(){
+    if(window.__LOW_PERF__) return;
+    const cards = document.querySelectorAll('.cards .card, .cafecito-wrap .cafecito-card');
+    cards.forEach((card, idx)=>{
+      const skel = document.createElement('div');
+      skel.className = 'card-skeleton';
+      card.appendChild(skel);
+      const delay = 320 + idx * 90;
+      setTimeout(()=>{
+        skel.classList.add('out');
+        setTimeout(()=> skel.remove(), 320);
+      }, delay);
+    });
+    // if low-perf trips late (the 5s fps check), rip out any skeletons
+    // still mid-flight rather than let them keep animating
+    window.addEventListener('lowperf:on', ()=>{
+      document.querySelectorAll('.card-skeleton').forEach(el=> el.remove());
+    });
+  })();
+</script>
+<script>
   const toast = document.getElementById('toast');
   let toastTimer;
 
@@ -2235,7 +2398,19 @@
         playClick();
         brandHome.classList.add('pressed');
         setTimeout(()=> brandHome.classList.remove('pressed'), 160);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: window.__LOW_PERF__ ? 'auto' : 'smooth' });
+      });
+    }
+
+    // theme toggle: flip light/dark, persist choice, play the click sound
+    const themeToggle = document.getElementById('theme-toggle');
+    if(themeToggle && window.__applyTheme){
+      themeToggle.addEventListener('click', ()=>{
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const next = isLight ? 'dark' : 'light';
+        window.__applyTheme(next);
+        try{ localStorage.setItem(window.__themeStorageKey, next); }catch(e){}
+        playClick();
       });
     }
 
@@ -2335,24 +2510,35 @@
   }
 </script>
 <script>
-  // scroll progress bar
+  // scroll progress bar + back-to-top button (share the one scroll listener)
   (function(){
     const bar = document.getElementById('scroll-progress-bar');
-    if(!bar) return;
+    const backToTop = document.getElementById('back-to-top');
     let ticking = false;
     function update(){
       const h = document.documentElement;
       const scrolled = h.scrollTop;
       const max = h.scrollHeight - h.clientHeight;
       const pct = max > 0 ? (scrolled / max) * 100 : 0;
-      bar.style.setProperty('--progress', pct.toFixed(2)+'%');
-      bar.style.width = pct.toFixed(2)+'%';
+      if(bar){
+        bar.style.setProperty('--progress', pct.toFixed(2)+'%');
+        bar.style.width = pct.toFixed(2)+'%';
+      }
+      if(backToTop){
+        backToTop.classList.toggle('show', scrolled > 560);
+      }
       ticking = false;
     }
     window.addEventListener('scroll', ()=>{
       if(!ticking){ requestAnimationFrame(update); ticking = true; }
     }, {passive:true});
     update();
+
+    if(backToTop){
+      backToTop.addEventListener('click', ()=>{
+        window.scrollTo({ top: 0, behavior: window.__LOW_PERF__ ? 'auto' : 'smooth' });
+      });
+    }
   })();
 </script>
 <script>
