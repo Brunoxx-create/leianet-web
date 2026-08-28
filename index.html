@@ -1251,15 +1251,24 @@
 
   /* ---- low performance mode --------------------------------------------
      Activated via JS (see early <head> script) when: RAM <= 3GB,
-     CPU cores <= 3, or measured FPS < 30 during the first 5s. Strips out
-     every purely-decorative effect: animations, transitions, blurs and
-     glows, background starfield extras, and the cursor-following glow. */
-  html.low-perf *{
-    animation:none !important;
-    transition:none !important;
+     CPU cores <= 3, or measured FPS < 30 during the first 5s. Mirrors the
+     existing mobile "strip decorative animations" block above, plus fully
+     removes the parallax planets/asteroids/satellite for a flat background
+     (those are the main lag source — scroll-driven transforms + blur/glow). */
+  html.low-perf .hero .eyebrow, html.low-perf .hero h1,
+  html.low-perf .hero p.lead, html.low-perf .hero .hero-cta,
+  html.low-perf .status-card{
+    animation:none !important;opacity:1 !important;transform:none !important;
   }
-  html.low-perf .reveal{opacity:1;transform:none;}
-  html.low-perf body{opacity:1;}
+  html.low-perf h1 span{animation:none !important;background:none !important;-webkit-text-fill-color:initial !important;color:var(--accent) !important;}
+  html.low-perf .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+  html.low-perf body{opacity:1 !important;}
+
+  /* flat background: drop the parallax planets, asteroids and satellite entirely */
+  html.low-perf .planet-parallax,
+  html.low-perf .planet-parallax-2,
+  html.low-perf .asteroid-parallax,
+  html.low-perf .satellite-parallax{display:none !important;}
 
   html.low-perf .cursor-glow{display:none !important;}
   html.low-perf .nebula,
@@ -1271,13 +1280,22 @@
   html.low-perf .starfield .shooting-star,
   html.low-perf .starfield .meteor{display:none !important;}
 
+  html.low-perf .btn::after, html.low-perf .link-btn::after{display:none !important;}
+  html.low-perf .card{transition:border-color .15s ease !important;}
+  html.low-perf .card:hover, html.low-perf .card:active{transform:none !important;box-shadow:none !important;}
+  html.low-perf .eyebrow .dot{animation:none !important;}
+  html.low-perf .pulse-dot::after{animation:none !important;display:none !important;}
+
   html.low-perf *{
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
     filter:none !important;
     box-shadow:none !important;
     text-shadow:none !important;
+    animation:none !important;
   }
+  /* transitions kept off globally except the couple of rules re-enabled above */
+  html.low-perf *{transition:none !important;}
 </style>
 </head>
 <body>
