@@ -653,6 +653,27 @@
   .icon-btn svg{width:16px;height:16px;}
   .perf-toggle.active{border-color:var(--ok);color:var(--ok);background:rgba(107,191,123,.1);}
 
+  /* active + hover: enlarge and show an "ACTIVADO" tooltip — the green
+     border alone is too subtle to notice the mode is on, so hover gives
+     an unmistakable confirmation */
+  .perf-toggle{position:relative;transition:border-color .15s, color .15s, transform .18s cubic-bezier(.2,.8,.2,1), background .15s;}
+  .perf-toggle.active:hover{transform:scale(1.18);}
+  .perf-toggle .perf-tip{
+    position:absolute;top:calc(100% + 10px);left:50%;transform:translate(-50%,-4px);
+    background:var(--bg-elev-2);border:1px solid var(--ok);color:var(--ok);
+    font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;
+    padding:5px 10px;border-radius:6px;white-space:nowrap;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .18s ease, transform .18s ease, visibility .18s;
+    box-shadow:0 10px 24px -10px rgba(0,0,0,.6);
+  }
+  .perf-toggle .perf-tip::before{
+    content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+    border:5px solid transparent;border-bottom-color:var(--ok);
+  }
+  .perf-toggle.active:hover .perf-tip{opacity:1;visibility:visible;transform:translate(-50%,0);}
+  html.low-perf .perf-toggle.active:hover{transform:none !important;}
+
   main{position:relative;z-index:1;}
   section.game{scroll-margin-top:84px;}
   nav a.active{color:var(--text);}
@@ -1551,6 +1572,7 @@
     </nav>
     <button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
+      <span class="perf-tip" aria-hidden="true">ACTIVADO</span>
     </button>
     <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -2496,7 +2518,12 @@
     // overriding the automatic hardware/fps detection; persisted like theme
     const perfToggle = document.getElementById('perf-toggle');
     if(perfToggle){
-      const syncPerfToggle = ()=> perfToggle.classList.toggle('active', !!window.__LOW_PERF__);
+      const syncPerfToggle = ()=>{
+        const isOn = !!window.__LOW_PERF__;
+        perfToggle.classList.toggle('active', isOn);
+        perfToggle.setAttribute('aria-label', isOn ? 'Modo de rendimiento activado — desactivar' : 'Activar modo de rendimiento');
+        perfToggle.title = isOn ? 'Modo rendimiento: ACTIVADO' : 'Modo rendimiento';
+      };
       syncPerfToggle();
       window.addEventListener('lowperf:on', syncPerfToggle);
       perfToggle.addEventListener('click', ()=>{
@@ -2511,6 +2538,9 @@
         }
         syncPerfToggle();
         playClick();
+        if(typeof showToast === 'function'){
+          showToast(goingLow ? 'Modo rendimiento activado ⚡' : 'Modo rendimiento desactivado');
+        }
       });
     }
 
