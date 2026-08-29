@@ -1,0 +1,29 @@
+# LeiaNET
+
+> LeiaNET (LeiaNETWORK) es una red argentina de servidores gratuitos de Minecraft, Counter-Strike 1.6 y Haxball, hosteados de forma independiente y sin fines de lucro. Cualquiera puede conectarse sin pagar membresía.
+
+LeiaNET surgió de la idea de administrar servidores propios de Minecraft y fue creciendo hasta sumar CS 1.6, Haxball y otros proyectos gaming bajo una misma identidad e infraestructura.
+
+## Servidores
+
+- [Minecraft Survival](https://leianet.ar/#minecraft): servidor SemiOP, versión 1.12.2 - 1.21.2, IP mc.leianet.ar
+- [Minecraft Creativo](https://leianet.ar/#minecraft): modo creativo libre, versión 1.21.1, IP creative.leianet.ar
+- [Minecraft PVP](https://leianet.ar/#minecraft): combate PVP clásico, versión 1.8.9, IP pvp.leianet.ar
+- [Counter-Strike 1.6](https://leianet.ar/#cs16): servidor con rotación de mapas estándar, IP cs.leianet.ar
+- [Counter-Strike 1.6 Only Dust2](https://leianet.ar/#cs16): solo de_dust2 sin rotación, IP dust2.leianet.ar
+- [Counter-Strike 1.6 Deathmatch](https://leianet.ar/#cs16): respawn instantáneo, acción directa, IP deathmatch.leianet.ar
+- [Haxball](https://leianet.ar/#haxball): 4 salas activas (2v2, 3v3, 4v4 "Gana y Sigue" y una sala pública abierta)
+
+## Comunidad y soporte
+
+- [Discord oficial](https://discord.gg/3Hsy6JrSMH): reporte de bugs, novedades y recompensas para donantes
+- [Cafecito](https://cafecito.app/leianet): apoyo económico al dominio, hosting e infraestructura del proyecto (100% se reinvierte en la red)
+- [FAQ](https://leianet.ar/#faq): preguntas frecuentes sobre el proyecto, conexión a servidores y reportes
+
+## Redes sociales
+
+- [Instagram](https://www.instagram.com/leia_network/)
+- [X (Twitter)](https://twitter.com/leianetwork)
+- [TikTok](https://www.tiktok.com/@leianetwork)
+- [Twitch](https://www.twitch.tv/leian3t)
+- [WhatsApp](https://whatsapp.com/channel/0029Vb8fIWJJP212BGepxK0j)
