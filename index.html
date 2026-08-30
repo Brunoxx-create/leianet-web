@@ -1080,6 +1080,37 @@
   }
 
   /* ---------- SOCIAL ---------- */
+  :root{ --discord:#5865F2; --discord-soft:rgba(88,101,242,.14); }
+  .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:920px;margin:0 auto;}
+  .contact-card{
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+    padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;
+    transition:border-color .15s, transform .15s, background .15s;
+  }
+  .contact-card:hover{border-color:var(--accent);transform:translateY(-3px);background:var(--bg-elev-2);}
+  .contact-icon{
+    width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    margin-bottom:6px;
+  }
+  .contact-icon.mail{background:var(--accent-soft, rgba(199,199,204,.12));color:var(--accent);}
+  .contact-icon.mail svg{width:24px;height:24px;}
+  .contact-icon.discord{background:var(--discord-soft);}
+  .contact-icon.discord img{width:26px;height:26px;object-fit:contain;}
+  .contact-card h4{font-family:var(--display);font-size:16px;font-weight:600;margin:0;}
+  .contact-card p{font-size:13.5px;line-height:1.6;color:var(--text-dim);margin:0 0 10px;max-width:32ch;}
+  .contact-card .btn{width:100%;justify-content:center;}
+  .contact-card .btn img{width:15px;height:15px;object-fit:contain;flex-shrink:0;}
+  .contact-card .btn svg{width:16px;height:16px;flex-shrink:0;}
+  .btn.no-caps{text-transform:none;letter-spacing:0;font-size:13.5px;}
+  .btn.discord{background:var(--discord);border-color:var(--discord);color:#fff;}
+  .btn.discord:hover{background:#6b76f5;box-shadow:0 12px 30px -12px rgba(88,101,242,.7);}
+  .contact-wrap .reveal{transition-delay:calc(var(--i,0) * 80ms);}
+  @media (max-width:720px){
+    .contact-wrap{grid-template-columns:1fr;}
+  }
+  @media (max-width:480px){
+    .btn.no-caps{font-size:12.5px;padding:12px 14px;word-break:break-all;text-align:center;}
+  }
   .social-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
   .social-btn{
     display:flex;align-items:center;gap:10px;
@@ -1569,6 +1600,7 @@
       <a href="#haxball">Haxball</a>
       <a href="#cafecito">Cafecito</a>
       <a href="#faq">FAQ</a>
+      <a href="#contact">Contacto</a>
     </nav>
     <button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg>
@@ -2030,6 +2062,47 @@
         <img src="assets/icon_discord.png" alt="Discord">
         Discord
       </a>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="game" id="contact">
+    <div class="sec-head center reveal">
+      <span class="sec-index">07 / CONTACTO</span>
+      <div class="icon-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;color:var(--accent);padding:0;">
+          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+          <path d="m2 7 8.97 6.2a2 2 0 0 0 2.06 0L22 7"></path>
+        </svg>
+      </div>
+      <h2>¿Necesitás algo?</h2>
+      <span class="count">Hablemos</span>
+    </div>
+
+    <div class="contact-wrap">
+      <div class="contact-card reveal" style="--i:0">
+        <div class="contact-icon mail">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 8.97 6.2a2 2 0 0 0 2.06 0L22 7"></path></svg>
+        </div>
+        <h4>Escribime un mail</h4>
+        <p>Dudas, reportes o propuestas para la red, respondo apenas puedo.</p>
+        <a class="btn primary no-caps" href="mailto:bruno.rebequi@leianet.ar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 8.97 6.2a2 2 0 0 0 2.06 0L22 7"></path></svg>
+          bruno.rebequi@leianet.ar
+        </a>
+      </div>
+
+      <div class="contact-card reveal" style="--i:1">
+        <div class="contact-icon discord">
+          <img src="assets/icon_discord.png" alt="Discord">
+        </div>
+        <h4>Sumate al Discord</h4>
+        <p>Anuncios, soporte, reportes de bugs y toda la comunidad de LeiaNET.</p>
+        <a class="btn discord" href="https://discord.gg/3Hsy6JrSMH" target="_blank" rel="noopener">
+          <img src="assets/icon_discord.png" alt="">
+          Unirme al servidor
+        </a>
+      </div>
     </div>
   </section>
 
