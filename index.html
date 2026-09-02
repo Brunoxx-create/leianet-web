@@ -729,19 +729,28 @@
   }
   .status-head .all-ok{
     font-family:var(--mono);font-size:11px;color:var(--ok);display:flex;align-items:center;gap:6px;
+    background:var(--bg);border:1px solid var(--border-soft);border-radius:20px;padding:5px 12px;
+    letter-spacing:.04em;text-transform:uppercase;backdrop-filter:blur(6px);
   }
-  .status-head .all-ok.bad{color:#ff5468;}
+  .status-head .all-ok.bad{color:#ff5468;border-color:rgba(255,84,104,.3);}
   .status-head .all-ok.bad .pulse-dot{background:#ff5468;}
   .status-head .all-ok.bad .pulse-dot::after{background:#ff5468;}
-  .status-head .all-ok.warn{color:#f5b942;}
+  .status-head .all-ok.warn{color:#f5b942;border-color:rgba(245,185,66,.3);}
   .status-head .all-ok.warn .warn-icon{width:14px;height:14px;flex-shrink:0;animation:warnBlink 1.6s ease-in-out infinite;}
   .low-perf .status-head .all-ok.warn .warn-icon{animation:none;}
   .status-list{padding:8px 6px;}
   .status-row{
     display:flex;align-items:center;justify-content:space-between;
-    padding:14px 16px;border-bottom:1px solid var(--border-soft);
+    padding:14px 16px;border-bottom:1px solid var(--border-soft);gap:12px;
   }
   .status-row:last-child{border-bottom:none;}
+  .status-row-info{display:flex;align-items:center;gap:12px;min-width:0;}
+  .status-icon{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;position:relative;overflow:hidden;
+    background:var(--bg);border:1px solid var(--border-soft);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .status-icon img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6px;}
   .status-row .name{font-family:var(--body);font-size:14px;color:var(--text);font-weight:500;}
   .status-row .sub{font-family:var(--mono);font-size:11.5px;color:var(--text-mute);margin-top:2px;}
   .status-pill{
@@ -774,19 +783,40 @@
     max-width:1180px;margin:0 auto;padding:56px clamp(18px,4vw,48px);
     border-top:1px solid var(--border-soft);
   }
-  .sec-head{display:flex;align-items:center;gap:16px;margin-bottom:30px;flex-wrap:wrap;cursor:default;}
-  .sec-head.center{justify-content:center;text-align:center;}
+  .sec-head{display:flex;align-items:flex-start;flex-wrap:wrap;column-gap:16px;row-gap:12px;margin-bottom:28px;cursor:default;}
+  .sec-head.center{justify-content:center;text-align:center;align-items:center;}
   .sec-head.center .count{margin-left:0;}
+  /* icon + eyebrow/title/subtitle always travel together as one block,
+     so they can never separate from each other when the row wraps */
+  .sec-head-main{display:flex;align-items:flex-start;gap:16px;min-width:0;flex:1 1 260px;}
   .sec-head .icon-badge{
-    width:46px;height:46px;border-radius:10px;background:var(--bg-elev);
+    width:64px;height:64px;border-radius:16px;background:var(--bg-elev);
     border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
     overflow:hidden;flex-shrink:0;position:relative;
     transition:border-color .35s ease, box-shadow .35s ease, transform .35s ease;
   }
   .sec-head .icon-badge img{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:6px;
+    position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:9px;
     transition:opacity .4s ease, transform .5s cubic-bezier(.2,.8,.2,1);
   }
+  /* text block next to a big logo: eyebrow + title + subtitle stacked */
+  .sec-head-copy{display:flex;flex-direction:column;gap:5px;min-width:0;padding-top:2px;}
+  .sec-head-copy h2{margin:0;}
+  .sec-head-copy .sec-sub{margin:0;font-family:var(--body);font-size:13.5px;line-height:1.5;color:var(--text-mute);max-width:38ch;}
+  /* "X/Y ONLINE" glass pill, top-right of a section header — its own flex
+     item so it wraps cleanly onto its own line instead of stranding itself
+     next to the icon when space runs out */
+  .online-pill{
+    margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ok);background:var(--bg-elev);border:1px solid var(--border);
+    border-radius:20px;padding:7px 14px;backdrop-filter:blur(6px);white-space:nowrap;
+  }
+  .online-pill .pulse-dot{background:var(--ok);}
+  .online-pill .pulse-dot::after{background:var(--ok);}
+  .online-pill.warn{color:#f5b942;}
+  .online-pill.warn .pulse-dot{background:#f5b942;animation:none;}
+  .online-pill.warn .pulse-dot::after{display:none;}
   .sec-head .icon-badge img.icon-color{opacity:0;transform:scale(.85);}
   .sec-head .icon-badge img.icon-gray{opacity:1;transform:scale(1);}
   .sec-head:hover .icon-badge{
@@ -825,6 +855,19 @@
   }
 
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+
+  /* info bar: small "how to connect" / "no install" hint under a section's cards */
+  .info-bar{
+    display:flex;align-items:flex-start;gap:11px;
+    background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:10px;
+    padding:13px 16px;margin-top:18px;
+  }
+  .info-bar .info-icon{
+    flex-shrink:0;width:17px;height:17px;margin-top:1px;color:var(--text-mute);
+  }
+  .info-bar .info-icon svg{display:block;width:100%;height:100%;}
+  .info-bar p{margin:0;font-size:13px;line-height:1.65;color:var(--text-dim);}
+  .info-bar p strong{color:var(--text);font-weight:600;}
 
   .card.card-wide{
     grid-column:1 / -1;
@@ -1112,6 +1155,7 @@
     .btn.no-caps{font-size:12.5px;padding:12px 14px;word-break:break-all;text-align:center;}
   }
   .social-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  /* legacy alias, kept in case .social-btn is referenced elsewhere */
   .social-btn{
     display:flex;align-items:center;gap:10px;
     background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;
@@ -1122,6 +1166,28 @@
   .social-btn:hover{border-color:var(--accent);background:var(--bg-elev-2);transform:translateY(-2px);}
   .social-btn img{width:20px;height:20px;object-fit:contain;opacity:.85;}
   .social-btn:hover img{opacity:1;}
+
+  /* social cards: icon badge + name/handle stacked, glass style */
+  .social-card{
+    display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;
+    padding:14px 18px;backdrop-filter:blur(8px);
+    transition:border-color .2s, transform .2s, background .2s, box-shadow .2s;
+  }
+  .social-card:hover{border-color:var(--accent);background:var(--bg-elev-2);transform:translateY(-3px);box-shadow:0 16px 34px -18px rgba(0,0,0,.55);}
+  .social-icon{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;position:relative;overflow:hidden;
+    background:var(--bg);border:1px solid var(--border-soft);
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .2s;
+  }
+  .social-card:hover .social-icon{border-color:var(--accent);}
+  .social-icon img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;opacity:.9;}
+  .social-icon svg{width:19px;height:19px;color:var(--text-dim);transition:color .2s;}
+  .social-card:hover .social-icon svg{color:var(--accent);}
+  .social-meta{display:flex;flex-direction:column;gap:1px;min-width:0;}
+  .social-name{font-family:var(--display);font-weight:600;font-size:13.5px;letter-spacing:.01em;}
+  .social-handle{font-family:var(--mono);font-size:11.5px;color:var(--text-mute);}
 
   /* toast */
   #toast{
@@ -1414,10 +1480,17 @@
     .status-head{padding:14px 16px;}
     .status-row{padding:12px 14px;}
     section.game{padding:40px 16px;}
-    .sec-head{gap:12px;margin-bottom:22px;}
-    .sec-head .icon-badge{width:38px;height:38px;border-radius:9px;}
+    .sec-head{column-gap:12px;row-gap:10px;margin-bottom:22px;}
+    .sec-head-main{gap:12px;flex:1 1 100%;}
+    .sec-head .icon-badge{width:52px;height:52px;border-radius:13px;}
+    .sec-head .icon-badge img{padding:7px;}
     .sec-head h2{font-size:18px;}
     .sec-head .count, .sec-head .sec-index{font-size:10.5px;padding:3px 8px;}
+    .sec-head-copy .sec-sub{font-size:12px;max-width:none;}
+    .online-pill{font-size:10px;padding:6px 11px;gap:6px;margin-left:0;}
+    .status-icon{width:34px;height:34px;border-radius:9px;}
+    .info-bar{padding:12px 14px;gap:9px;margin-top:14px;}
+    .info-bar p{font-size:12.5px;}
     .cards{grid-template-columns:1fr;gap:12px;}
     .card{padding:18px 16px 16px;}
     .card:hover{transform:none;}
@@ -1429,6 +1502,10 @@
     .faq-item[open] .faq-a{padding:0 16px 16px;}
     .social-row{gap:10px;}
     .social-btn{padding:11px 14px;font-size:12.5px;flex:1 1 calc(50% - 10px);justify-content:center;}
+    .social-card{padding:12px 14px;gap:10px;flex:1 1 calc(50% - 10px);}
+    .social-icon{width:34px;height:34px;}
+    .social-name{font-size:12.5px;}
+    .social-handle{font-size:11px;}
     footer{padding:26px 16px 32px;flex-direction:column;text-align:center;gap:10px;}
     #toast{bottom:16px;font-size:12px;padding:10px 16px;max-width:90vw;}
     .grain{opacity:.025;}
@@ -1436,6 +1513,7 @@
 
   @media (max-width:380px){
     .social-btn{flex:1 1 100%;}
+    .social-card{flex:1 1 100%;}
   }
 
   /* ---------- PERFORMANCE: LIGHTEN HEAVY BACKGROUND EFFECTS ON MOBILE ----------
@@ -1636,23 +1714,38 @@
       </div>
       <div class="status-list">
         <div class="status-row">
-          <div>
-            <div class="name">Minecraft</div>
-            <div class="sub">3 servidores</div>
+          <div class="status-row-info">
+            <div class="status-icon">
+              <img src="assets/logo_minecraft.png" alt="">
+            </div>
+            <div>
+              <div class="name">Minecraft</div>
+              <div class="sub">3 servidores</div>
+            </div>
           </div>
           <div class="status-pill offline"><span class="pulse-dot"></span> Offline</div>
         </div>
         <div class="status-row">
-          <div>
-            <div class="name">Counter-Strike 1.6</div>
-            <div class="sub">3 servidores</div>
+          <div class="status-row-info">
+            <div class="status-icon">
+              <img src="assets/logo_cs_transparent.png" alt="">
+            </div>
+            <div>
+              <div class="name">Counter-Strike 1.6</div>
+              <div class="sub">3 servidores</div>
+            </div>
           </div>
           <div class="status-pill offline"><span class="pulse-dot"></span> Offline</div>
         </div>
         <div class="status-row">
-          <div>
-            <div class="name">Haxball</div>
-            <div class="sub">4 salas</div>
+          <div class="status-row-info">
+            <div class="status-icon">
+              <img src="assets/logo_leianet_star.png" alt="">
+            </div>
+            <div>
+              <div class="name">Haxball</div>
+              <div class="sub">4 salas</div>
+            </div>
           </div>
           <div class="status-pill">
             <span class="pulse-dot"></span>
@@ -1666,13 +1759,18 @@
   <!-- MINECRAFT -->
   <section class="game" id="minecraft">
     <div class="sec-head reveal">
-      <span class="sec-index">01 / SERVIDORES</span>
-            <div class="icon-badge">
-        <img class="icon-gray" src="assets/logo_minecraft.png" alt="Minecraft">
-        <img class="icon-color" src="assets/minecraft_color.png" alt="Minecraft">
+      <div class="sec-head-main">
+        <div class="icon-badge">
+          <img class="icon-gray" src="assets/logo_minecraft.png" alt="Minecraft">
+          <img class="icon-color" src="assets/minecraft_color.png" alt="Minecraft">
+        </div>
+        <div class="sec-head-copy">
+          <span class="sec-index">01 / SERVIDORES</span>
+          <h2>Minecraft</h2>
+          <p class="sec-sub">Tres modos, una sola red.</p>
+        </div>
       </div>
-      <h2>Minecraft</h2>
-      <span class="count">3 servidores</span>
+      <span class="online-pill warn"><span class="pulse-dot"></span>0/3 ONLINE</span>
     </div>
     <div class="cards">
 
@@ -1749,18 +1847,29 @@
       </div>
 
     </div>
+    <div class="info-bar reveal">
+      <span class="info-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+      </span>
+      <p><strong>Cómo conectarte:</strong> Multijugador → Agregar servidor → pegá la dirección. Compatible con Java Edition.</p>
+    </div>
   </section>
 
   <!-- CS 1.6 -->
   <section class="game" id="cs16">
     <div class="sec-head reveal">
-      <span class="sec-index">02 / SERVIDORES</span>
-            <div class="icon-badge">
-        <img class="icon-gray" src="assets/logo_cs_transparent.png" alt="Counter-Strike 1.6">
-        <img class="icon-color" src="assets/logo_cs2.png" alt="Counter-Strike 1.6">
+      <div class="sec-head-main">
+        <div class="icon-badge">
+          <img class="icon-gray" src="assets/logo_cs_transparent.png" alt="Counter-Strike 1.6">
+          <img class="icon-color" src="assets/logo_cs2.png" alt="Counter-Strike 1.6">
+        </div>
+        <div class="sec-head-copy">
+          <span class="sec-index">02 / SERVIDORES</span>
+          <h2>Counter-Strike 1.6</h2>
+          <p class="sec-sub">Tres modos clásicos, sin vueltas.</p>
+        </div>
       </div>
-      <h2>Counter-Strike 1.6</h2>
-      <span class="count">3 servidores</span>
+      <span class="online-pill warn"><span class="pulse-dot"></span>0/3 ONLINE</span>
     </div>
     <div class="cards">
 
@@ -1837,18 +1946,29 @@
       </div>
 
     </div>
+    <div class="info-bar reveal">
+      <span class="info-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+      </span>
+      <p><strong>Cómo conectarte:</strong> Abrí la consola (~) y escribí connect seguido de la dirección. Sin mods ni descargas extra.</p>
+    </div>
   </section>
 
   <!-- HAXBALL -->
   <section class="game" id="haxball">
     <div class="sec-head reveal">
-      <span class="sec-index">03 / SALAS</span>
-            <div class="icon-badge">
-        <img class="icon-gray" src="assets/logo_leianet_star.png" alt="Haxball">
-        <img class="icon-color" src="assets/logo_leianet_star_color.png" alt="Haxball">
+      <div class="sec-head-main">
+        <div class="icon-badge">
+          <img class="icon-gray" src="assets/logo_leianet_star.png" alt="Haxball">
+          <img class="icon-color" src="assets/logo_leianet_star_color.png" alt="Haxball">
+        </div>
+        <div class="sec-head-copy">
+          <span class="sec-index">03 / SALAS</span>
+          <h2>Haxball</h2>
+          <p class="sec-sub">Salas abiertas, entrá y jugá.</p>
+        </div>
       </div>
-      <h2>Haxball</h2>
-      <span class="count">4 salas</span>
+      <span class="online-pill"><span class="pulse-dot"></span>4/4 ONLINE</span>
     </div>
     <div class="cards">
 
@@ -1912,6 +2032,12 @@
         </div>
       </div>
 
+    </div>
+    <div class="info-bar reveal">
+      <span class="info-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+      </span>
+      <p><strong>Sin instalación:</strong> Haxball corre en el navegador. Si la sala está llena, esperá unos segundos y volvé a intentar.</p>
     </div>
   </section>
 
@@ -2042,25 +2168,49 @@
       <span class="count">Seguinos</span>
     </div>
     <div class="social-row">
-      <a class="social-btn reveal" style="--i:0" href="https://www.instagram.com/leia_network/" target="_blank" rel="noopener">
-        <img src="assets/icon_instagram.png" alt="Instagram">
-        Instagram
+      <a class="social-card reveal" style="--i:0" href="https://www.instagram.com/leia_network/" target="_blank" rel="noopener">
+        <span class="social-icon"><img src="assets/icon_instagram.png" alt=""></span>
+        <span class="social-meta">
+          <span class="social-name">Instagram</span>
+          <span class="social-handle">@leia_network</span>
+        </span>
       </a>
-      <a class="social-btn reveal" style="--i:1" href="https://twitter.com/leianetwork" target="_blank" rel="noopener">
-        <img src="assets/icon_x.png" alt="X">
-        X
+      <a class="social-card reveal" style="--i:1" href="https://twitter.com/leianetwork" target="_blank" rel="noopener">
+        <span class="social-icon"><img src="assets/icon_x.png" alt=""></span>
+        <span class="social-meta">
+          <span class="social-name">X</span>
+          <span class="social-handle">@leianetwork</span>
+        </span>
       </a>
-      <a class="social-btn reveal" style="--i:2" href="https://www.tiktok.com/@leianetwork" target="_blank" rel="noopener">
-        <img src="assets/icon_tiktok.png" alt="TikTok">
-        TikTok
+      <a class="social-card reveal" style="--i:2" href="https://www.tiktok.com/@leianetwork" target="_blank" rel="noopener">
+        <span class="social-icon"><img src="assets/icon_tiktok.png" alt=""></span>
+        <span class="social-meta">
+          <span class="social-name">TikTok</span>
+          <span class="social-handle">@leianetwork</span>
+        </span>
       </a>
-      <a class="social-btn reveal" style="--i:3" href="https://whatsapp.com/channel/0029Vb8fIWJJP212BGepxK0j" target="_blank" rel="noopener">
-        <img src="assets/icon_whatsapp.png" alt="WhatsApp">
-        WhatsApp
+      <a class="social-card reveal" style="--i:3" href="https://twitch.tv/leian3t" target="_blank" rel="noopener">
+        <span class="social-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.29 2 3 5.71v14h4.86V22l3.43-2.29h3.14L21 13V2H4.29Zm14.9 10.28-2.86 2.86h-3.14l-2.29 2.28v-2.28H7.29V3.71h11.9v8.57Z"/><path d="M15.14 6.57h1.72v4.29h-1.72V6.57ZM10.57 6.57h1.72v4.29h-1.72V6.57Z"/></svg>
+        </span>
+        <span class="social-meta">
+          <span class="social-name">Twitch</span>
+          <span class="social-handle">leian3t</span>
+        </span>
       </a>
-      <a class="social-btn reveal" style="--i:4" href="https://discord.gg/3Hsy6JrSMH" target="_blank" rel="noopener">
-        <img src="assets/icon_discord.png" alt="Discord">
-        Discord
+      <a class="social-card reveal" style="--i:4" href="https://whatsapp.com/channel/0029Vb8fIWJJP212BGepxK0j" target="_blank" rel="noopener">
+        <span class="social-icon"><img src="assets/icon_whatsapp.png" alt=""></span>
+        <span class="social-meta">
+          <span class="social-name">WhatsApp</span>
+          <span class="social-handle">Canal oficial</span>
+        </span>
+      </a>
+      <a class="social-card reveal" style="--i:5" href="https://discord.gg/3Hsy6JrSMH" target="_blank" rel="noopener">
+        <span class="social-icon"><img src="assets/icon_discord.png" alt=""></span>
+        <span class="social-meta">
+          <span class="social-name">Discord</span>
+          <span class="social-handle">Canal oficial</span>
+        </span>
       </a>
     </div>
   </section>
@@ -2648,6 +2798,16 @@
       navBackdrop.addEventListener('click', closeNav);
       mainNav.querySelectorAll('a').forEach(a=> a.addEventListener('click', closeNav));
     }
+  })();
+</script>
+<script>
+  // defensive: if an image ever fails to load (bad path, offline asset, etc.)
+  // hide it instead of letting the browser paint stray alt-text that breaks
+  // the layout of fixed-size badges/icons.
+  (function(){
+    document.querySelectorAll('img').forEach(img=>{
+      img.addEventListener('error', ()=>{ img.style.opacity = '0'; }, { once:true });
+    });
   })();
 </script>
 <script>
