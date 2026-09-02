@@ -119,6 +119,19 @@
     --mono: 'JetBrains Mono', monospace;
     --display: 'Chakra Petch', sans-serif;
     --body: 'Inter', sans-serif;
+
+    /* ---- liquid glass system ---- */
+    --glass-fill: linear-gradient(155deg, rgba(255,255,255,.09), rgba(255,255,255,.015) 55%, rgba(255,255,255,.03));
+    --glass-fill-strong: linear-gradient(155deg, rgba(255,255,255,.14), rgba(255,255,255,.02) 55%, rgba(255,255,255,.05));
+    --glass-border: rgba(255,255,255,.15);
+    --glass-border-hover: rgba(255,255,255,.30);
+    --glass-blur: blur(22px) saturate(170%);
+    --glass-blur-sm: blur(12px) saturate(150%);
+    --glass-shadow: 0 24px 60px -28px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.09), inset 0 -1px 0 rgba(0,0,0,.25);
+    --glass-shadow-sm: 0 10px 26px -16px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+    --iris-a: rgba(140,170,255,.5);
+    --iris-b: rgba(217,164,65,.45);
+    --iris-c: rgba(199,140,255,.4);
   }
 
   *{box-sizing:border-box;}
@@ -197,8 +210,10 @@
   @media (max-width:880px){
     .quick-nav{
       display:flex;position:fixed;left:0;right:0;bottom:0;z-index:45;
-      background:rgba(15,15,17,.92);backdrop-filter:blur(14px);
-      border-top:1px solid var(--border-soft);
+      background:linear-gradient(0deg, rgba(15,15,17,.9), rgba(24,24,27,.7));
+      backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+      border-top:1px solid var(--glass-border);
+      box-shadow:0 -12px 30px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
       padding:8px clamp(8px,3vw,20px) calc(8px + env(safe-area-inset-bottom));
       justify-content:space-between;gap:4px;
     }
@@ -627,9 +642,17 @@
     position:sticky;top:0;z-index:50;
     display:flex;align-items:center;justify-content:space-between;
     padding:14px clamp(18px,4vw,48px);
-    background:var(--header-bg);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--border-soft);
+    background:linear-gradient(180deg, rgba(24,24,27,.72), rgba(15,15,17,.6));
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    border-bottom:1px solid var(--glass-border);
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 18px 40px -30px rgba(0,0,0,.8);
+    transition:box-shadow .3s ease, background .3s ease;
+  }
+  header::after{
+    content:'';position:absolute;inset:auto 0 0 0;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.35) 45%, rgba(255,255,255,.35) 55%, transparent);
+    opacity:.5;pointer-events:none;
   }
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;transition:transform .16s ease;}
   .brand img{height:46px;width:auto;display:block;}
@@ -645,10 +668,11 @@
   .icon-btn{
     position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     width:34px;height:34px;border-radius:50%;
-    background:transparent;border:1px solid var(--border);color:var(--text-dim);
-    cursor:pointer;transition:border-color .15s, color .15s, transform .15s;
+    background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text-dim);
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    cursor:pointer;transition:border-color .15s, color .15s, transform .15s, background .15s;
   }
-  .icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--glass-fill-strong);}
   .icon-btn:active{transform:scale(.9);}
   .icon-btn svg{width:16px;height:16px;}
   .perf-toggle.active{border-color:var(--ok);color:var(--ok);background:rgba(107,191,123,.1);}
@@ -705,24 +729,58 @@
   .hero-cta{display:flex;gap:12px;flex-wrap:wrap;}
   .btn{
     font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
-    padding:13px 22px;border-radius:8px;border:1px solid var(--border);
-    background:var(--bg-elev);color:var(--text);text-decoration:none;
+    padding:13px 22px;border-radius:10px;border:1px solid var(--glass-border);
+    background:var(--glass-fill);color:var(--text);text-decoration:none;
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    box-shadow:var(--glass-shadow-sm);
     display:inline-flex;align-items:center;gap:8px;cursor:pointer;
-    transition:border-color .15s, transform .12s, background .15s;
+    transition:border-color .2s, transform .35s cubic-bezier(.2,.8,.2,1), background .2s, box-shadow .3s;
+    will-change:transform;
   }
-  .btn:hover{border-color:var(--accent);background:var(--bg-elev-2);}
-  .btn:active{transform:translateY(1px);}
-  .btn.primary{background:var(--accent);border-color:var(--accent);color:#111113;}
-  .btn.primary:hover{background:#e0e0e4;}
+  .btn:hover{border-color:var(--glass-border-hover);background:var(--glass-fill-strong);}
+  .btn:active{transform:translateY(1px) scale(.98) !important;}
+  .btn.primary{
+    background:linear-gradient(155deg, #fff, var(--accent) 60%);
+    border-color:rgba(255,255,255,.5);color:#111113;
+    box-shadow:0 14px 34px -14px rgba(199,199,204,.55), inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  .btn.primary:hover{background:linear-gradient(155deg, #fff, #e0e0e4 60%);box-shadow:0 18px 40px -14px rgba(199,199,204,.7), inset 0 1px 0 rgba(255,255,255,.7);}
 
   /* live status card */
+  .status-card-wrap{position:relative;isolation:isolate;}
+  /* the hero's one big orchestrated moment: a slow, liquid blob of light
+     morphing behind the glass status card, its colour drifting through the
+     site's cool/gold/violet accents — reads as light suspended inside the
+     glass rather than a generic decorative blur */
+  .hero-glass-orb{
+    position:absolute;z-index:-1;pointer-events:none;
+    top:50%;left:50%;width:120%;height:120%;
+    transform:translate(-50%,-50%);
+    background:
+      radial-gradient(closest-side, var(--iris-a), transparent 70%) 20% 25% / 65% 65% no-repeat,
+      radial-gradient(closest-side, var(--iris-b), transparent 70%) 80% 30% / 60% 60% no-repeat,
+      radial-gradient(closest-side, var(--iris-c), transparent 70%) 50% 80% / 55% 55% no-repeat;
+    filter:blur(60px) saturate(140%);
+    opacity:.55;
+    animation:orb-morph 18s ease-in-out infinite;
+    border-radius:42% 58% 65% 35% / 45% 40% 60% 55%;
+  }
+  @keyframes orb-morph{
+    0%,100%{border-radius:42% 58% 65% 35% / 45% 40% 60% 55%;transform:translate(-50%,-50%) rotate(0deg) scale(1);}
+    33%{border-radius:60% 40% 35% 65% / 55% 65% 35% 45%;transform:translate(-48%,-52%) rotate(8deg) scale(1.06);}
+    66%{border-radius:35% 65% 55% 45% / 60% 35% 65% 40%;transform:translate(-52%,-48%) rotate(-6deg) scale(.97);}
+  }
+  @media (max-width:880px){.hero-glass-orb{opacity:.4;}}
   .status-card{
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
-    overflow:hidden;box-shadow:0 20px 50px -20px rgba(0,0,0,.6);
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:16px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    overflow:hidden;box-shadow:var(--glass-shadow);
+    position:relative;
   }
   .status-head{
     display:flex;align-items:center;justify-content:space-between;
-    padding:16px 20px;background:var(--bg-elev-2);border-bottom:1px solid var(--border-soft);
+    padding:16px 20px;background:linear-gradient(180deg, rgba(255,255,255,.05), transparent);
+    border-bottom:1px solid var(--glass-border);
   }
   .status-head span.lbl{
     font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--text-dim);
@@ -790,10 +848,11 @@
      so they can never separate from each other when the row wraps */
   .sec-head-main{display:flex;align-items:flex-start;gap:16px;min-width:0;flex:1 1 260px;}
   .sec-head .icon-badge{
-    width:64px;height:64px;border-radius:16px;background:var(--bg-elev);
-    border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
-    overflow:hidden;flex-shrink:0;position:relative;
-    transition:border-color .35s ease, box-shadow .35s ease, transform .35s ease;
+    width:64px;height:64px;border-radius:18px;background:var(--glass-fill);
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;
+    overflow:hidden;flex-shrink:0;position:relative;box-shadow:var(--glass-shadow-sm);
+    transition:border-color .35s ease, box-shadow .35s ease, transform .35s ease, background .35s ease;
   }
   .sec-head .icon-badge img{
     position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:9px;
@@ -809,8 +868,9 @@
   .online-pill{
     margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
     font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--ok);background:var(--bg-elev);border:1px solid var(--border);
-    border-radius:20px;padding:7px 14px;backdrop-filter:blur(6px);white-space:nowrap;
+    color:var(--ok);background:var(--glass-fill);border:1px solid var(--glass-border);
+    border-radius:20px;padding:7px 14px;backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    white-space:nowrap;box-shadow:var(--glass-shadow-sm);
   }
   .online-pill .pulse-dot{background:var(--ok);}
   .online-pill .pulse-dot::after{background:var(--ok);}
@@ -859,8 +919,9 @@
   /* info bar: small "how to connect" / "no install" hint under a section's cards */
   .info-bar{
     display:flex;align-items:flex-start;gap:11px;
-    background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:10px;
-    padding:13px 16px;margin-top:18px;
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:12px;
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    padding:13px 16px;margin-top:18px;box-shadow:var(--glass-shadow-sm);
   }
   .info-bar .info-icon{
     flex-shrink:0;width:17px;height:17px;margin-top:1px;color:var(--text-mute);
@@ -892,11 +953,14 @@
     .card.card-wide .card-wide-actions .link-btn{width:100%;}
   }
 
+  .cards{perspective:1400px;}
   .card{
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
-    padding:20px 20px 18px;position:relative;transition:border-color .18s, transform .18s;
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    box-shadow:var(--glass-shadow);
+    padding:20px 20px 18px;position:relative;
+    transform:rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)) translateY(0) translateZ(0);
   }
-  .card:hover{border-color:#3a3a40;transform:translateY(-2px);}
 
   /* ---- skeleton shimmer (brief "loading" state before a card settles in) ---- */
   .card-skeleton{
@@ -922,17 +986,18 @@
   .card .desc{font-size:13px;color:var(--text-mute);margin:0 0 16px;}
   .ip-row{
     display:flex;align-items:center;justify-content:space-between;gap:10px;
-    background:var(--bg);border:1px solid var(--border-soft);border-radius:8px;
+    background:rgba(0,0,0,.22);border:1px solid var(--border-soft);border-radius:9px;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.35);
     padding:10px 12px;
   }
   .ip-row code{font-family:var(--mono);font-size:13.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .copy-btn{
     flex-shrink:0;display:flex;align-items:center;gap:6px;
-    background:transparent;border:1px solid var(--border);color:var(--text-dim);
-    font-family:var(--mono);font-size:11.5px;padding:7px 10px;border-radius:6px;
+    background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text-dim);
+    font-family:var(--mono);font-size:11.5px;padding:7px 10px;border-radius:7px;
     cursor:pointer;transition:all .15s;
   }
-  .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--glass-fill-strong);}
   .copy-btn.copied{border-color:var(--ok);color:var(--ok);}
   .copy-btn svg{width:13px;height:13px;flex-shrink:0;}
   /* pop-in on the checkmark that replaces the copy icon; low-perf mode
@@ -946,11 +1011,13 @@
 
   .link-btn{
     display:flex;align-items:center;justify-content:center;gap:8px;
-    background:transparent;border:1px solid var(--border);color:var(--text);
+    background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text);
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
     font-family:var(--display);font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;
-    padding:11px 12px;border-radius:8px;text-decoration:none;transition:all .15s;
+    padding:11px 12px;border-radius:9px;text-decoration:none;transition:all .2s;
+    box-shadow:var(--glass-shadow-sm);
   }
-  .link-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .link-btn:hover{border-color:var(--glass-border-hover);color:var(--accent);background:var(--glass-fill-strong);}
 
   /* ---------- CAFECITO / DONACIONES ---------- */
   :root{ --coffee:#d9a441; --coffee-soft:rgba(217,164,65,.12); }
@@ -959,16 +1026,18 @@
   @media (max-width:880px){.cafecito-wrap{grid-template-columns:1fr;}}
 
   .cafecito-card{
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:16px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    box-shadow:var(--glass-shadow);
     padding:26px 26px 24px;position:relative;overflow:hidden;isolation:isolate;
-    transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+    transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease, background .25s ease;
   }
   .cafecito-card.main{display:flex;flex-direction:column;justify-content:space-between;}
   .cafecito-card::before{
-    content:'';position:absolute;inset:0;z-index:-1;opacity:.55;
+    content:'';position:absolute;inset:0;z-index:-1;opacity:.7;
     background:radial-gradient(420px 220px at 8% -10%, var(--coffee-soft), transparent 65%);
   }
-  .cafecito-card:hover{border-color:#4a3a1f;transform:translateY(-3px);box-shadow:0 20px 44px -22px rgba(217,164,65,.25);}
+  .cafecito-card:hover{border-color:rgba(217,164,65,.5);transform:translateY(-4px);box-shadow:0 26px 54px -24px rgba(217,164,65,.35), inset 0 1px 0 rgba(255,255,255,.14);}
 
   .cafecito-msg p{font-size:14px;line-height:1.75;color:var(--text-dim);margin:0 0 14px;max-width:56ch;}
   .cafecito-msg p:last-of-type{margin-bottom:22px;}
@@ -995,11 +1064,12 @@
 
   .perk-list{display:flex;flex-direction:column;gap:12px;}
   .perk-row{
-    display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:9px;
-    background:var(--bg);border:1px solid var(--border-soft);
+    display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:10px;
+    background:rgba(0,0,0,.18);border:1px solid var(--border-soft);
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.3);
     transition:transform .18s ease, border-color .18s ease, background .18s ease;
   }
-  .perk-row:hover{transform:translateX(4px);border-color:#4a3a1f;background:var(--bg-elev-2);}
+  .perk-row:hover{transform:translateX(4px);border-color:#4a3a1f;background:rgba(217,164,65,.08);}
   .perk-icon{
     width:32px;height:32px;border-radius:8px;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
@@ -1073,10 +1143,12 @@
   /* ---------- FAQ ---------- */
   .faq-list{display:flex;flex-direction:column;gap:10px;max-width:820px;margin:0 auto;}
   .faq-item{
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
-    overflow:hidden;transition:border-color .2s;
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    box-shadow:var(--glass-shadow-sm);
+    overflow:hidden;transition:border-color .2s, background .2s;
   }
-  .faq-item:hover{border-color:#3a3a40;}
+  .faq-item:hover{border-color:var(--glass-border-hover);background:var(--glass-fill-strong);}
   .faq-item summary{
     list-style:none;cursor:pointer;padding:18px 20px;
     display:flex;align-items:center;justify-content:space-between;gap:16px;
@@ -1126,11 +1198,13 @@
   :root{ --discord:#5865F2; --discord-soft:rgba(88,101,242,.14); }
   .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:920px;margin:0 auto;}
   .contact-card{
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:16px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    box-shadow:var(--glass-shadow);
     padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;
-    transition:border-color .15s, transform .15s, background .15s;
+    transition:border-color .2s, transform .3s cubic-bezier(.2,.8,.2,1), background .2s, box-shadow .3s;
   }
-  .contact-card:hover{border-color:var(--accent);transform:translateY(-3px);background:var(--bg-elev-2);}
+  .contact-card:hover{border-color:var(--glass-border-hover);transform:translateY(-4px);background:var(--glass-fill-strong);box-shadow:0 26px 54px -24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.14);}
   .contact-icon{
     width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
     margin-bottom:6px;
@@ -1158,23 +1232,26 @@
   /* legacy alias, kept in case .social-btn is referenced elsewhere */
   .social-btn{
     display:flex;align-items:center;gap:10px;
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:12px;
+    backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
     padding:12px 18px;text-decoration:none;color:var(--text);
     font-family:var(--display);font-weight:600;font-size:13.5px;letter-spacing:.02em;
+    box-shadow:var(--glass-shadow-sm);
     transition:border-color .2s, transform .2s, background .2s;
   }
-  .social-btn:hover{border-color:var(--accent);background:var(--bg-elev-2);transform:translateY(-2px);}
+  .social-btn:hover{border-color:var(--glass-border-hover);background:var(--glass-fill-strong);transform:translateY(-2px);}
   .social-btn img{width:20px;height:20px;object-fit:contain;opacity:.85;}
   .social-btn:hover img{opacity:1;}
 
   /* social cards: icon badge + name/handle stacked, glass style */
   .social-card{
     display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;
-    padding:14px 18px;backdrop-filter:blur(8px);
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;
+    padding:14px 18px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    box-shadow:var(--glass-shadow-sm);
     transition:border-color .2s, transform .2s, background .2s, box-shadow .2s;
   }
-  .social-card:hover{border-color:var(--accent);background:var(--bg-elev-2);transform:translateY(-3px);box-shadow:0 16px 34px -18px rgba(0,0,0,.55);}
+  .social-card:hover{border-color:var(--glass-border-hover);background:var(--glass-fill-strong);transform:translateY(-3px);box-shadow:0 20px 40px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.14);}
   .social-icon{
     width:38px;height:38px;border-radius:10px;flex-shrink:0;position:relative;overflow:hidden;
     background:var(--bg);border:1px solid var(--border-soft);
@@ -1192,10 +1269,12 @@
   /* toast */
   #toast{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
-    background:var(--bg-elev-2);border:1px solid var(--ok);color:var(--text);
-    font-family:var(--mono);font-size:13px;padding:11px 18px;border-radius:8px;
+    background:linear-gradient(155deg, rgba(107,191,123,.22), rgba(24,24,27,.6));
+    border:1px solid rgba(107,191,123,.5);color:var(--text);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    font-family:var(--mono);font-size:13px;padding:11px 18px;border-radius:10px;
     opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:100;
-    box-shadow:0 10px 30px -10px rgba(0,0,0,.6);
+    box-shadow:0 14px 36px -12px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.12);
   }
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
@@ -1210,21 +1289,31 @@
   .card{
     overflow:hidden;isolation:isolate;
   }
+  /* specular hotspot that tracks the cursor — the "light hitting glass" highlight.
+     kept at negative z-index, same as the original, so it always paints behind
+     real card content (tag/heading/ip-row) without needing to touch every
+     child's stacking — chain-band / lock-overlay / card-skeleton keep managing
+     their own z-index untouched. */
   .card::before{
     content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;z-index:-1;
-    background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%), rgba(199,199,204,.55), transparent 60%);
+    background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.7), transparent 60%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;mask-composite:exclude;
-    opacity:0;transition:opacity .3s ease;
+    opacity:0;transition:opacity .3s ease;pointer-events:none;
   }
+  /* soft color wash beneath the surface, same tracked position, reads as light refracting through the glass */
   .card::after{
     content:'';position:absolute;inset:0;border-radius:inherit;z-index:-2;
-    background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(199,199,204,.06), transparent 65%);
-    opacity:0;transition:opacity .3s ease;
+    background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%), rgba(199,199,204,.10), transparent 65%);
+    opacity:0;transition:opacity .35s ease;pointer-events:none;
   }
   .card:hover::before, .card:hover::after{opacity:1;}
-  .card{transition:border-color .18s, transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s ease;}
-  .card:hover{transform:translateY(-4px);box-shadow:0 18px 40px -18px rgba(0,0,0,.55);}
+  .card{transition:border-color .2s, transform .12s linear, box-shadow .3s ease, background .3s ease;}
+  .card:hover{
+    border-color:var(--glass-border-hover);
+    transform:rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)) translateY(-6px) translateZ(6px);
+    box-shadow:0 30px 60px -24px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(0,0,0,.3);
+  }
 
   /* ---------- BUTTON SHINE ---------- */
   .btn, .link-btn{position:relative;overflow:hidden;}
@@ -1316,13 +1405,14 @@
     position:fixed;right:20px;bottom:20px;z-index:60;
     width:44px;height:44px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
-    background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
+    background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text-dim);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
     cursor:pointer;opacity:0;visibility:hidden;transform:translateY(10px);
-    transition:opacity .25s ease, transform .25s ease, visibility .25s, border-color .15s, color .15s;
-    box-shadow:0 10px 24px -10px rgba(0,0,0,.5);
+    transition:opacity .25s ease, transform .25s ease, visibility .25s, border-color .15s, color .15s, background .15s;
+    box-shadow:var(--glass-shadow-sm);
   }
   .back-to-top.show{opacity:1;visibility:visible;transform:translateY(0);}
-  .back-to-top:hover{border-color:var(--accent);color:var(--accent);}
+  .back-to-top:hover{border-color:var(--glass-border-hover);color:var(--accent);background:var(--glass-fill-strong);}
   .back-to-top:active{transform:scale(.92);}
   .back-to-top svg{width:19px;height:19px;}
   @media (max-width:640px){
@@ -1336,11 +1426,12 @@
     position:fixed;left:20px;bottom:20px;z-index:70;
     width:56px;height:56px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
-    background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
-    cursor:pointer;box-shadow:0 12px 28px -12px rgba(0,0,0,.55);
+    background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text-dim);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    cursor:pointer;box-shadow:var(--glass-shadow-sm);
     transition:border-color .2s ease, color .2s ease, transform .18s ease, background .2s ease, box-shadow .25s ease;
   }
-  .twitch-chat-toggle:hover{border-color:var(--twitch);color:var(--twitch);background:var(--bg-elev-2);}
+  .twitch-chat-toggle:hover{border-color:var(--twitch);color:var(--twitch);background:var(--glass-fill-strong);}
   .twitch-chat-toggle:active{transform:scale(.9);}
   .twitch-chat-toggle.open{
     border-color:var(--twitch);color:var(--twitch);background:var(--twitch-soft);
@@ -1368,8 +1459,9 @@
   .twitch-chat-panel{
     position:fixed;left:20px;bottom:88px;z-index:69;
     width:340px;height:min(500px,68vh);
-    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
-    box-shadow:0 24px 60px -20px rgba(0,0,0,.65), 0 0 0 1px rgba(145,70,255,.06);
+    background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:16px;
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.65), 0 0 0 1px rgba(145,70,255,.06), inset 0 1px 0 rgba(255,255,255,.1);
     overflow:hidden;display:flex;flex-direction:column;
     transform-origin:bottom left;
     transform:scale(.9) translateY(16px);opacity:0;visibility:hidden;pointer-events:none;
@@ -1380,7 +1472,7 @@
   }
   .twitch-chat-head{
     display:flex;align-items:center;justify-content:space-between;
-    padding:12px 14px;background:var(--bg-elev-2);border-bottom:1px solid var(--border-soft);flex-shrink:0;
+    padding:12px 14px;background:linear-gradient(180deg, rgba(255,255,255,.06), transparent);border-bottom:1px solid var(--glass-border);flex-shrink:0;
   }
   .twitch-chat-title{
     display:flex;align-items:center;gap:8px;
@@ -1608,6 +1700,46 @@
   html.low-perf .eyebrow .dot{animation:none !important;}
   html.low-perf .pulse-dot::after{animation:none !important;display:none !important;}
 
+  /* ---- liquid-glass fallback ---------------------------------------------
+     backdrop-filter/box-shadow/animation are already stripped by the
+     catch-all just below, but a translucent tint with no blur behind it
+     would look washed-out and see-through to the busy background — so
+     every frosted surface gets swapped back to the site's original solid
+     panel colour here. Cheap to paint, same layout, same borders. */
+  html.low-perf header,
+  html.low-perf .btn,
+  html.low-perf .link-btn,
+  html.low-perf .icon-btn,
+  html.low-perf .copy-btn,
+  html.low-perf .status-card,
+  html.low-perf .status-head,
+  html.low-perf .sec-head .icon-badge,
+  html.low-perf .online-pill,
+  html.low-perf .info-bar,
+  html.low-perf .card,
+  html.low-perf .cafecito-card,
+  html.low-perf .faq-item,
+  html.low-perf .contact-card,
+  html.low-perf .social-btn,
+  html.low-perf .social-card,
+  html.low-perf .back-to-top,
+  html.low-perf .twitch-chat-toggle,
+  html.low-perf .twitch-chat-panel,
+  html.low-perf .quick-nav{
+    background:var(--bg-elev) !important;
+    border-color:var(--border) !important;
+  }
+  html.low-perf .status-head,
+  html.low-perf .twitch-chat-head{background:var(--bg-elev-2) !important;}
+  html.low-perf .btn.primary{background:var(--accent) !important;color:#111113 !important;}
+  html.low-perf .btn.coffee{background:linear-gradient(135deg,#e6b355,#c98f2e) !important;}
+  html.low-perf .btn.discord{background:var(--discord) !important;}
+  html.low-perf #toast{background:var(--bg-elev-2) !important;border-color:var(--ok) !important;}
+  html.low-perf .hero-glass-orb{display:none !important;}
+  /* neutralize the cursor-tracked tilt entirely, on top of the JS no longer
+     attaching the listeners once low-perf is known */
+  html.low-perf .card{--rx:0deg !important;--ry:0deg !important;}
+
   html.low-perf *{
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
@@ -1704,7 +1836,9 @@
       </div>
     </div>
 
-    <div class="status-card">
+    <div class="status-card-wrap">
+      <div class="hero-glass-orb" aria-hidden="true"></div>
+      <div class="status-card">
       <div class="status-head">
         <span class="lbl">Estado de los servidores</span>
         <span class="all-ok warn">
@@ -1753,6 +1887,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </section>
 
@@ -2831,15 +2966,63 @@
   })();
 </script>
 <script>
-  // card cursor-glow: track pointer position per card for the radial highlight
+  // card cursor-glow + tilt: track pointer position per card for the radial
+  // highlight, and derive a subtle 3D tilt from the same coordinates (the
+  // "glass catching the light as it turns" effect). Skipped on touch and
+  // reduced-motion, and killed instantly if low-perf triggers mid-session.
   (function(){
     if(window.matchMedia('(pointer: coarse)').matches) return; // skip on touch
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let tiltEnabled = !window.__LOW_PERF__;
+    window.addEventListener('lowperf:on', ()=>{
+      tiltEnabled = false;
+      document.querySelectorAll('.card').forEach(card=>{
+        card.style.removeProperty('--rx');
+        card.style.removeProperty('--ry');
+      });
+    });
+    const MAX_TILT = 6; // degrees — kept small so it reads as glass, not a toy
     document.querySelectorAll('.card').forEach(card=>{
       card.addEventListener('mousemove', (e)=>{
         const r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
-        card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+        const px = (e.clientX - r.left) / r.width;
+        const py = (e.clientY - r.top) / r.height;
+        card.style.setProperty('--mx', (px * 100) + '%');
+        card.style.setProperty('--my', (py * 100) + '%');
+        if(!tiltEnabled) return;
+        card.style.setProperty('--rx', ((px - 0.5) * MAX_TILT * 2).toFixed(2) + 'deg');
+        card.style.setProperty('--ry', ((0.5 - py) * MAX_TILT * 2).toFixed(2) + 'deg');
       });
+      card.addEventListener('mouseleave', ()=>{
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      });
+    });
+  })();
+</script>
+<script>
+  // magnetic primary buttons: a small, capped pull toward the cursor while
+  // hovering, snapping back on leave. Desktop + fine pointer only, and
+  // skipped entirely once low-perf is known (mirrors the tilt script above).
+  (function(){
+    if(window.matchMedia('(pointer: coarse)').matches) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if(window.__LOW_PERF__) return;
+    let stopped = false;
+    window.addEventListener('lowperf:on', ()=>{
+      stopped = true;
+      document.querySelectorAll('.btn.primary, .btn.coffee').forEach(btn=> btn.style.transform = '');
+    });
+    const MAX_PULL = 7; // px
+    document.querySelectorAll('.btn.primary, .btn.coffee').forEach(btn=>{
+      btn.addEventListener('mousemove', (e)=>{
+        if(stopped) return;
+        const r = btn.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        btn.style.transform = `translate(${(px * MAX_PULL * 2).toFixed(1)}px, ${(py * MAX_PULL * 2).toFixed(1)}px)`;
+      });
+      btn.addEventListener('mouseleave', ()=>{ btn.style.transform = ''; });
     });
   })();
 </script>
