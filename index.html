@@ -1284,6 +1284,13 @@
   .cards .reveal{transition-delay:calc(var(--i,0) * 70ms);}
   .faq-list .reveal{transition-delay:calc(var(--i,0) * 55ms);}
   .social-row .reveal{transition-delay:calc(var(--i,0) * 60ms);}
+  /* the staggered entrance delay above is only meant for the initial
+     scroll-in animation. Once an element has already revealed (JS adds
+     .in via IntersectionObserver), reset the delay to 0 — otherwise it
+     keeps applying to every future transition on that element, including
+     the hover tilt/glow, making cards 2/3/4 feel laggy on hover while
+     card 1 (delay 0 to begin with) feels instant. */
+  .cards .reveal.in, .faq-list .reveal.in, .social-row .reveal.in{transition-delay:0s;}
 
   /* ---------- CARD GLOW / HOVER UPGRADE ---------- */
   .card{
@@ -1299,16 +1306,17 @@
     background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.7), transparent 60%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;mask-composite:exclude;
-    opacity:0;transition:opacity .3s ease;pointer-events:none;
+    opacity:0;transition:opacity .08s ease-out;pointer-events:none;
   }
   /* soft color wash beneath the surface, same tracked position, reads as light refracting through the glass */
   .card::after{
     content:'';position:absolute;inset:0;border-radius:inherit;z-index:-2;
     background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%), rgba(199,199,204,.10), transparent 65%);
-    opacity:0;transition:opacity .35s ease;pointer-events:none;
+    opacity:0;transition:opacity .1s ease-out;pointer-events:none;
   }
   .card:hover::before, .card:hover::after{opacity:1;}
-  .card{transition:border-color .2s, transform .12s linear, box-shadow .3s ease, background .3s ease;}
+  /* transform reacts fast so the tilt feels instant under the cursor */
+  .card{transition:border-color .2s, transform .05s linear, box-shadow .3s ease, background .3s ease;}
   .card:hover{
     border-color:var(--glass-border-hover);
     transform:rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)) translateY(-6px) translateZ(6px);
@@ -1534,6 +1542,9 @@
     font-family:var(--mono);font-size:11px;color:var(--text-mute);
     border:1px solid var(--border-soft);border-radius:20px;padding:3px 10px;
     letter-spacing:.06em;order:-1;
+    align-self:flex-start; /* .sec-head-copy is a column flexbox, so without
+      this the pill stretches to the container's full width instead of
+      hugging its own text */
   }
   .sec-head.center .sec-index{order:0;}
 
@@ -1736,9 +1747,9 @@
   html.low-perf .btn.discord{background:var(--discord) !important;}
   html.low-perf #toast{background:var(--bg-elev-2) !important;border-color:var(--ok) !important;}
   html.low-perf .hero-glass-orb{display:none !important;}
-  /* neutralize the cursor-tracked tilt entirely, on top of the JS no longer
-     attaching the listeners once low-perf is known */
-  html.low-perf .card{--rx:0deg !important;--ry:0deg !important;}
+  /* tilt (--rx/--ry) is intentionally left working in low-perf mode — it's
+     a cheap per-event transform, not a continuous animation, so it's kept
+     even for weaker devices; only the costly stuff below gets stripped */
 
   html.low-perf *{
     backdrop-filter:none !important;
@@ -1850,7 +1861,7 @@
         <div class="status-row">
           <div class="status-row-info">
             <div class="status-icon">
-              <img src="assets/logo_minecraft.png" alt="">
+              <img src="assets/minecraft_color.png" alt="">
             </div>
             <div>
               <div class="name">Minecraft</div>
@@ -1862,7 +1873,7 @@
         <div class="status-row">
           <div class="status-row-info">
             <div class="status-icon">
-              <img src="assets/logo_cs_transparent.png" alt="">
+              <img src="assets/logo_cs2.png" alt="">
             </div>
             <div>
               <div class="name">Counter-Strike 1.6</div>
@@ -1874,7 +1885,7 @@
         <div class="status-row">
           <div class="status-row-info">
             <div class="status-icon">
-              <img src="assets/logo_leianet_star.png" alt="">
+              <img src="assets/logo_leianet_star_color.png" alt="">
             </div>
             <div>
               <div class="name">Haxball</div>
@@ -2969,18 +2980,17 @@
   // card cursor-glow + tilt: track pointer position per card for the radial
   // highlight, and derive a subtle 3D tilt from the same coordinates (the
   // "glass catching the light as it turns" effect). Skipped on touch and
-  // reduced-motion, and killed instantly if low-perf triggers mid-session.
+  // reduced-motion. Kept ON even in low-perf mode: it's just a per-event
+  // transform update (no continuous animation loop), so it's cheap — the
+  // actually expensive parts (blur, box-shadow) are the ones low-perf strips
+  // elsewhere. Previously this was disabled in low-perf, which meant the
+  // tilt would silently stop working mid-session for anyone whose device
+  // auto-tripped low-perf (low FPS in the first 5s / low core count), making
+  // it look like only the first few cards touched before that point "had"
+  // the effect.
   (function(){
     if(window.matchMedia('(pointer: coarse)').matches) return; // skip on touch
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let tiltEnabled = !window.__LOW_PERF__;
-    window.addEventListener('lowperf:on', ()=>{
-      tiltEnabled = false;
-      document.querySelectorAll('.card').forEach(card=>{
-        card.style.removeProperty('--rx');
-        card.style.removeProperty('--ry');
-      });
-    });
     const MAX_TILT = 6; // degrees — kept small so it reads as glass, not a toy
     document.querySelectorAll('.card').forEach(card=>{
       card.addEventListener('mousemove', (e)=>{
@@ -2989,7 +2999,6 @@
         const py = (e.clientY - r.top) / r.height;
         card.style.setProperty('--mx', (px * 100) + '%');
         card.style.setProperty('--my', (py * 100) + '%');
-        if(!tiltEnabled) return;
         card.style.setProperty('--rx', ((px - 0.5) * MAX_TILT * 2).toFixed(2) + 'deg');
         card.style.setProperty('--ry', ((0.5 - py) * MAX_TILT * 2).toFixed(2) + 'deg');
       });
