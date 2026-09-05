@@ -1091,6 +1091,26 @@
   .card.locked > *{filter:saturate(.6) brightness(.62);}
   .card.locked .copy-btn{pointer-events:none;}
   .card.locked .link-btn{pointer-events:none;}
+  .card.new-server{
+    position:relative;
+    border-color:rgba(107,191,123,.55);
+    box-shadow:0 0 0 1px rgba(107,191,123,.25), 0 0 30px -6px rgba(107,191,123,.55), 0 0 60px -18px rgba(107,191,123,.45);
+    animation:newServerGlow 2.4s ease-in-out infinite;
+  }
+  .card.new-server:hover{border-color:rgba(107,191,123,.8);}
+  @keyframes newServerGlow{
+    0%,100%{box-shadow:0 0 0 1px rgba(107,191,123,.25), 0 0 30px -6px rgba(107,191,123,.55), 0 0 60px -18px rgba(107,191,123,.45);}
+    50%{box-shadow:0 0 0 1px rgba(107,191,123,.4), 0 0 42px -4px rgba(107,191,123,.75), 0 0 80px -14px rgba(107,191,123,.55);}
+  }
+  html.low-perf .card.new-server{animation:none;}
+  .card.new-server .new-badge{
+    position:absolute;top:14px;right:14px;z-index:2;
+    font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ok);background:rgba(107,191,123,.14);border:1px solid rgba(107,191,123,.5);
+    padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:5px;
+  }
+  .card.new-server .new-badge .pulse-dot{width:6px;height:6px;background:var(--ok);}
+  .card.new-server .new-badge .pulse-dot::after{background:var(--ok);}
 
   .chain-band{
     position:absolute;left:-25%;width:150%;height:30px;z-index:2;opacity:.94;
@@ -2022,7 +2042,8 @@
     </div>
     <div class="cards">
 
-      <div class="card reveal" style="--i:0">
+      <div class="card new-server reveal" style="--i:0">
+        <span class="new-badge"><span class="pulse-dot"></span>Nuevo</span>
         <span class="tag">Mixto</span>
         <h3>CS 1.6</h3>
         <p class="desc">Rotación de mapas estándar</p>
