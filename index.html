@@ -1880,7 +1880,10 @@
               <div class="sub">3 servidores</div>
             </div>
           </div>
-          <div class="status-pill offline"><span class="pulse-dot"></span> Offline</div>
+          <div class="status-pill warn">
+            <svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+            A medias
+          </div>
         </div>
         <div class="status-row">
           <div class="status-row-info">
@@ -2015,31 +2018,20 @@
           <p class="sec-sub">Tres modos clásicos, sin vueltas.</p>
         </div>
       </div>
-      <span class="online-pill warn"><span class="pulse-dot"></span>0/3 ONLINE</span>
+      <span class="online-pill warn"><span class="pulse-dot"></span>1/3 ONLINE</span>
     </div>
     <div class="cards">
 
-      <div class="card locked reveal" style="--i:0">
+      <div class="card reveal" style="--i:0">
         <span class="tag">Mixto</span>
         <h3>CS 1.6</h3>
         <p class="desc">Rotación de mapas estándar</p>
         <div class="ip-row">
-          <code>cs.leianet.ar</code>
-          <button class="copy-btn" data-copy="cs.leianet.ar">
+          <code>cs.leianet.ar:666</code>
+          <button class="copy-btn" data-copy="cs.leianet.ar:666">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar
           </button>
-        </div>
-        <div class="chain-band top"></div>
-        <div class="chain-band bottom"></div>
-        <div class="lock-overlay">
-          <div class="lock-badge">
-            <div class="lock-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
-            </div>
-            <div class="lock-title">NO DISPONIBLE</div>
-            <div class="lock-sub">Por ahora</div>
-          </div>
         </div>
       </div>
 
@@ -2703,6 +2695,27 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=> toast.classList.remove('show'), 1800);
   }
+
+  window.addEventListener('load', ()=>{
+    setTimeout(()=>{
+      clearTimeout(toastTimer);
+      toast.textContent = 'NUEVO SERVIDOR HABILITADO';
+      toast.classList.add('show');
+
+      const cs16Section = document.getElementById('cs16');
+      if(cs16Section){
+        const hideOnReach = new IntersectionObserver((entries)=>{
+          entries.forEach(entry=>{
+            if(entry.isIntersecting){
+              toast.classList.remove('show');
+              hideOnReach.disconnect();
+            }
+          });
+        }, { threshold: 0.15 });
+        hideOnReach.observe(cs16Section);
+      }
+    }, 900);
+  });
 
   document.querySelectorAll('.copy-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
