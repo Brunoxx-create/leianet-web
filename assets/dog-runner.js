@@ -160,9 +160,9 @@
   var intensity = 0;
 
   var dog = {
-    x: 90, y: 0, w: 92, h: 46,
+    x: 90, y: 0, w: 132, h: 66,
     jumping: false, jumpStart: 0,
-    jumpDur: 600, jumpHeight: 118
+    jumpDur: 600, jumpHeight: 150
   };
 
   function computeGround(){
@@ -245,12 +245,18 @@
   }
 
   function obstacleBox(o){
-    return { x:o.x - o.w*0.40, y: GROUND_Y - o.h*0.95, w:o.w*0.80, h:o.h*0.95 };
+    // Antes usaba casi el sprite entero (80% ancho / 95% alto), lo que
+    // hacía que a veces "tocara" antes de lo que se veía visualmente.
+    // Ahora es más chico que el sprite real para dar margen de perdón.
+    return { x:o.x - o.w*0.30, y: GROUND_Y - o.h*0.82, w:o.w*0.60, h:o.h*0.82 };
   }
 
   /* ---------------- perro ---------------- */
   function dogHitbox(){
-    return { x: dog.x + dog.w*0.18, y: dog.y + dog.h*0.15, w: dog.w*0.64, h: dog.h*0.75 };
+    // Hitbox más chica que el sprite (antes 64%/75% del cuerpo, muy
+    // ajustada) para que el jugador tenga margen real y no pierda por
+    // rozar de casualidad con una pata o la cola.
+    return { x: dog.x + dog.w*0.28, y: dog.y + dog.h*0.24, w: dog.w*0.46, h: dog.h*0.60 };
   }
 
   function updateDogY(now){
