@@ -170,6 +170,85 @@
 }
 
 /* ============================================================
+   Aviso "girá tu teléfono" — se muestra sobre el canvas cuando el
+   juego está abierto en un celular con orientación vertical.
+   ============================================================ */
+#dr-rotate{
+  display:none;
+  position:absolute;inset:0;z-index:5;
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:#0c0c0e;
+  text-align:center;padding:24px;
+}
+#dr-rotate.dr-show{display:flex;}
+#dr-rotate-icon{
+  width:46px;height:46px;color:#c7c7cc;
+  animation:dr-rotate-spin 1.6s ease-in-out infinite;
+}
+@keyframes dr-rotate-spin{
+  0%,100%{transform:rotate(0deg);}
+  50%{transform:rotate(-90deg);}
+}
+#dr-rotate p{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px;
+  color:#ededee;margin:0;letter-spacing:.02em;
+}
+#dr-rotate p span{
+  display:block;margin-top:6px;
+  font-family:'JetBrains Mono',monospace;font-weight:400;
+  font-size:11px;color:#a9aaaf;letter-spacing:0;
+}
+html.low-perf #dr-rotate-icon,
+html.perf-mid #dr-rotate-icon{
+  animation:none !important;
+}
+
+/* ============================================================
+   Móvil: que el modal entre entero en pantalla (sobre todo en
+   horizontal, donde la altura disponible es chica) en vez de
+   quedar cortado o forzar scroll dentro del popup.
+   ============================================================ */
+@media (max-width:880px){
+  #dr-overlay{padding:6px;}
+  #dr-box{
+    width:100%;max-width:100%;
+    padding:8px 10px 10px;
+    max-height:100vh;max-height:100dvh;
+    display:flex;flex-direction:column;
+  }
+  #dr-canvas-wrap{
+    aspect-ratio:auto;
+    flex:1 1 auto;
+    min-height:0;
+  }
+  #dr-topbar{margin-bottom:6px;}
+}
+@media (max-width:880px) and (orientation:landscape){
+  #dr-footer-hint{margin-top:6px;font-size:10px;}
+  #dr-title{font-size:12px;}
+  #dr-close{width:26px;height:26px;}
+}
+/* pantallas de celular muy bajas en horizontal (ej. la mayoría de
+   los teléfonos comunes): achicar todo lo que ocupa espacio fijo */
+@media (max-width:900px) and (orientation:landscape) and (max-height:480px){
+  #dr-overlay{padding:4px;}
+  #dr-box{padding:6px 8px 8px;}
+  #dr-topbar{margin-bottom:4px;}
+  #dr-footer-hint{display:none;}
+  #dr-hud{top:6px;right:8px;font-size:11px;padding:3px 8px;}
+  #dr-hud .dr-best{margin-left:8px;}
+  #dr-countdown{font-size:34px;}
+  #dr-rotate-icon{width:36px;height:36px;}
+  #dr-rotate p{font-size:13px;}
+  #dr-over-card{padding:12px 16px;}
+  #dr-sad-dog{height:56px;margin-bottom:6px;}
+  #dr-over-card h3{font-size:13px;margin-bottom:4px;}
+  #dr-over-card .dr-score-big{font-size:17px;margin-bottom:2px;}
+  #dr-over-card .dr-score-best{font-size:10px;margin-bottom:10px;}
+  .dr-btn{padding:8px 16px;font-size:11px;}
+}
+
+/* ============================================================
    Modo rendimiento — respeta html.low-perf / html.perf-mid
    (el mismo sistema que ya usa el resto de leianet.ar)
    ============================================================ */
