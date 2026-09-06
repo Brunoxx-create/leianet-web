@@ -16,7 +16,7 @@
 
 #dr-box{
   position:relative;
-  width:min(880px,94vw);
+  width:min(1180px,96vw);
   background:#0f0f11;
   border:1px solid #2b2b30;
   border-radius:14px;
@@ -59,7 +59,7 @@
 #dr-canvas-wrap{
   position:relative;z-index:1;
   width:100%;
-  aspect-ratio:16/7;
+  aspect-ratio:16/6.4;
   border-radius:10px;
   overflow:hidden;
   background:#0c0c0e;
