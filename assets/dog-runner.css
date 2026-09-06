@@ -1,0 +1,212 @@
+/* ============================================================
+   LeiaNET — Border Collie Runner (easter egg) — v3
+   ============================================================ */
+
+#dr-overlay{
+  position:fixed;inset:0;z-index:9999;
+  display:none;
+  align-items:center;justify-content:center;
+  background:rgba(6,6,8,.88);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  font-family:'Inter',sans-serif;
+  opacity:0;
+  transition:opacity .25s ease;
+}
+#dr-overlay.dr-open{display:flex;opacity:1;}
+
+#dr-box{
+  position:relative;
+  width:min(880px,94vw);
+  background:#0f0f11;
+  border:1px solid #2b2b30;
+  border-radius:14px;
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.7);
+  padding:18px 18px 22px;
+  transform:translateY(10px) scale(.98);
+  transition:transform .25s ease;
+  overflow:hidden;
+}
+#dr-overlay.dr-open #dr-box{transform:translateY(0) scale(1);}
+
+/* leve textura de grano + nebulosa de fondo alrededor del modal, igual estética que el sitio */
+#dr-box::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(500px 260px at 10% -10%, rgba(217,164,65,.05), transparent 60%),
+    radial-gradient(420px 240px at 95% 105%, rgba(255,255,255,.03), transparent 55%);
+}
+
+#dr-topbar{
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+#dr-title{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:15px;letter-spacing:.04em;text-transform:uppercase;
+  color:#ededee;
+}
+#dr-title span{color:#c7c7cc;}
+#dr-close{
+  width:30px;height:30px;border-radius:8px;
+  border:1px solid #2b2b30;background:#18181b;color:#a9aaaf;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;line-height:1;
+  transition:border-color .15s,color .15s;
+}
+#dr-close:hover{border-color:#c7c7cc;color:#ededee;}
+
+#dr-canvas-wrap{
+  position:relative;z-index:1;
+  width:100%;
+  aspect-ratio:16/7;
+  border-radius:10px;
+  overflow:hidden;
+  background:#0c0c0e;
+  border:1px solid #232326;
+}
+
+/* nebulosa dinámica del juego: cambia de color con la dificultad (JS la actualiza) */
+#dr-bg-nebula{
+  position:absolute;inset:0;z-index:0;
+  transition:background 1.2s ease;
+  background:
+    radial-gradient(650px 320px at 15% -10%, rgba(110,140,255,.16), transparent 60%),
+    radial-gradient(600px 320px at 85% 110%, rgba(217,164,65,.14), transparent 60%);
+}
+/* grid muy sutil, igual espíritu que el sitio */
+#dr-canvas-wrap::after{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:36px 36px;
+  mask-image:radial-gradient(ellipse 100% 70% at 50% 30%, black 0%, transparent 75%);
+}
+
+#dr-canvas{
+  position:relative;z-index:1;
+  display:block;width:100%;height:100%;
+  touch-action:manipulation;
+  image-rendering:pixelated;
+  image-rendering:-moz-crisp-edges;
+  image-rendering:crisp-edges;
+}
+
+#dr-hud{
+  position:absolute;top:10px;right:14px;z-index:2;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;color:#ededee;
+  background:rgba(15,15,17,.55);
+  padding:4px 10px;border-radius:6px;
+  border:1px solid rgba(255,255,255,.08);
+  pointer-events:none;
+}
+#dr-hud .dr-best{color:#a9aaaf;margin-left:10px;}
+
+#dr-msg-layer{
+  position:absolute;inset:0;z-index:3;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;pointer-events:none;
+}
+#dr-msg-layer.dr-hide{display:none;}
+
+#dr-countdown{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:64px;color:#ededee;
+  text-shadow:0 0 30px rgba(199,199,204,.4);
+}
+
+#dr-over-card{
+  pointer-events:auto;
+  background:rgba(15,15,17,.78);
+  border:1px solid #2b2b30;
+  border-radius:12px;
+  padding:22px 26px;
+  max-width:80%;
+}
+#dr-sad-dog{
+  display:block;
+  margin:0 auto 10px;
+  width:auto;height:132px;
+  max-width:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.45));
+}
+@media (max-width:600px){
+  #dr-sad-dog{height:104px;}
+}
+#dr-over-card h3{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:19px;
+  color:#ededee;margin:0 0 8px;
+}
+#dr-over-card .dr-score-big{
+  font-family:'JetBrains Mono',monospace;font-size:28px;color:#c7c7cc;margin-bottom:4px;
+}
+#dr-over-card .dr-score-best{
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:#706f74;margin-bottom:16px;
+}
+
+.dr-btn{
+  font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12.5px;
+  letter-spacing:.04em;text-transform:uppercase;
+  padding:11px 20px;border-radius:8px;border:1px solid #c7c7cc;
+  background:#c7c7cc;color:#111113;cursor:pointer;
+  transition:background .15s,transform .1s;
+}
+.dr-btn:hover{background:#e0e0e4;}
+.dr-btn:active{transform:translateY(1px);}
+
+#dr-footer-hint{
+  position:relative;z-index:1;
+  margin-top:10px;text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:#706f74;
+}
+
+@media (max-width:600px){
+  #dr-countdown{font-size:46px;}
+  #dr-over-card h3{font-size:16px;}
+  #dr-over-card .dr-score-big{font-size:22px;}
+}
+
+/* ============================================================
+   Modo rendimiento — respeta html.low-perf / html.perf-mid
+   (el mismo sistema que ya usa el resto de leianet.ar)
+   ============================================================ */
+html.low-perf #dr-overlay,
+html.perf-mid #dr-overlay{
+  backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+  background:rgba(6,6,8,.95) !important;
+}
+html.low-perf #dr-box,
+html.perf-mid #dr-box{
+  box-shadow:none !important;
+  transition:none !important;
+  transform:none !important;
+}
+html.low-perf #dr-box::before,
+html.perf-mid #dr-box::before,
+html.low-perf #dr-canvas-wrap::after,
+html.perf-mid #dr-canvas-wrap::after{
+  display:none !important;
+}
+html.low-perf #dr-bg-nebula,
+html.perf-mid #dr-bg-nebula{
+  transition:none !important;
+}
+html.low-perf #dr-hud,
+html.perf-mid #dr-hud{
+  background:var(--bg-elev,#18181b) !important;
+}
+html.low-perf #dr-countdown,
+html.perf-mid #dr-countdown{
+  text-shadow:none !important;
+}
+html.low-perf #dr-over-card,
+html.perf-mid #dr-over-card{
+  background:var(--bg-elev,#18181b) !important;
+}
+html.low-perf .dr-btn,
+html.perf-mid .dr-btn{
+  transition:none !important;
+}
