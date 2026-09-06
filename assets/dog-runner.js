@@ -19,6 +19,7 @@
 
   var IMG_RUN1 = ASSET_PATH + 'dog_run1.png';
   var IMG_RUN2 = ASSET_PATH + 'dog_run2.png';
+  var IMG_JUMP = ASSET_PATH + 'dog_jump.png';
   var SND_JUMP = ASSET_PATH + 'saltar.mp3';
   var SND_MUSIC = ASSET_PATH + 'musica.mp3';
 
@@ -82,6 +83,9 @@
   var runImgs = [new Image(), new Image()];
   runImgs[0].src = IMG_RUN1;
   runImgs[1].src = IMG_RUN2;
+
+  var jumpImg = new Image();
+  jumpImg.src = IMG_JUMP;
 
   var jumpSound = new Audio(SND_JUMP);
   var music = new Audio(SND_MUSIC);
@@ -214,12 +218,22 @@
     var baseH = 40 + Math.random()*24 + intensity*10;
     var o1 = makeObstacle(W + 20, baseH, pickObstacleType());
     obstacles.push(o1);
-    var double = Math.random() < (0.10 + intensity*0.12);
+    // Antes el hueco entre un par de obstáculos era una distancia fija
+    // en píxeles. A velocidad alta (más intensidad) esa misma distancia
+    // se cruza en mucho menos tiempo real, así que a veces el par
+    // quedaba directamente imposible de esquivar. Ahora el hueco se
+    // calcula en función de la velocidad actual para mantener siempre
+    // el mismo margen real de reacción/salto, y a intensidad muy alta
+    // directamente no se generan pares.
+    var doubleChance = intensity > 0.82 ? 0 : (0.10 + intensity*0.08);
+    var double = Math.random() < doubleChance;
     if (double){
       var baseH2 = baseH * 0.82;
-      var gapX = o1.x + o1.w/2 + 42 + baseH2*0.6;
+      var minGapSteps = 22; // ~366ms a 60fps, deja margen para saltar
+      var gapX = o1.x + o1.w/2 + Math.max(minGapSteps * speed, 90) + baseH2*0.5;
       obstacles.push(makeObstacle(gapX, baseH2, pickObstacleType()));
     }
+    return double;
   }
 
   function drawObstacle(o){
@@ -248,7 +262,8 @@
   }
 
   function drawDog(now){
-    var img = dog.jumping ? runImgs[0] : runImgs[runFrameIndex];
+    var jumpReady = jumpImg.complete && jumpImg.naturalWidth > 0;
+    var img = dog.jumping ? (jumpReady ? jumpImg : runImgs[0]) : runImgs[runFrameIndex];
     if (!img.complete || img.naturalWidth === 0) return;
     drawPixelShadow(dog.x + dog.w/2, dog.w*0.8, GROUND_Y+2);
     if (dog.jumping){
@@ -358,7 +373,9 @@
       // huecos imposibles de esquivar). Ahora el minimo deja siempre
       // margen para completar un salto entero antes del siguiente spawn.
       nextSpawnIn = Math.max(42, 74 - intensity*32) + Math.random()*28;
-      spawnObstacle();
+      // Si el spawn que acaba de salir fue un par doble, le damos un
+      // colchón extra al próximo para no encimarle un tercer obstáculo.
+      if (spawnObstacle()) { nextSpawnIn += 20; }
     }
     for (var i = obstacles.length-1; i>=0; i--){
       var o = obstacles[i];
