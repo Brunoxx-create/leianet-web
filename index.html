@@ -51,6 +51,14 @@
     // API publica — usada por el toggle manual de rendimiento del header.
     window.__enableLowPerf = function(reason){ applyTier('low', reason || 'manual'); };
     window.__disableLowPerf = function(){ applyTier('full', 'manual'); };
+    // API publica generica — permite a otros scripts (ej. el minijuego)
+    // forzar un tier exacto ('full'|'mid'|'low'|'ultra') sin tocar la
+    // eleccion manual guardada en localStorage, para poder restaurarla
+    // despues tal cual estaba.
+    window.__setPerfTier = function(tier, reason){
+      if(TIERS.indexOf(tier) === -1) return;
+      applyTier(tier, reason || 'external');
+    };
 
     // 0) eleccion manual explicita del usuario: gana siempre, sin medir nada.
     var manual = null;
@@ -613,6 +621,7 @@
       };
       syncPerfToggle();
       window.addEventListener('lowperf:on', syncPerfToggle);
+      window.addEventListener('perftier:change', syncPerfToggle);
       perfToggle.addEventListener('click', ()=>{
         const goingLow = !window.__LOW_PERF__;
         if(goingLow){
@@ -987,4 +996,4 @@
     });
   })();
 </script>
-</body></html>
+<link rel="stylesheet" href="assets/dog-runner.css"><script src="assets/dog-runner.js"></script></body></html>
