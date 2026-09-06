@@ -160,9 +160,9 @@
   var intensity = 0;
 
   var dog = {
-    x: 90, y: 0, w: 132, h: 66,
+    x: 70, y: 0, w: 114, h: 57,
     jumping: false, jumpStart: 0,
-    jumpDur: 600, jumpHeight: 150
+    jumpDur: 600, jumpHeight: 138
   };
 
   function computeGround(){
@@ -229,8 +229,8 @@
     var double = Math.random() < doubleChance;
     if (double){
       var baseH2 = baseH * 0.82;
-      var minGapSteps = 22; // ~366ms a 60fps, deja margen para saltar
-      var gapX = o1.x + o1.w/2 + Math.max(minGapSteps * speed, 90) + baseH2*0.5;
+      var minGapSteps = 26; // ~433ms a 60fps, más colchón que antes
+      var gapX = o1.x + o1.w/2 + Math.max(minGapSteps * speed, 110) + baseH2*0.5;
       obstacles.push(makeObstacle(gapX, baseH2, pickObstacleType()));
     }
     return double;
@@ -378,7 +378,7 @@
       // menos que los 600ms que dura el salto, lo que podia generar
       // huecos imposibles de esquivar). Ahora el minimo deja siempre
       // margen para completar un salto entero antes del siguiente spawn.
-      nextSpawnIn = Math.max(42, 74 - intensity*32) + Math.random()*28;
+      nextSpawnIn = Math.max(52, 88 - intensity*34) + Math.random()*30;
       // Si el spawn que acaba de salir fue un par doble, le damos un
       // colchón extra al próximo para no encimarle un tercer obstáculo.
       if (spawnObstacle()) { nextSpawnIn += 20; }
