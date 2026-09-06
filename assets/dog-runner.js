@@ -37,6 +37,10 @@
         '<div id="dr-bg-nebula"></div>' +
         '<canvas id="dr-canvas"></canvas>' +
         '<div id="dr-hud">SCORE <b id="dr-score">0</b><span class="dr-best">BEST <b id="dr-best">0</b></span></div>' +
+        '<div id="dr-rotate">' +
+          '<svg id="dr-rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg>' +
+          '<p id="dr-rotate-text">Girá tu teléfono<span>Este minijuego se juega en horizontal</span></p>' +
+        '</div>' +
         '<div id="dr-msg-layer">' +
           '<div id="dr-countdown" style="display:none"></div>' +
           '<div id="dr-over-card" style="display:none">' +
@@ -64,6 +68,7 @@
   var closeBtn = overlay.querySelector('#dr-close');
   var bgNebula = overlay.querySelector('#dr-bg-nebula');
   var countdownEl = overlay.querySelector('#dr-countdown');
+  var rotateOverlay = overlay.querySelector('#dr-rotate');
 
   var best = parseInt(localStorage.getItem(LS_BEST) || '0', 10);
   bestEl.textContent = best;
@@ -378,6 +383,7 @@
   }
 
   /* ---------------- flujo ---------------- */
+  var countdownIv = null;
   function startCountdown(){
     overCard.style.display = 'none';
     msgLayer.classList.remove('dr-hide');
@@ -385,14 +391,16 @@
     countdownVal = 5;
     countdownEl.style.display = 'block';
     countdownEl.textContent = countdownVal;
-    var iv = setInterval(function(){
+    if (countdownIv){ clearInterval(countdownIv); }
+    countdownIv = setInterval(function(){
       countdownVal--;
       if (countdownVal > 0){
         countdownEl.textContent = countdownVal;
       } else if (countdownVal === 0){
         countdownEl.textContent = '¡YA!';
       } else {
-        clearInterval(iv);
+        clearInterval(countdownIv);
+        countdownIv = null;
         countdownEl.style.display = 'none';
         beginPlay();
       }
@@ -452,6 +460,42 @@
     savedPerfTier = null;
   }
 
+  /* ---------------- soporte móvil: pedir horizontal ---------------- */
+  // En celulares (mismo breakpoint que ya usa el resto del sitio) el
+  // juego necesita ancho para jugarse cómodo, así que si el teléfono
+  // está en vertical mostramos un aviso pidiendo girarlo, en vez de
+  // arrancar el juego apretado en una franja angosta.
+  var rotateBlocking = false;
+  var mqMobile = window.matchMedia('(max-width:880px)');
+  function needsRotate(){
+    return mqMobile.matches && window.innerWidth < window.innerHeight;
+  }
+
+  function handleViewportChange(){
+    if (!overlay.classList.contains('dr-open')) return;
+    var blocked = needsRotate();
+    if (blocked && !rotateBlocking){
+      rotateBlocking = true;
+      if (countdownIv){ clearInterval(countdownIv); countdownIv = null; }
+      if (state === 'playing'){ try { music.pause(); } catch(e){} }
+      state = 'idle';
+      msgLayer.classList.add('dr-hide');
+      overCard.style.display = 'none';
+      rotateOverlay.classList.add('dr-show');
+    } else if (!blocked && rotateBlocking){
+      rotateBlocking = false;
+      rotateOverlay.classList.remove('dr-show');
+      resizeCanvas();
+      computeGround();
+      initStars();
+      startCountdown();
+    } else if (!blocked){
+      resizeCanvas();
+      computeGround();
+      initStars();
+    }
+  }
+
   function openGame(){
     loadObstacleImages();
     forceLowPerfWhilePlaying();
@@ -467,13 +511,22 @@
     drawGround(0);
     overCard.style.display = 'none';
     document.addEventListener('keydown', onKeyDown);
-    startCountdown();
+    rotateBlocking = needsRotate();
+    if (rotateBlocking){
+      rotateOverlay.classList.add('dr-show');
+    } else {
+      rotateOverlay.classList.remove('dr-show');
+      startCountdown();
+    }
   }
 
   function closeGame(){
     overlay.classList.remove('dr-open');
     state = 'idle';
     music.pause();
+    if (countdownIv){ clearInterval(countdownIv); countdownIv = null; }
+    rotateBlocking = false;
+    rotateOverlay.classList.remove('dr-show');
     document.removeEventListener('keydown', onKeyDown);
     restorePerfState();
   }
@@ -495,8 +548,11 @@
   retryBtn.addEventListener('click', startCountdown);
   closeBtn.addEventListener('click', closeGame);
   overlay.addEventListener('click', function(e){ if (e.target === overlay) closeGame(); });
-  window.addEventListener('resize', function(){
-    if (overlay.classList.contains('dr-open')){ resizeCanvas(); computeGround(); initStars(); }
+  window.addEventListener('resize', handleViewportChange);
+  window.addEventListener('orientationchange', function(){
+    // iOS a veces reporta innerWidth/innerHeight viejos justo al disparar
+    // el evento; con un pequeño delay ya están actualizados.
+    setTimeout(handleViewportChange, 60);
   });
 
   /* ---------------- hook: click en el logo ---------------- */
