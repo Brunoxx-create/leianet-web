@@ -47,6 +47,7 @@
   color:#ededee;
 }
 #dr-title span{color:#c7c7cc;}
+#dr-topbar-actions{display:flex;align-items:center;gap:8px;}
 #dr-close{
   width:30px;height:30px;border-radius:8px;
   border:1px solid #2b2b30;background:#18181b;color:#a9aaaf;
@@ -55,6 +56,16 @@
   transition:border-color .15s,color .15s;
 }
 #dr-close:hover{border-color:#c7c7cc;color:#ededee;}
+
+#dr-trophy{
+  width:30px;height:30px;border-radius:8px;
+  border:1px solid #2b2b30;background:#18181b;color:#a9aaaf;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+#dr-trophy svg{width:16px;height:16px;}
+#dr-trophy:hover{border-color:#d9a441;color:#d9a441;}
 
 #dr-canvas-wrap{
   position:relative;z-index:1;
@@ -157,6 +168,15 @@
 .dr-btn:hover{background:#e0e0e4;}
 .dr-btn:active{transform:translateY(1px);}
 
+#dr-over-lb-link{
+  pointer-events:auto;
+  margin-top:12px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:#a9aaaf;
+  text-decoration:underline;cursor:pointer;
+  transition:color .15s;
+}
+#dr-over-lb-link:hover{color:#d9a441;}
+
 #dr-footer-hint{
   position:relative;z-index:1;
   margin-top:10px;text-align:center;
@@ -201,6 +221,92 @@
 html.low-perf #dr-rotate-icon,
 html.perf-mid #dr-rotate-icon{
   animation:none !important;
+}
+
+/* ============================================================
+   Pantalla de nick — se muestra al abrir el juego (antes de la
+   cuenta regresiva) para elegir/cambiar el nombre con el que se
+   guarda el puntaje. Mismo lenguaje visual que el resto del modal.
+   ============================================================ */
+#dr-nickgate{
+  display:none;
+  position:absolute;inset:0;z-index:6;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:#0c0c0e;
+  text-align:center;padding:24px;
+}
+#dr-nickgate-card{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  width:100%;max-width:300px;
+}
+#dr-nickgate-card h3{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:17px;
+  color:#ededee;margin:0;
+}
+#dr-nick-input{
+  width:100%;box-sizing:border-box;
+  font-family:'JetBrains Mono',monospace;font-size:15px;text-align:center;
+  padding:10px 12px;border-radius:8px;
+  border:1px solid #2b2b30;background:#18181b;color:#ededee;
+}
+#dr-nick-input:focus{outline:none;border-color:#c7c7cc;}
+#dr-nick-input.dr-nick-error{border-color:#e23c46;}
+#dr-nick-input.dr-nick-error:focus{border-color:#e23c46;}
+#dr-nickgate-hint{
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:#706f74;
+  margin:0;max-width:260px;
+}
+#dr-nickgate-hint.dr-nick-error-text{color:#e23c46;}
+
+/* ============================================================
+   Modal de ranking completo — cubre todo el #dr-box (incluida la
+   topbar) al tocar el trofeo o "Ver ranking completo".
+   ============================================================ */
+#dr-leaderboard{
+  display:none;
+  position:absolute;inset:0;z-index:50;
+  flex-direction:column;
+  background:#0f0f11;border-radius:14px;
+  padding:16px 16px 12px;
+}
+#dr-lb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;flex-shrink:0;
+}
+#dr-lb-title{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:15px;letter-spacing:.04em;text-transform:uppercase;
+  color:#ededee;
+}
+#dr-lb-close{
+  width:30px;height:30px;border-radius:8px;
+  border:1px solid #2b2b30;background:#18181b;color:#a9aaaf;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;line-height:1;
+  transition:border-color .15s,color .15s;
+}
+#dr-lb-close:hover{border-color:#c7c7cc;color:#ededee;}
+#dr-lb-body{flex:1 1 auto;overflow-y:auto;min-height:0;}
+.dr-lb-row{
+  display:flex;align-items:center;gap:10px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:#ededee;
+  padding:8px 10px;border-bottom:1px solid #1d1d20;
+}
+.dr-lb-row.dr-lb-mine{
+  background:rgba(217,164,65,.10);border-radius:6px;color:#d9a441;
+}
+.dr-lb-rank{width:42px;flex-shrink:0;color:#706f74;}
+.dr-lb-row.dr-lb-mine .dr-lb-rank{color:#d9a441;}
+.dr-lb-name{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dr-lb-score{font-weight:700;flex-shrink:0;}
+.dr-lb-loading,.dr-lb-empty{
+  text-align:center;padding:34px 10px;color:#706f74;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;
+}
+@media (max-width:600px){
+  #dr-nickgate-card h3{font-size:15px;}
+  .dr-lb-row{font-size:12px;padding:7px 8px;}
+  .dr-lb-rank{width:32px;}
 }
 
 /* ============================================================
