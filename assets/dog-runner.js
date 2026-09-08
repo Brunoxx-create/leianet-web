@@ -99,6 +99,7 @@
   var bestEl = overlay.querySelector('#dr-best');
   var closeBtn = overlay.querySelector('#dr-close');
   var bgNebula = overlay.querySelector('#dr-bg-nebula');
+  var canvasWrap = overlay.querySelector('#dr-canvas-wrap');
   var countdownEl = overlay.querySelector('#dr-countdown');
   var rotateOverlay = overlay.querySelector('#dr-rotate');
   var nickGate = overlay.querySelector('#dr-nickgate');
@@ -198,6 +199,13 @@
   var runFrameIndex = 0;
   var countdownVal = 5;
   var intensity = 0;
+  var overdrive = 0;
+  var lastOverdrive = -1;
+  var difficultyHue = 210;
+  var groundSat = 0;
+  var groundStrokeLight = 30;
+  var groundFillLight = 13;
+  var dayProgress = 0;
   var nickGateDone = false; // se resetea cada vez que se abre el juego
 
   var dog = {
@@ -212,25 +220,81 @@
   }
 
   function computeIntensity(s){
-    return Math.max(0, Math.min(1, 1 - Math.exp(-s/650)));
+    return Math.max(0, Math.min(1, 1 - Math.exp(-s/430)));
+  }
+
+  // Más allá de intensity=1 (que ya satura para no volver el juego
+  // imposible) seguimos "escalando" muy despacio y con techo, sólo para
+  // que la música y los colores del fondo/piso sigan evolucionando en
+  // partidas muy largas, sin tocar la dificultad real del juego.
+  function computeOverdrive(s){
+    return Math.max(0, Math.min(1, (s - 430) / 2200));
   }
 
   /* ---- fondo dinámico: SOLO se actualiza throttled, no por frame ---- */
   var lastFxUpdate = 0;
   var lastFxIntensity = -1;
   function applyDifficultyFX(now){
-    music.playbackRate = 1.0 + intensity * 0.32; // barato, se puede hacer siempre
-    if (isLowPerf()) return; // fondo fijo en modo bajo rendimiento (ya lo pone el CSS)
-    if (now - lastFxUpdate < 400 && Math.abs(intensity - lastFxIntensity) < 0.04) return;
+    // la música se acelera con la dificultad (y un poquito más en partidas
+    // largas via "overdrive"), con techo para que siga siendo jugable/audible.
+    music.playbackRate = Math.min(1.55, 1.0 + intensity * 0.4 + overdrive * 0.15);
+    // OJO: antes acá había un "if (isLowPerf()) return" que cortaba TODO
+    // el cálculo de color (cielo y piso) en modo rendimiento, asumiendo
+    // que el CSS ya fijaba un fondo estático — no es así, el CSS de
+    // low-perf/perf-mid solo apaga transiciones. Resultado: en cualquier
+    // dispositivo detectado como low-perf/perf-mid, el color NUNCA
+    // cambiaba, sin importar el puntaje. Estos cambios de color son
+    // baratos (solo hsl() plano, sin blur ni sombras), así que se
+    // calculan siempre, en todos los modos de rendimiento.
+    if (now - lastFxUpdate < 400 && Math.abs(intensity - lastFxIntensity) < 0.03 && overdrive === lastOverdrive) return;
     lastFxUpdate = now;
     lastFxIntensity = intensity;
-    var blue = 'rgba(110,140,255,' + (0.16*(1-intensity*0.6)).toFixed(3) + ')';
-    var gold = 'rgba(217,164,65,' + (0.14 + intensity*0.10).toFixed(3) + ')';
-    var red  = 'rgba(226,60,70,' + (intensity*0.22).toFixed(3) + ')';
+    lastOverdrive = overdrive;
+
+    // Antes el gradiente usaba "intensity" (que satura en ~15-20
+    // segundos de juego), así que a los pocos segundos ya estaba todo
+    // rojo. Ahora usa el PUNTAJE directamente, con una escala mucho más
+    // larga: tarda varios miles de puntos en recorrerse, lo que se
+    // siente como "avanza mientras sostenés velocidad alta durante la
+    // partida" en vez de saltar de golpe al principio.
+    var currentScore = Math.max(0, Math.floor(distance/8));
+    var colorProgress = Math.min(1, currentScore / 9000); // 0->1 en ~9000 puntos (noche -> peligro rojo)
+    dayProgress = Math.max(0, Math.min(1, (currentScore - 15000) / 6000)); // a los 15000 arranca el amanecer, de día completo a los 21000
+    var stage = colorProgress + dayProgress; // 0..2, timeline completa
+
+    var hue, skySat, skyLight, gSat, gStrokeLight, gFillLight;
+    if (stage <= 1){
+      var t = stage; // fase noche: azul -> rojo
+      hue = 210 - t*210;
+      skySat = 30 + t*45;
+      skyLight = 8 + t*11;
+      gSat = t*62;
+      gStrokeLight = 30 + t*18;
+      gFillLight = 13 + t*8;
+    } else {
+      var t2 = stage - 1; // fase amanecer -> día: rojo -> naranja -> celeste día
+      hue = t2 < 0.3 ? (t2/0.3)*30 : 30 + ((t2-0.3)/0.7)*170;
+      skySat = 75 - t2*35;
+      skyLight = 19 + t2*46;
+      gSat = 62 - t2*20;
+      gStrokeLight = 48 + t2*20;
+      gFillLight = 21 + t2*24;
+    }
+    difficultyHue = hue;
+    groundSat = gSat;
+    groundStrokeLight = gStrokeLight;
+    groundFillLight = gFillLight;
+
+    canvasWrap.style.backgroundColor = 'hsl(' + Math.round(hue) + ',' + Math.round(skySat) + '%,' + Math.round(skyLight) + '%)';
+
+    if (isLowPerf()) return; // el glow radial (más decorativo) sí se saltea en rendimiento bajo
+    var glowOpacity = Math.min(1, colorProgress + dayProgress*0.6);
+    var glow = 'hsla(' + Math.round(hue) + ',80%,60%,' + (0.14 + glowOpacity*0.10).toFixed(3) + ')';
+    var glow2 = 'hsla(' + Math.round((hue+30)%360) + ',75%,58%,' + (0.10 + glowOpacity*0.10).toFixed(3) + ')';
     bgNebula.style.background =
-      'radial-gradient(650px 320px at 15% -10%, ' + blue + ', transparent 60%),' +
-      'radial-gradient(600px 320px at 85% 110%, ' + gold + ', transparent 60%),' +
-      'radial-gradient(500px 260px at 60% 40%, ' + red + ', transparent 65%)';
+      'radial-gradient(650px 320px at 15% -10%, ' + glow + ', transparent 60%),' +
+      'radial-gradient(600px 320px at 85% 110%, ' + glow2 + ', transparent 60%),' +
+      'radial-gradient(520px 280px at 60% 40%, hsla(' + Math.round(hue) + ',85%,55%,' + (glowOpacity*0.20).toFixed(3) + '), transparent 65%)';
   }
 
   /* ---------------- obstáculos (imágenes reales, cacheadas como Image) ---------------- */
@@ -256,22 +320,20 @@
   }
 
   function spawnObstacle(){
-    var baseH = 40 + Math.random()*24 + intensity*10;
+    var baseH = 40 + Math.random()*24 + intensity*6;
     var o1 = makeObstacle(W + 20, baseH, pickObstacleType());
     obstacles.push(o1);
-    // Antes el hueco entre un par de obstáculos era una distancia fija
-    // en píxeles. A velocidad alta (más intensidad) esa misma distancia
-    // se cruza en mucho menos tiempo real, así que a veces el par
-    // quedaba directamente imposible de esquivar. Ahora el hueco se
-    // calcula en función de la velocidad actual para mantener siempre
-    // el mismo margen real de reacción/salto, y a intensidad muy alta
-    // directamente no se generan pares.
-    var doubleChance = intensity > 0.82 ? 0 : (0.10 + intensity*0.08);
+    // El hueco entre un par doble ahora usa el MISMO colchón mínimo que
+    // el espacio normal entre obstáculos (antes eran ~433ms, menos que
+    // los 600ms del salto, lo que pedía "adivinar" un salto larguísimo
+    // imposible). Así, un par doble es tan justo/injusto como dos
+    // obstáculos normales seguidos: nunca exige un salto imposible.
+    var doubleChance = intensity > 0.75 ? 0 : (0.08 + intensity*0.06);
     var double = Math.random() < doubleChance;
     if (double){
       var baseH2 = baseH * 0.82;
-      var minGapSteps = 26; // ~433ms a 60fps, más colchón que antes
-      var gapX = o1.x + o1.w/2 + Math.max(minGapSteps * speed, 110) + baseH2*0.5;
+      var minGapSteps = 50; // mismo piso de seguridad que el spawn normal
+      var gapX = o1.x + o1.w/2 + minGapSteps * speed + baseH2*0.5;
       obstacles.push(makeObstacle(gapX, baseH2, pickObstacleType()));
     }
     return double;
@@ -342,7 +404,9 @@
 
   function drawStars(steps){
     ctx.fillStyle = '#ffffff';
-    ctx.globalAlpha = 0.55;
+    // Cuando sale el sol (dayProgress, desde los 15000 puntos) el cielo
+    // se aclara y las estrellas se van apagando hasta casi desaparecer.
+    ctx.globalAlpha = 0.55 * (1 - dayProgress*0.92);
     for (var i=0;i<stars.length;i++){
       var s = stars[i];
       s.x -= s.speed * (speed/6) * steps;
@@ -352,16 +416,39 @@
     ctx.globalAlpha = 1;
   }
 
+  // Sol que sale a partir de los 15000 puntos (dayProgress 0->1) y sube
+  // desde el horizonte mientras el cielo se va aclarando.
+  function drawSun(){
+    if (dayProgress <= 0) return;
+    var sunX = W * 0.80;
+    var sunY = GROUND_Y - dayProgress * (GROUND_Y * 0.78) - 10;
+    var r = 24;
+    var alpha = Math.min(1, dayProgress * 1.5);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var glow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, r*2.6);
+    glow.addColorStop(0, 'rgba(255,236,190,0.55)');
+    glow.addColorStop(1, 'rgba(255,236,190,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(sunX, sunY, r*2.6, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = dayProgress < 0.5 ? '#ffcf7a' : '#fff2c8';
+    ctx.beginPath(); ctx.arc(sunX, sunY, r, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
   var groundScrollX = 0;
   function drawGround(steps){
-    ctx.strokeStyle = intensity > 0.55 ? 'rgba(226,90,100,.55)' : '#2b2b30';
+    // el piso usa el MISMO matiz que el cielo (difficultyHue), con su
+    // propia saturación/luminosidad (groundSat/Light) para la misma
+    // línea de tiempo: gris -> rojo peligro -> amanecer -> día.
+    ctx.strokeStyle = 'hsl(' + Math.round(difficultyHue) + ',' + Math.round(groundSat) + '%,' + Math.round(groundStrokeLight) + '%)';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, GROUND_Y+2);
     ctx.lineTo(W, GROUND_Y+2);
     ctx.stroke();
 
-    ctx.fillStyle = intensity > 0.55 ? 'rgba(226,90,100,.28)' : '#232326';
+    ctx.fillStyle = 'hsl(' + Math.round(difficultyHue) + ',' + Math.round(groundSat*0.85) + '%,' + Math.round(groundFillLight) + '%)';
     groundScrollX -= speed * steps;
     if (groundScrollX < -40) groundScrollX += 40;
     for (var x = groundScrollX; x < W; x += 40){
@@ -396,11 +483,21 @@
 
     ctx.clearRect(0,0,W,H);
     drawStars(steps);
+    drawSun();
     drawGround(steps);
 
     distance += speed * steps;
     intensity = computeIntensity(distance/8);
-    speed = baseSpeed + intensity * 7.5;
+    overdrive = computeOverdrive(distance/8);
+    // La velocidad sube más rápido al principio (menos "muy fácil" al
+    // arrancar), pero con un techo (SPEED_CAP) calculado para que SIEMPRE
+    // quede al menos ~750ms desde que un obstáculo aparece hasta que
+    // llega al perro — suficiente para reaccionar y saltar. Pasado ese
+    // techo, la sensación de "más difícil" sigue viniendo del ritmo de
+    // aparición de obstáculos, la música y el color del cielo/piso, no
+    // de una velocidad injugable.
+    var SPEED_CAP = baseSpeed + 8;
+    speed = Math.min(SPEED_CAP, baseSpeed + intensity * 8 + overdrive * 2);
     applyDifficultyFX(now);
 
     score = Math.floor(distance / 8);
@@ -413,13 +510,18 @@
     drawDog(now);
 
     spawnTimer += steps;
-    if (spawnTimer > nextSpawnIn){
+    // Tope de obstaculos simultaneos en pantalla: red de seguridad extra
+    // para que nunca se "amontonen" muchos de golpe (por ej. si hubo un
+    // salto grande de tiempo tras la pestaña en segundo plano).
+    var MAX_OBSTACLES_ONSCREEN = 4;
+    if (spawnTimer > nextSpawnIn && obstacles.length < MAX_OBSTACLES_ONSCREEN){
       spawnTimer = 0;
-      // Piso minimo levantado (antes bajaba a ~26 "frames" ~= 433ms,
-      // menos que los 600ms que dura el salto, lo que podia generar
-      // huecos imposibles de esquivar). Ahora el minimo deja siempre
-      // margen para completar un salto entero antes del siguiente spawn.
-      nextSpawnIn = Math.max(52, 88 - intensity*34) + Math.random()*30;
+      // El piso minimo (nextSpawnIn) siempre deja margen de sobra para
+      // completar un salto entero (600ms) antes de que llegue el
+      // siguiente obstaculo: en el peor caso (maxima intensidad +
+      // overdrive, sin el extra aleatorio) quedan ~830ms, es decir
+      // ~230ms de colchon real por encima de la duracion del salto.
+      nextSpawnIn = Math.max(50, 78 - intensity*32 - overdrive*6) + Math.random()*24;
       // Si el spawn que acaba de salir fue un par doble, le damos un
       // colchón extra al próximo para no encimarle un tercer obstáculo.
       if (spawnObstacle()) { nextSpawnIn += 20; }
@@ -717,7 +819,10 @@
     obstacles = [];
     distance = 0;
     intensity = 0;
+    overdrive = 0;
+    dayProgress = 0;
     lastFxIntensity = -1;
+    lastOverdrive = -1;
     speed = baseSpeed;
     spawnTimer = 0;
     dog.jumping = false;
@@ -811,6 +916,7 @@
     computeGround();
     initStars();
     intensity = 0;
+    dayProgress = 0;
     lastFxIntensity = -1;
     applyDifficultyFX(0);
     ctx.clearRect(0,0,W,H);
