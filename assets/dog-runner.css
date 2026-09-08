@@ -74,6 +74,7 @@
   border-radius:10px;
   overflow:hidden;
   background:#0c0c0e;
+  transition:background-color 1.2s ease;
   border:1px solid #232326;
 }
 
