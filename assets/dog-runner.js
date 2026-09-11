@@ -219,16 +219,27 @@
     dog.y = GROUND_Y - dog.h;
   }
 
+  // Antes esto saturaba en s≈430 (≈15-20s de juego), así que a partir de
+  // ahí el juego quedaba completamente "plano" el resto de la partida:
+  // misma velocidad, misma mezcla de obstáculos, mismo ritmo de spawn,
+  // para siempre. Eso es lo que hacía posible llegar a puntajes enormes
+  // en poco tiempo real, con el piloto automático puesto. Ahora satura
+  // mucho más tarde (s≈1800 → ~0.63, s≈5000 → ~0.95), estirando la
+  // "rampa" de dificultad de ~20s a varios minutos.
   function computeIntensity(s){
-    return Math.max(0, Math.min(1, 1 - Math.exp(-s/430)));
+    return Math.max(0, Math.min(1, 1 - Math.exp(-s/1800)));
   }
 
-  // Más allá de intensity=1 (que ya satura para no volver el juego
-  // imposible) seguimos "escalando" muy despacio y con techo, sólo para
-  // que la música y los colores del fondo/piso sigan evolucionando en
-  // partidas muy largas, sin tocar la dificultad real del juego.
+  // "overdrive" ahora es la dificultad de largo plazo: ya no se usa solo
+  // para música/colores, también sigue haciendo el juego más exigente
+  // (más obstáculos difíciles, más dobles, más obstáculos en pantalla a
+  // la vez) durante TODA una partida larga, en vez de aplanarse a los
+  // pocos segundos. Satura recién cerca de los ~46000 puntos, así que
+  // una corrida de varios miles de puntos exige sostener el nivel, no
+  // solo sobrevivir el arranque. El techo de velocidad/tiempo de
+  // reacción (más abajo) no se toca: sigue siendo siempre posible.
   function computeOverdrive(s){
-    return Math.max(0, Math.min(1, (s - 430) / 2200));
+    return Math.max(0, Math.min(1, (s - 800) / 45000));
   }
 
   /* ---- fondo dinámico: SOLO se actualiza throttled, no por frame ---- */
@@ -300,9 +311,17 @@
   /* ---------------- obstáculos (imágenes reales, cacheadas como Image) ---------------- */
   function pickObstacleType(){
     var r = Math.random();
+    // Antes esto topeaba en 30% hard / 25% mid apenas intensity pasaba
+    // 0.6, y como intensity saturaba rapidísimo, esa mezcla quedaba fija
+    // para siempre. Ahora "overdrive" sigue empujando la mezcla hacia
+    // los obstáculos difíciles durante toda la partida larga: en el
+    // techo (intensity=1, overdrive=1) queda ~65% hard / 35% mid, sin
+    // obstáculos fáciles.
+    var hardW = Math.min(0.65, intensity*0.30 + overdrive*0.35);
+    var midW = Math.min(0.35, intensity*0.25 + overdrive*0.10);
     var pool;
-    if (intensity > 0.6 && r < 0.30) pool = OBSTACLE_TIERS.hard;
-    else if (intensity > 0.3 && r < 0.55) pool = OBSTACLE_TIERS.mid;
+    if (r < hardW) pool = OBSTACLE_TIERS.hard;
+    else if (r < hardW + midW) pool = OBSTACLE_TIERS.mid;
     else pool = OBSTACLE_TIERS.easy;
     return pool[Math.floor(Math.random() * pool.length)];
   }
@@ -320,7 +339,7 @@
   }
 
   function spawnObstacle(){
-    var baseH = 40 + Math.random()*24 + intensity*6;
+    var baseH = 40 + Math.random()*24 + intensity*6 + overdrive*10;
     var o1 = makeObstacle(W + 20, baseH, pickObstacleType());
     obstacles.push(o1);
     // El hueco entre un par doble ahora usa el MISMO colchón mínimo que
@@ -328,7 +347,12 @@
     // los 600ms del salto, lo que pedía "adivinar" un salto larguísimo
     // imposible). Así, un par doble es tan justo/injusto como dos
     // obstáculos normales seguidos: nunca exige un salto imposible.
-    var doubleChance = intensity > 0.75 ? 0 : (0.08 + intensity*0.06);
+    // Antes se apagaban los dobles por completo pasado intensity=0.75,
+    // que se alcanzaba en segundos: eso le sacaba variedad al resto de
+    // la partida. Ahora siguen haciéndose más frecuentes con overdrive
+    // (hasta 35%), para que sostener puntajes altos exija más saltos
+    // dobles consecutivos bien ejecutados.
+    var doubleChance = Math.min(0.35, 0.08 + intensity*0.10 + overdrive*0.20);
     var double = Math.random() < doubleChance;
     if (double){
       var baseH2 = baseH * 0.82;
@@ -513,7 +537,12 @@
     // Tope de obstaculos simultaneos en pantalla: red de seguridad extra
     // para que nunca se "amontonen" muchos de golpe (por ej. si hubo un
     // salto grande de tiempo tras la pestaña en segundo plano).
-    var MAX_OBSTACLES_ONSCREEN = 4;
+    // Antes era fijo en 4 siempre. Ahora en partidas largas (overdrive
+    // alto) puede haber hasta 6 en pantalla a la vez, lo que obliga a
+    // planificar varios saltos por adelantado en vez de reaccionar de a
+    // uno. El piso mínimo de tiempo entre spawns (más abajo) no cambia,
+    // así que esto no genera saltos imposibles, solo más para pensar.
+    var MAX_OBSTACLES_ONSCREEN = 4 + Math.round(overdrive * 2);
     if (spawnTimer > nextSpawnIn && obstacles.length < MAX_OBSTACLES_ONSCREEN){
       spawnTimer = 0;
       // El piso minimo (nextSpawnIn) siempre deja margen de sobra para
