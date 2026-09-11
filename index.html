@@ -171,6 +171,15 @@
 .novedad-card.tipo-anuncio{--nv-color:#7aa3ff;--nv-soft:rgba(122,163,255,.14)}
 .novedad-card.tipo-error{--nv-color:#ff5468;--nv-soft:rgba(255,84,104,.14)}
 .novedad-card.tipo-info{--nv-color:#6bbf7b;--nv-soft:rgba(107,191,123,.14)}
+.novedad-card.tipo-actualizacion{--nv-color:#4fd1c5;--nv-soft:rgba(79,209,197,.14)}
+.novedad-card.tipo-mantenimiento{--nv-color:#f0994d;--nv-soft:rgba(240,153,77,.14)}
+.novedad-card.tipo-evento{--nv-color:#b48af0;--nv-soft:rgba(180,138,240,.14)}
+.novedad-card.tipo-exito{--nv-color:#4fd162;--nv-soft:rgba(79,209,98,.14)}
+.novedad-card.tipo-alerta{--nv-color:#ff7a45;--nv-soft:rgba(255,122,69,.14)}
+.novedad-card.tipo-nuevo{--nv-color:#ff7ab8;--nv-soft:rgba(255,122,184,.14)}
+.novedad-imagen{width:100%;max-height:260px;object-fit:cover;border-radius:12px;margin:10px 0;display:block;border:1px solid var(--glass-border)}
+.novedad-texto u{text-decoration:underline}
+.novedad-texto s{text-decoration:line-through;opacity:.75}
 @media (max-width:640px){.novedades-wrap{margin-top:14px}.novedad-card{padding:14px 16px;gap:12px}.novedad-titulo{font-size:14.5px}.novedad-texto{font-size:13px}}
 html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important}
 </style>
@@ -1019,7 +1028,12 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
     var NOVEDADES_API_URL = 'https://novedades.leianet.ar/api/novedades';
     var CANTIDAD_A_MOSTRAR = 20; // el backend ya las manda ordenadas, mas nueva primero
 
-    var ICONOS = { importante: '⚠️', anuncio: '📢', error: '⛔', info: 'ℹ️' };
+    var ICONOS = {
+      importante: '⚠️', anuncio: '📢', error: '⛔', info: 'ℹ️',
+      actualizacion: '🔄', mantenimiento: '🛠️', evento: '🎉',
+      exito: '✅', alerta: '🚨', nuevo: '✨'
+    };
+    var TIPOS_VALIDOS = Object.keys(ICONOS);
 
     function escapeHtml(str){
       var div = document.createElement('div');
@@ -1029,10 +1043,15 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
 
     function formatearTexto(texto){
       // escapa todo primero (evita HTML/JS raro pegado en el panel admin)
-      // y despues habilita **negrita** y [texto](url) como unico formato permitido.
+      // y despues habilita un formato limitado: negrita, cursiva, tachado,
+      // subrayado y links.
       var seguro = escapeHtml(texto);
-      seguro = seguro.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      seguro = seguro.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');       // **negrita**
+      seguro = seguro.replace(/~~(.+?)~~/g, '<s>$1</s>');                    // ~~tachado~~
+      seguro = seguro.replace(/__(.+?)__/g, '<u>$1</u>');                    // __subrayado__
+      seguro = seguro.replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, '$1<em>$2</em>'); // *cursiva* (sin chocar con **)
       seguro = seguro.replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      seguro = seguro.replace(/\n/g, '<br>');
       return seguro;
     }
 
@@ -1051,7 +1070,8 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
       }
 
       cont.innerHTML = lista.slice(0, CANTIDAD_A_MOSTRAR).map(function(n){
-        var tipo = ['importante','anuncio','error','info'].indexOf(n.tipo) !== -1 ? n.tipo : 'info';
+        var tipo = TIPOS_VALIDOS.indexOf(n.tipo) !== -1 ? n.tipo : 'info';
+        var imagenHtml = n.imagen ? '<img class="novedad-imagen" src="' + escapeHtml(n.imagen) + '" alt="" loading="lazy">' : '';
         return '' +
           '<div class="novedad-card tipo-' + tipo + '">' +
             '<div class="novedad-icono">' + (ICONOS[tipo] || 'ℹ️') + '</div>' +
@@ -1061,6 +1081,7 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
                 '<span class="novedad-fecha">' + formatearFecha(n.fecha) + '</span>' +
               '</div>' +
               '<div class="novedad-titulo">' + escapeHtml(n.titulo || '') + '</div>' +
+              imagenHtml +
               '<div class="novedad-texto">' + formatearTexto(n.texto || '') + '</div>' +
             '</div>' +
           '</div>';
