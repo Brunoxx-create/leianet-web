@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Novedades — LeiaNET</title>
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0f11; --bg-elev:#18181b; --border:#2b2b30; --text:#ededee;
+    --text-dim:#a9aaaf; --text-mute:#706f74; --accent:#d9a441;
+    --accent-soft:rgba(217,164,65,.14); --mono:'JetBrains Mono',monospace;
+    --display:'Chakra Petch',sans-serif; --body:'Inter',sans-serif;
+    --glass-fill:rgba(255,255,255,.05); --glass-border:rgba(255,255,255,.14);
+    --ok:#6bbf7b; --err:#ff5468;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);max-width:640px;margin:40px auto;padding:0 20px}
+  h1{font-family:var(--display);color:var(--accent);font-size:1.3rem;margin-bottom:4px}
+  .sub{color:var(--text-mute);font-size:13px;margin-bottom:24px}
+  label{display:block;margin-top:16px;margin-bottom:6px;font-size:.82rem;color:var(--text-dim);font-family:var(--mono)}
+  input,select,textarea{width:100%;background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text);padding:11px;border-radius:9px;font-family:inherit;font-size:.95rem}
+  textarea{min-height:120px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  button{margin-top:20px;background:linear-gradient(135deg,#e6b355,#c98f2e);color:#211705;border:none;padding:13px 20px;border-radius:9px;font-weight:700;font-family:var(--display);letter-spacing:.02em;cursor:pointer}
+  button:hover{opacity:.92}
+  #estado{margin-top:12px;font-size:.88rem;font-family:var(--mono)}
+  .ok{color:var(--ok)} .err{color:var(--err)}
+  .item{border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .item .info{min-width:0}
+  .item .tipo{font-family:var(--mono);font-size:10.5px;color:var(--accent)}
+  .item .titulo{font-size:14px;margin-top:2px}
+  .item .fecha{color:var(--text-mute);font-size:11.5px;margin-top:2px}
+  .item button.del{margin:0;background:rgba(255,84,104,.14);color:var(--err);padding:7px 12px;font-size:.78rem;flex-shrink:0}
+  hr{border:none;border-top:1px solid var(--border);margin:36px 0}
+</style>
+</head>
+<body>
+
+<h1>Publicar novedad</h1>
+<div class="sub">leianet.ar — este panel no aparece en el menu del sitio, guardalo en favoritos</div>
+
+<label>Token de acceso</label>
+<input type="password" id="token" placeholder="tu NOVEDADES_TOKEN">
+
+<label>Tipo</label>
+<select id="tipo">
+  <option value="importante">Importante</option>
+  <option value="anuncio">Anuncio</option>
+  <option value="error">Error</option>
+  <option value="info">Info</option>
+</select>
+
+<label>Fecha</label>
+<input type="date" id="fecha">
+
+<label>Titulo</label>
+<input type="text" id="titulo" placeholder="Estamos actualizando el hosting">
+
+<label>Texto (podes usar **negrita** y [texto](https://link.com) para links)</label>
+<textarea id="texto" placeholder="Todos los servidores estan apagados temporalmente..."></textarea>
+
+<button onclick="publicar()">Publicar</button>
+<div id="estado"></div>
+
+<hr>
+<h1 style="font-size:1.1rem">Novedades actuales</h1>
+<div id="lista"></div>
+
+<script>
+  // Cambiar por la URL real de tu backend (Cloudflare Tunnel)
+  const API_URL = 'https://api.leianet.ar/api/novedades';
+
+  document.getElementById('fecha').valueAsDate = new Date();
+
+  async function publicar(){
+    const token = document.getElementById('token').value;
+    const tipo = document.getElementById('tipo').value;
+    const fecha = document.getElementById('fecha').value;
+    const titulo = document.getElementById('titulo').value;
+    const texto = document.getElementById('texto').value;
+    const estado = document.getElementById('estado');
+
+    if(!token || !titulo || !texto){
+      estado.textContent = 'Completa token, titulo y texto.';
+      estado.className = 'err';
+      return;
+    }
+
+    try{
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+        body: JSON.stringify({ tipo, fecha, titulo, texto }),
+      });
+      if(!res.ok){
+        const err = await res.json();
+        throw new Error(err.error || 'Error al publicar');
+      }
+      estado.textContent = 'Publicado correctamente.';
+      estado.className = 'ok';
+      document.getElementById('titulo').value = '';
+      document.getElementById('texto').value = '';
+      cargarLista();
+    }catch(e){
+      estado.textContent = 'Error: ' + e.message;
+      estado.className = 'err';
+    }
+  }
+
+  async function borrar(id){
+    const token = document.getElementById('token').value;
+    if(!token){ alert('Necesitas el token para borrar.'); return; }
+    if(!confirm('¿Borrar esta novedad?')) return;
+    const res = await fetch(API_URL + '/' + id, { method: 'DELETE', headers: { 'x-auth-token': token } });
+    if(res.ok) cargarLista(); else alert('No se pudo borrar.');
+  }
+
+  async function cargarLista(){
+    const res = await fetch(API_URL);
+    const lista = await res.json();
+    const cont = document.getElementById('lista');
+    cont.innerHTML = '';
+    lista.forEach((n) => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div class="info">
+          <div class="tipo">${n.tipo.toUpperCase()}</div>
+          <div class="titulo">${n.titulo}</div>
+          <div class="fecha">${n.fecha}</div>
+        </div>`;
+      const btn = document.createElement('button');
+      btn.className = 'del';
+      btn.textContent = 'Borrar';
+      btn.onclick = () => borrar(n.id);
+      div.appendChild(btn);
+      cont.appendChild(div);
+    });
+  }
+
+  cargarLista();
+</script>
+
+</body>
+</html>
