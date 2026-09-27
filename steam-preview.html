@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>STEAM PREVIEW — LeiaNET Hub</title>
+<title>LINUX STEAM — LeiaNET</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -78,10 +78,17 @@ h1 span{background:linear-gradient(100deg,var(--accent) 20%,#fff 50%,var(--accen
 .sort-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .sort-tabs button{font-family:var(--mono);font-size:11px;padding:7px 14px;border-radius:20px;border:1px solid var(--glass-border);background:var(--glass-fill);color:var(--text-dim);cursor:pointer}
 .sort-tabs button.active{border-color:var(--accent);color:#111113;background:linear-gradient(155deg,#fff,var(--accent) 60%)}
-.linux-stat{max-width:900px;margin:20px auto 0;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:14px 18px;backdrop-filter:var(--glass-blur);font-family:var(--mono);font-size:12px;color:var(--text-dim);display:none}
-.linux-stat strong{color:var(--text);font-family:var(--display)}
-.reco-box{max-width:900px;margin:12px auto 0;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:14px 18px;backdrop-filter:var(--glass-blur);font-size:13px;line-height:1.6;color:var(--text-dim);display:none}
+.linux-stat{max-width:900px;margin:20px auto 0;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:20px 22px;backdrop-filter:var(--glass-blur);font-family:var(--mono);font-size:13px;color:var(--text-dim);display:none;text-align:center}
+.linux-stat .big-num{display:block;font-family:var(--display);font-weight:700;font-size:44px;color:var(--text);line-height:1.1;margin-bottom:6px}
+.reco-box{max-width:900px;margin:12px auto 0;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:14px 18px;backdrop-filter:var(--glass-blur);font-size:13px;line-height:1.6;color:var(--text-dim);display:none;align-items:flex-start;gap:12px}
 .reco-box strong{color:var(--text)}
+.reco-icon{flex:none;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:var(--display)}
+.reco-box.good{border-color:rgba(107,191,123,.5)}
+.reco-box.good .reco-icon{background:rgba(107,191,123,.16);color:#6bbf7b}
+.reco-box.warn{border-color:rgba(217,164,65,.5)}
+.reco-box.warn .reco-icon{background:rgba(217,164,65,.16);color:#d9a441}
+.reco-box.bad{border-color:rgba(224,122,122,.55)}
+.reco-box.bad .reco-icon{background:rgba(224,122,122,.16);color:#e07a7a}
 .game-list{display:flex;flex-direction:column;gap:10px;perspective:1400px}
 .game-card{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:12px;padding:11px 14px;opacity:0;animation:cardin .4s ease forwards;position:relative;isolation:isolate;overflow:hidden;transition:border-color .2s,box-shadow .3s,transform .05s linear;transform:rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)) translateY(var(--lift,0px)) translateZ(var(--liftz,0px))}
 .game-card::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;z-index:-1;background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.55),transparent 60%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .1s}
@@ -246,7 +253,7 @@ function renderLinuxStat(games, map){
   const working = withData.filter(g => WORKING_TIERS.includes(map[String(g.appid)].tier));
   const el = document.getElementById('linuxStat');
   el.style.display = 'block';
-  el.innerHTML = `<strong>${working.length}</strong> de ${games.length} juegos de tu biblioteca corren en Linux según ProtonDB (${withData.length} tienen datos, el resto no fue reportado).`;
+  el.innerHTML = `<span class="big-num">${working.length} / ${games.length}</span>juegos de tu biblioteca corren en Linux según ProtonDB (${withData.length} tienen datos, el resto no fue reportado).`;
 }
 
 function renderRecommendation(games, map){
@@ -258,21 +265,27 @@ function renderRecommendation(games, map){
   const coverage = totalHours ? Math.round((workingHours/totalHours)*100) : 0;
 
   const box = document.getElementById('recoBox');
-  box.style.display = 'block';
-  let msg;
+  box.style.display = 'flex';
+  let msg, level, icon;
   if(totalHours === 0){
     msg = 'Todavía no jugaste lo suficiente como para calcular una recomendación confiable.';
+    level = 'warn'; icon = '!';
   } else if(top5Broken.length >= 3){
     const names = top5Broken.slice(0,3).map(g=>g.name).join(', ');
     msg = `No te recomendamos pasarte a Linux todavía: de tus 5 juegos más jugados, ${top5Broken.length} no corren bien (${names}), aunque en total el ${coverage}% de tus horas están cubiertas.`;
+    level = 'bad'; icon = '✕';
   } else if(coverage >= 80){
     msg = `Tenés cubierto el ${coverage}% de tus horas jugadas con títulos que andan bien en Linux, y tus juegos más jugados no tienen problemas grandes. Buen candidato para migrar.`;
+    level = 'good'; icon = '✓';
   } else if(coverage >= 50){
     msg = `El ${coverage}% de tus horas jugadas están en juegos que funcionan bien en Linux. Es viable, pero revisá el resto de tu top antes de migrar del todo.`;
+    level = 'warn'; icon = '!';
   } else {
     msg = `Solo el ${coverage}% de tus horas jugadas están en juegos con buen soporte en Linux. Todavía dependés bastante de títulos sin buen estado ahí.`;
+    level = 'bad'; icon = '✕';
   }
-  box.innerHTML = `<strong>Recomendación:</strong> ${msg}`;
+  box.className = 'reco-box ' + level;
+  box.innerHTML = `<span class="reco-icon">${icon}</span><span><strong>Recomendación:</strong> ${msg}</span>`;
 }
 
 async function renderGames(games, map){
