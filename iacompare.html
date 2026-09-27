@@ -1,0 +1,358 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IA COMPARE - LeiaNET</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f11;--bg-elev:#18181b;--bg-elev-2:#201f23;--border:#2b2b30;--border-soft:#232326;--text:#ededee;--text-dim:#a9aaaf;--text-mute:#706f74;--accent:#c7c7cc;--accent-soft:rgba(199,199,204,.12);--ok:#6bbf7b;--mono:'JetBrains Mono',monospace;--display:'Chakra Petch',sans-serif;--body:'Inter',sans-serif;--glass-fill:linear-gradient(155deg,rgba(255,255,255,.09),rgba(255,255,255,.015) 55%,rgba(255,255,255,.03));--glass-fill-strong:linear-gradient(155deg,rgba(255,255,255,.14),rgba(255,255,255,.02) 55%,rgba(255,255,255,.05));--glass-border:rgba(255,255,255,.15);--glass-border-hover:rgba(255,255,255,.30);--glass-blur:blur(20px) saturate(170%);--glass-shadow:0 24px 60px -28px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.09);--iris-a:rgba(140,170,255,.5);--iris-b:rgba(217,164,65,.45);--iris-c:rgba(199,140,255,.4);--coffee:#d9a441}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+::selection{background:rgba(199,199,204,.28);color:#fff}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#2c2c31;border-radius:10px;border:2px solid var(--bg)}
+body{margin:0;background:radial-gradient(1200px 600px at 15% -10%,rgba(217,164,65,.06),transparent 60%),radial-gradient(900px 500px at 90% 0%,rgba(255,255,255,.03),transparent 55%),var(--bg);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;padding-bottom:40px;opacity:0}
+body.loaded{opacity:1;transition:opacity .5s ease}
+a{color:inherit}
+.grain{position:fixed;inset:-100px;z-index:1;pointer-events:none;opacity:.035;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.nebula{position:fixed;inset:-10%;z-index:0;pointer-events:none;overflow:hidden}
+.nebula span{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;animation:nebdrift 50s ease-in-out infinite}
+.nebula span:nth-child(1){width:56vw;height:56vw;top:-18%;left:-14%;background:radial-gradient(circle,var(--iris-a),transparent 65%)}
+.nebula span:nth-child(2){width:48vw;height:48vw;bottom:-20%;right:-12%;background:radial-gradient(circle,var(--iris-b),transparent 65%);animation-delay:-8s}
+.nebula span:nth-child(3){width:40vw;height:40vw;top:30%;left:55%;background:radial-gradient(circle,var(--iris-c),transparent 65%);animation-delay:-20s}
+@keyframes nebdrift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(3%,4%) scale(1.06)}}
+.grid-overlay{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 100% 60% at 50% 0%,black 0%,transparent 70%)}
+.starfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stars-layer{position:absolute;inset:0}
+.stars-layer.s1{animation:twinkle 3.2s ease-in-out infinite}
+.stars-layer.s2{animation:twinkle 4.4s ease-in-out infinite .8s}
+.stars-layer.s3{animation:twinkle 5.6s ease-in-out infinite 1.6s}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+.shooting-star{position:absolute;top:0;left:0;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 10px 3px rgba(255,255,255,.9),0 0 22px 6px rgba(255,255,255,.35);opacity:0}
+.shooting-star::before{content:'';position:absolute;top:50%;left:0;width:130px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9));transform-origin:100% 50%;transform:translate(-100%,-50%)}
+.shooting-star.fire{offset-rotate:auto;animation:shoot var(--star-dur,1.1s) linear forwards}
+@keyframes shoot{0%{offset-distance:0%;opacity:0}8%{opacity:1}70%{opacity:.9}100%{offset-distance:100%;opacity:0}}
+.meteor{position:absolute;top:0;left:0;width:10px;height:10px;opacity:0;offset-rotate:auto;animation:meteor-fly var(--meteor-dur,2.4s) linear forwards}
+.meteor .meteor-rock{position:absolute;top:50%;left:50%;width:9px;height:8px;transform:translate(-50%,-50%) rotate(-25deg);border-radius:44% 56% 62% 38% / 52% 40% 60% 48%;background:radial-gradient(circle at 32% 30%,rgba(255,236,210,.85),transparent 46%),linear-gradient(150deg,#6b5040 0%,#3a2a20 55%,#1c1310 100%);box-shadow:0 0 6px 1px rgba(255,150,60,.5)}
+.meteor .meteor-trail{position:absolute;top:50%;left:0;width:190px;height:8px;transform:translate(-100%,-50%);transform-origin:100% 50%;background:linear-gradient(90deg,transparent 0%,rgba(255,120,40,0) 4%,rgba(255,140,50,.5) 45%,rgba(255,190,110,.85) 80%,rgba(255,235,200,.95) 100%);filter:blur(.5px);border-radius:50%}
+@keyframes meteor-fly{0%{offset-distance:0%;opacity:0}6%{opacity:1}65%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.planet-parallax{position:fixed;top:6%;right:-8%;z-index:0;pointer-events:none}
+.planet-wrap{animation:planet-float 26s ease-in-out infinite}
+.planet-glow{position:absolute;inset:-40%;border-radius:50%;background:radial-gradient(circle,rgba(199,199,204,.16),transparent 70%);filter:blur(10px)}
+.planet{position:relative;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.5),transparent 42%),radial-gradient(circle at 60% 65%,rgba(255,255,255,.06),transparent 55%),linear-gradient(155deg,#3a3a40 0%,#232326 45%,#131315 100%);box-shadow:inset -32px -25px 72px rgba(0,0,0,.65),inset 18px 14px 42px rgba(255,255,255,.05),0 0 100px rgba(199,199,204,.10)}
+.planet-ring{position:absolute;top:50%;left:50%;width:440px;height:112px;transform:translate(-50%,-50%) rotate(-18deg);border-radius:50%;border:1px solid rgba(199,199,204,.28)}
+@keyframes planet-float{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,18px)}}
+@media (max-width:900px){.planet-parallax{display:none}}
+.planet-parallax-2{position:fixed;bottom:-70px;left:-70px;z-index:0;pointer-events:none}
+.planet-wrap-2{animation:planet-float-2 32s ease-in-out infinite}
+.planet-2 .planet-glow{background:radial-gradient(circle,rgba(217,164,65,.18),transparent 70%)}
+.planet-2 .planet{width:190px;height:190px;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.4),transparent 42%),radial-gradient(circle at 62% 68%,rgba(255,255,255,.05),transparent 55%),linear-gradient(155deg,#4a3d2c 0%,#2a2320 45%,#14110f 100%);box-shadow:inset -22px -18px 48px rgba(0,0,0,.65),inset 14px 11px 28px rgba(255,255,255,.05),0 0 74px rgba(217,164,65,.12)}
+.planet-2 .planet-ring{width:290px;height:72px;border-color:rgba(217,164,65,.24)}
+@keyframes planet-float-2{0%,100%{transform:translate(0,0)}50%{transform:translate(12px,-14px)}}
+@media (max-width:900px){.planet-parallax-2{display:none}}
+.cursor-glow{position:fixed;top:0;left:0;width:520px;height:520px;z-index:0;pointer-events:none;background:radial-gradient(circle,rgba(199,199,204,.06),transparent 68%);transform:translate(calc(var(--cx,50vw) - 50%),calc(var(--cy,50vh) - 50%));transition:opacity .3s ease;opacity:0}
+.cursor-glow.active{opacity:1}
+@media (hover:none),(pointer:coarse){.cursor-glow{display:none}}
+main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+header{padding:14px clamp(16px,4vw,48px);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(24,24,27,.72),rgba(15,15,17,.55));backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.02em;text-decoration:none;color:var(--text)}
+.brand .dotwrap{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(107,191,123,.15);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.brand small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--text-mute);letter-spacing:.06em}
+.hero{padding:clamp(40px,7vw,68px) 0 20px;text-align:center}
+.eyebrow{font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;gap:8px;justify-content:center;align-items:center}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,50px);line-height:1.05;margin:0 0 14px;letter-spacing:-.01em}
+h1 span{background:linear-gradient(100deg,var(--accent) 20%,#fff 50%,var(--accent) 80%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:-220% center}}
+.hero p{color:var(--text-dim);max-width:60ch;margin:0 auto;font-size:14.5px;line-height:1.6}
+.note{max-width:900px;margin:22px auto 6px;display:flex;gap:10px;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:12px;padding:12px 16px;backdrop-filter:var(--glass-blur)}
+.note p{margin:0;font-size:12.5px;line-height:1.55;color:var(--text-dim)}
+.controls{display:flex;flex-direction:column;gap:14px;margin:22px 0 6px}
+.cat-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;padding:9px 14px;border-radius:20px;border:1px solid var(--glass-border);background:var(--glass-fill);color:var(--text-dim);cursor:pointer;backdrop-filter:var(--glass-blur);transition:all .15s;display:flex;align-items:center;gap:6px;user-select:none}
+.chip:hover{border-color:var(--glass-border-hover);color:var(--text)}
+.chip.active{border-color:var(--accent);color:#111113;background:linear-gradient(155deg,#fff,var(--accent) 60%);box-shadow:0 10px 26px -12px rgba(199,199,204,.5)}
+.subrow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--glass-border);border-radius:20px;overflow:hidden;background:var(--glass-fill)}
+.seg button{font-family:var(--mono);font-size:11px;padding:7px 14px;background:none;border:none;color:var(--text-mute);cursor:pointer}
+.seg button.active{color:var(--text);background:rgba(255,255,255,.08)}
+.count-pill{font-family:var(--mono);font-size:11px;color:var(--text-mute);border:1px solid var(--border);padding:4px 10px;border-radius:20px}
+.rank-list{display:flex;flex-direction:column;gap:10px;margin:24px 0 8px;perspective:1400px}
+.rank-card{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:14px 16px;backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow);opacity:0;animation:cardin .4s ease forwards;position:relative;overflow:hidden;isolation:isolate;transition:border-color .2s,box-shadow .3s,transform .05s linear;transform:rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)) translateY(var(--lift,0px)) translateZ(var(--liftz,0px))}
+.rank-card::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;z-index:-1;background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.6),transparent 60%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .1s}
+.rank-card::after{content:'';position:absolute;inset:0;border-radius:inherit;z-index:-2;background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(199,199,204,.09),transparent 65%);opacity:0;transition:opacity .1s}
+.rank-card:hover::before,.rank-card:hover::after{opacity:1}
+.rank-card:hover{border-color:var(--glass-border-hover);box-shadow:0 26px 54px -22px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14)}
+@keyframes cardin{to{opacity:1}}
+@media (hover:none),(pointer:coarse){.rank-card{transform:none!important}}
+.rank-num{font-family:var(--display);font-weight:700;font-size:18px;color:var(--text-mute);text-align:center}
+.rank-card.top1 .rank-num{color:#d9a441}
+.rank-card.top2 .rank-num{color:#c7c7cc}
+.rank-card.top3 .rank-num{color:#c98f2e}
+.rank-info{min-width:0}
+.rank-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.rank-name{font-family:var(--display);font-weight:600;font-size:15px}
+.rank-vendor{font-family:var(--mono);font-size:10.5px;color:var(--text-mute);border:1px solid var(--border-soft);padding:2px 8px;border-radius:20px}
+.rank-tags{display:flex;gap:6px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--text-mute)}
+.rank-tags span{background:var(--accent-soft);color:var(--accent);padding:2px 7px;border-radius:5px}
+.bar-wrap{width:100%;height:6px;border-radius:4px;background:rgba(0,0,0,.3);margin-top:8px;overflow:hidden;max-width:340px}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),#fff)}
+.score-box{text-align:right;font-family:var(--mono)}
+.score-num{font-size:20px;font-weight:600;color:var(--text)}
+.score-lbl{font-size:9.5px;color:var(--text-mute);letter-spacing:.06em;text-transform:uppercase}
+.sources{max-width:900px;margin:8px auto 40px;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:16px 20px;backdrop-filter:var(--glass-blur)}
+.sources h4{font-family:var(--display);font-size:13px;margin:0 0 8px;color:var(--text);letter-spacing:.02em}
+.sources ul{margin:0;padding-left:18px;font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--text-mute)}
+.sources a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11px;color:var(--text-mute);border-top:1px solid var(--border-soft);position:relative;z-index:1}
+@media(max-width:640px){.rank-card{grid-template-columns:32px 1fr auto;padding:12px}.score-num{font-size:16px}.bar-wrap{max-width:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}body{opacity:1}}
+</style>
+</head><body>
+<div class="grid-overlay"></div>
+<div class="nebula"><span></span><span></span><span></span></div>
+<div class="starfield" id="starfield"><div class="stars-layer s1" id="s1"></div><div class="stars-layer s2" id="s2"></div><div class="stars-layer s3" id="s3"></div></div>
+<div class="planet-parallax"><div class="planet-wrap"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div>
+<div class="planet-parallax-2"><div class="planet-wrap-2 planet-2"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div>
+<div class="grain"></div>
+<div class="cursor-glow" id="cursor-glow"></div>
+<header><a href="https://leianet.ar" class="brand"><span class="dotwrap"></span><span>AI COMPARE<small>leianet.ar / hub dev</small></span></a></header>
+<main>
+<section class="hero">
+<div class="eyebrow">◆ leianetwork · comparador en vivo · datos verificados</div>
+<h1>¿Qué IA usar <span>hoy?</span></h1>
+<p>Rankeamos Anthropic, OpenAI, Google, xAI, DeepSeek, Alibaba, Moonshot, Z.AI y Meta — elegí una categoría y mirá el top, con precio real y fuentes abajo de cada sección.</p>
+</section>
+<div class="note"><p><strong>Metodología:</strong> el precio (input/output por millón de tokens) y la ventana de contexto son datos verificables tomados de las páginas oficiales de precios de cada proveedor (linkeadas abajo). Los puntajes por categoría son un índice cualitativo propio 0–100, construido a partir de leaderboards públicos como Artificial Analysis Intelligence Index y LLM-Stats — no un benchmark único, así que tomalo como guía, no como dato exacto.</p></div>
+<div class="controls">
+<div class="cat-row" id="catRow"></div>
+<div class="subrow">
+<div class="seg" id="topSeg"><button data-n="15" class="active">TOP 15</button><button data-n="20">TOP 20</button></div>
+<span class="count-pill" id="countPill"></span>
+</div>
+</div>
+<div class="rank-list" id="rankList"></div>
+<div class="sources" id="sourcesBox"></div>
+</main>
+<footer>AI COMPARE — parte de LeiaNET · hub para devs y gamers · leianet.ar</footer>
+<script>
+const CATS = [
+  {id:'general', label:'General', icon:'★'},
+  {id:'razonamiento', label:'Razonamiento', icon:'🧠'},
+  {id:'matematicas', label:'Matemáticas', icon:'∑'},
+  {id:'programacion', label:'Programación', icon:'</>'},
+  {id:'agentico', label:'Agéntico', icon:'⚙'},
+  {id:'rag', label:'RAG', icon:'🔎'},
+  {id:'chatbot', label:'Chatbot', icon:'💬'},
+  {id:'escritura', label:'Escritura', icon:'✎'},
+  {id:'imagenes', label:'Imágenes', icon:'🖼'},
+  {id:'video', label:'Video', icon:'🎬'},
+  {id:'contexto', label:'Contexto', icon:'📚'},
+  {id:'costo', label:'Costo', icon:'$'},
+];
+
+// precio = USD por 1M tokens [input, output], fuente oficial del proveedor (ver sección Fuentes)
+const MODELS = [
+  {n:'Claude Fable 5.1',vendor:'Anthropic',ctx:'1M',price:[10,50],s:{razonamiento:96,matematicas:93,programacion:96,agentico:97,rag:93,chatbot:90,escritura:95,imagenes:55,video:15,contexto:90,costo:38}},
+  {n:'Claude Opus 5.5',vendor:'Anthropic',ctx:'1M',price:[4,20],s:{razonamiento:96,matematicas:92,programacion:97,agentico:97,rag:93,chatbot:91,escritura:95,imagenes:58,video:18,contexto:90,costo:58}},
+  {n:'Claude Sonnet 5',vendor:'Anthropic',ctx:'1M',price:[2,10],s:{razonamiento:91,matematicas:87,programacion:94,agentico:93,rag:90,chatbot:90,escritura:92,imagenes:55,video:15,contexto:88,costo:80}},
+  {n:'Claude Haiku 4.5',vendor:'Anthropic',ctx:'200K',price:[1,5],s:{razonamiento:80,matematicas:76,programacion:83,agentico:80,rag:78,chatbot:84,escritura:82,imagenes:45,video:10,contexto:75,costo:92}},
+  {n:'GPT-6 Astra',vendor:'OpenAI',ctx:'1M',price:[10,50],s:{razonamiento:97,matematicas:95,programacion:95,agentico:96,rag:90,chatbot:91,escritura:90,imagenes:88,video:60,contexto:90,costo:38}},
+  {n:'GPT-5.6 Sol',vendor:'OpenAI',ctx:'1.05M',price:[4,20],s:{razonamiento:92,matematicas:91,programacion:91,agentico:90,rag:87,chatbot:90,escritura:88,imagenes:85,video:55,contexto:90,costo:76}},
+  {n:'GPT-5.6 Terra',vendor:'OpenAI',ctx:'1.05M',price:[2,12],s:{razonamiento:85,matematicas:83,programacion:84,agentico:80,rag:80,chatbot:86,escritura:83,imagenes:75,video:35,contexto:88,costo:87}},
+  {n:'GPT-5.6 Luna',vendor:'OpenAI',ctx:'1.05M',price:[0.2,1.2],s:{razonamiento:74,matematicas:70,programacion:73,agentico:65,rag:68,chatbot:80,escritura:74,imagenes:40,video:0,contexto:80,costo:99}},
+  {n:'Gemini 3.1 Pro',vendor:'Google',ctx:'2M',price:[2,12],s:{razonamiento:93,matematicas:90,programacion:89,agentico:88,rag:92,chatbot:88,escritura:87,imagenes:90,video:85,contexto:99,costo:87}},
+  {n:'Gemini 3.8 Flash',vendor:'Google',ctx:'1M',price:[0.75,3.75],s:{razonamiento:83,matematicas:80,programacion:81,agentico:76,rag:83,chatbot:85,escritura:80,imagenes:80,video:78,contexto:95,costo:95}},
+  {n:'Grok 4.6',vendor:'xAI',ctx:'500K',price:[2,6],s:{razonamiento:88,matematicas:87,programacion:86,agentico:82,rag:78,chatbot:85,escritura:82,imagenes:68,video:30,contexto:80,costo:90}},
+  {n:'Grok 4.1 Fast',vendor:'xAI',ctx:'2M',price:[0.2,0.5],s:{razonamiento:76,matematicas:73,programacion:74,agentico:68,rag:72,chatbot:80,escritura:75,imagenes:0,video:0,contexto:97,costo:99}},
+  {n:'DeepSeek V4 Pro',vendor:'DeepSeek',ctx:'164K',price:[0.435,0.87],s:{razonamiento:89,matematicas:90,programacion:90,agentico:80,rag:80,chatbot:82,escritura:80,imagenes:0,video:0,contexto:65,costo:98}},
+  {n:'DeepSeek V4 Flash',vendor:'DeepSeek',ctx:'164K',price:[0.14,0.28],s:{razonamiento:78,matematicas:78,programacion:79,agentico:68,rag:70,chatbot:76,escritura:74,imagenes:0,video:0,contexto:65,costo:100}},
+  {n:'Qwen 3.8 Max',vendor:'Alibaba',ctx:'256K',price:[1.2,6],s:{razonamiento:87,matematicas:86,programacion:87,agentico:78,rag:82,chatbot:82,escritura:80,imagenes:60,video:25,contexto:78,costo:85}},
+  {n:'Kimi K3',vendor:'Moonshot AI',ctx:'256K',price:null,s:{razonamiento:86,matematicas:82,programacion:87,agentico:83,rag:80,chatbot:80,escritura:79,imagenes:0,video:0,contexto:78,costo:0}},
+  {n:'GLM-5.3',vendor:'Z.AI',ctx:'200K',price:null,s:{razonamiento:83,matematicas:80,programacion:85,agentico:76,rag:77,chatbot:79,escritura:77,imagenes:0,video:0,contexto:70,costo:0}},
+  {n:'Llama 4 Maverick',vendor:'Meta (vía Groq)',ctx:'256K',price:null,s:{razonamiento:84,matematicas:79,programacion:81,agentico:74,rag:77,chatbot:82,escritura:79,imagenes:55,video:10,contexto:78,costo:0}},
+  {n:'Mistral Large 3',vendor:'Mistral',ctx:'256K',price:null,s:{razonamiento:84,matematicas:81,programacion:83,agentico:77,rag:80,chatbot:82,escritura:81,imagenes:30,video:0,contexto:78,costo:0}},
+  {n:'Pixtral Large',vendor:'Mistral',ctx:'128K',price:null,s:{razonamiento:79,matematicas:74,programacion:76,agentico:64,rag:72,chatbot:74,escritura:72,imagenes:85,video:20,contexto:70,costo:0}},
+];
+
+function computeScore(m, cat){
+  if(cat==='general'){
+    const keys=Object.keys(m.s).filter(k=>k!=='costo');
+    return Math.round(keys.reduce((a,k)=>a+m.s[k],0)/keys.length);
+  }
+  if(cat==='costo') return m.price ? m.s.costo : 0;
+  return m.s[cat] ?? 0;
+}
+function priceLabel(m){
+  if(!m.price) return 'precio no publicado';
+  const [i,o]=m.price;
+  return `$${i} / $${o} por 1M tok`;
+}
+
+const SOURCES_GENERAL = [
+  ['Artificial Analysis — LLM Leaderboard (Intelligence Index)','https://artificialanalysis.ai/leaderboards/models'],
+  ['LLM-Stats — AI Model Leaderboard','https://llm-stats.com/'],
+];
+const SOURCES_COSTO = [
+  ['Anthropic — API Pricing (Claude)','https://www.anthropic.com/pricing'],
+  ['OpenAI — API Pricing (GPT)','https://developers.openai.com/api/docs/pricing'],
+  ['Google — Gemini API Pricing','https://ai.google.dev/gemini-api/docs/pricing'],
+  ['xAI — Grok API Pricing','https://docs.x.ai/developers/pricing'],
+  ['DeepSeek — API Pricing','https://api-docs.deepseek.com/quick_start/pricing'],
+];
+
+let activeCat='general', topN=15;
+
+function renderChips(){
+  const row=document.getElementById('catRow');
+  row.innerHTML='';
+  CATS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='chip'+(c.id===activeCat?' active':'');
+    b.innerHTML=`<span>${c.icon}</span> ${c.label}`;
+    b.onclick=()=>{activeCat=c.id;renderChips();renderList();};
+    row.appendChild(b);
+  });
+}
+
+function attachTilt(card){
+  if(window.matchMedia('(pointer:coarse)').matches) return;
+  const MAX_TILT = 6; // grados — sutil, como el glass del sitio
+  card.addEventListener('mouseenter', ()=>{
+    card.style.setProperty('--lift','-5px');
+    card.style.setProperty('--liftz','6px');
+  });
+  card.addEventListener('mousemove', e=>{
+    const r=card.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    card.style.setProperty('--mx',(px*100)+'%');
+    card.style.setProperty('--my',(py*100)+'%');
+    card.style.setProperty('--rx',((px-0.5)*MAX_TILT*2).toFixed(2)+'deg');
+    card.style.setProperty('--ry',((0.5-py)*MAX_TILT*2).toFixed(2)+'deg');
+  });
+  card.addEventListener('mouseleave', ()=>{
+    card.style.setProperty('--rx','0deg');
+    card.style.setProperty('--ry','0deg');
+    card.style.setProperty('--lift','0px');
+    card.style.setProperty('--liftz','0px');
+  });
+}
+
+function renderList(){
+  const list=document.getElementById('rankList');
+  list.innerHTML='';
+  const ranked=MODELS.map(m=>({...m,score:computeScore(m,activeCat)}))
+    .filter(m=>m.score>0)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,topN);
+  document.getElementById('countPill').textContent = `${ranked.length} modelos · categoría: ${CATS.find(c=>c.id===activeCat).label}`;
+  ranked.forEach((m,i)=>{
+    const div=document.createElement('div');
+    const topClass = i===0?'top1':i===1?'top2':i===2?'top3':'';
+    div.className=`rank-card ${topClass}`;
+    div.style.animationDelay=(i*35)+'ms';
+    const tagExtra = activeCat==='costo' ? priceLabel(m) : `ctx ${m.ctx}`;
+    div.innerHTML=`
+      <div class="rank-num">#${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-head"><span class="rank-name">${m.n}</span><span class="rank-vendor">${m.vendor}</span></div>
+        <div class="rank-tags"><span>${tagExtra}</span>${activeCat!=='costo'?`<span>${priceLabel(m)}</span>`:''}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${m.score}%"></div></div>
+      </div>
+      <div class="score-box"><div class="score-num">${m.score}</div><div class="score-lbl">/100</div></div>
+    `;
+    list.appendChild(div);
+    attachTilt(div);
+  });
+  renderSources();
+}
+
+function renderSources(){
+  const box=document.getElementById('sourcesBox');
+  const list = activeCat==='costo' ? SOURCES_COSTO : SOURCES_GENERAL.concat(activeCat==='costo'?[]:[]);
+  const extra = activeCat==='costo' ? [] : SOURCES_COSTO.slice(0,0);
+  box.innerHTML = `<h4>Fuentes usadas en esta sección (${CATS.find(c=>c.id===activeCat).label})</h4><ul>${
+    list.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')
+  }${activeCat!=='costo'?`<li>Precios de cada modelo: ver páginas oficiales de precios (Anthropic, OpenAI, Google, xAI, DeepSeek) — mismas que en la categoría Costo.</li>`:''}</ul>`;
+}
+
+document.getElementById('topSeg').addEventListener('click',e=>{
+  const btn=e.target.closest('button'); if(!btn) return;
+  document.querySelectorAll('#topSeg button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  topN=parseInt(btn.dataset.n,10);
+  renderList();
+});
+
+renderChips();
+renderList();
+
+// ---- starfield ----
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const layers=[{id:'s1',count:110,size:1,opacity:.9},{id:'s2',count:70,size:2,opacity:.7},{id:'s3',count:35,size:1,opacity:1}];
+  const w=2600,h=2000;
+  layers.forEach(l=>{
+    const el=document.getElementById(l.id); if(!el) return;
+    let shadows=[];
+    for(let i=0;i<l.count;i++){
+      shadows.push(`${Math.round(Math.random()*w)}px ${Math.round(Math.random()*h)}px 0px rgba(255,255,255,${l.opacity})`);
+    }
+    el.style.width=l.size+'px';el.style.height=l.size+'px';el.style.borderRadius='50%';el.style.background='transparent';el.style.boxShadow=shadows.join(',');
+  });
+  if(reduceMotion) return;
+  const starfield=document.getElementById('starfield');
+  const supportsOffsetPath = window.CSS && CSS.supports && CSS.supports('offset-path',"path('M0,0')");
+  function spawnShootingStar(){
+    if(starfield.querySelectorAll('.shooting-star').length>=3) return;
+    const el=document.createElement('div'); el.className='shooting-star fire';
+    const vw=window.innerWidth;
+    el.style.top=(15+Math.random()*45)+'%'; el.style.left=(10+Math.random()*40)+'%';
+    const dir=Math.random()<0.5?1:-1;
+    const dx=dir*(Math.min(vw*0.35,420)+Math.random()*120), dy=70+Math.random()*160;
+    const dur=(1.0+Math.random()*0.6);
+    el.style.setProperty('--star-dur',dur.toFixed(2)+'s');
+    if(supportsOffsetPath){
+      const len=Math.hypot(dx,dy)||1, perpX=-dy/len, perpY=dx/len, sign=Math.random()<0.5?1:-1, amt=50+Math.random()*70;
+      const cx=dx/2+perpX*amt*sign, cy=dy/2+perpY*amt*sign;
+      el.style.offsetPath=`path('M0,0 Q${cx.toFixed(1)},${cy.toFixed(1)} ${dx.toFixed(1)},${dy.toFixed(1)}')`;
+    }
+    starfield.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+  function spawnMeteor(){
+    if(starfield.querySelectorAll('.meteor').length>=1) return;
+    const el=document.createElement('div'); el.className='meteor';
+    el.innerHTML='<div class="meteor-trail"></div><div class="meteor-rock"></div>';
+    const vw=window.innerWidth;
+    el.style.top=(2+Math.random()*18)+'%'; el.style.left=(5+Math.random()*60)+'%';
+    const dir=Math.random()<0.5?1:-1;
+    const dx=dir*(Math.min(vw*0.45,560)+Math.random()*160), dy=220+Math.random()*220;
+    const dur=(2.0+Math.random()*1.0);
+    el.style.setProperty('--meteor-dur',dur.toFixed(2)+'s');
+    if(supportsOffsetPath){
+      const len=Math.hypot(dx,dy)||1, perpX=-dy/len, perpY=dx/len, sign=Math.random()<0.5?1:-1, amt=30+Math.random()*40;
+      const cx=dx/2+perpX*amt*sign, cy=dy/2+perpY*amt*sign;
+      el.style.offsetPath=`path('M0,0 Q${cx.toFixed(1)},${cy.toFixed(1)} ${dx.toFixed(1)},${dy.toFixed(1)}')`;
+    }
+    starfield.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+  function scheduleStar(){ setTimeout(()=>{ if(!document.hidden) spawnShootingStar(); scheduleStar(); }, 2200+Math.random()*5500); }
+  function scheduleMeteor(){ setTimeout(()=>{ if(!document.hidden) spawnMeteor(); scheduleMeteor(); }, 20000+Math.random()*25000); }
+  setTimeout(spawnShootingStar,400); scheduleStar();
+  setTimeout(spawnMeteor,3500); scheduleMeteor();
+})();
+
+// ---- cursor glow ----
+(function(){
+  const glow=document.getElementById('cursor-glow');
+  if(window.matchMedia('(hover:none),(pointer:coarse)').matches) return;
+  window.addEventListener('mousemove', e=>{
+    document.documentElement.style.setProperty('--cx', e.clientX+'px');
+    document.documentElement.style.setProperty('--cy', e.clientY+'px');
+    glow.classList.add('active');
+  });
+})();
+
+window.addEventListener('load',()=>document.body.classList.add('loaded'));
+</script>
+</body></html>
