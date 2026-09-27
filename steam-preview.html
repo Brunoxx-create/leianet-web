@@ -115,7 +115,7 @@ html,body{height:100%}
 html{scroll-behavior:smooth}
 ::selection{background:rgba(199,199,204,.28);color:#fff}
 ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#2c2c31;border-radius:10px;border:2px solid var(--bg)}
-body{margin:0;background:radial-gradient(1200px 600px at 15% -10%,rgba(217,164,65,.06),transparent 60%),radial-gradient(900px 500px at 90% 0%,rgba(255,255,255,.03),transparent 55%),var(--bg);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;padding-bottom:40px;opacity:0}
+body{margin:0;background:radial-gradient(1200px 600px at 15% -10%,rgba(217,164,65,.06),transparent 60%),radial-gradient(900px 500px at 90% 0%,rgba(255,255,255,.03),transparent 55%),var(--bg);background-attachment:fixed,fixed,scroll;color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;padding-bottom:40px;opacity:0}
 body.loaded{opacity:1;transition:opacity .5s ease}
 a{color:inherit}
 .grain{position:fixed;inset:-100px;z-index:1;pointer-events:none;opacity:.035;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
@@ -136,20 +136,50 @@ a{color:inherit}
 .shooting-star::before{content:'';position:absolute;top:50%;left:0;width:130px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9));transform-origin:100% 50%;transform:translate(-100%,-50%)}
 .shooting-star.fire{offset-rotate:auto;animation:shoot var(--star-dur,1.1s) linear forwards}
 @keyframes shoot{0%{offset-distance:0%;opacity:0}8%{opacity:1}70%{opacity:.9}100%{offset-distance:100%;opacity:0}}
-.planet-parallax{position:fixed;top:6%;right:-8%;z-index:0;pointer-events:none}
-.planet-wrap{animation:planet-float 26s ease-in-out infinite}
+.depth-veil{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1400px 900px at 50% 0%,transparent 0%,rgba(6,6,10,var(--depth,0)) 100%);transition:background .15s linear}
+.nebula-mono{position:fixed;inset:-10%;pointer-events:none;z-index:0;overflow:hidden}
+.nebula-mono span{position:absolute;border-radius:50%;filter:blur(50px);width:72vw;height:72vw;top:32%;left:12%;background:radial-gradient(circle,rgba(165,165,172,.28) 0%,rgba(95,95,102,.20) 32%,rgba(18,18,22,.28) 56%,transparent 74%);animation:nebdrift 56s ease-in-out infinite;animation-delay:-14s}
+.planet-parallax{position:fixed;top:6%;right:-8%;z-index:0;pointer-events:none;transform:translate3d(0,calc(var(--scroll-y,0px) * -0.12),0)}
+.planet-wrap{animation:planet-float 26s ease-in-out infinite;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
 .planet-glow{position:absolute;inset:-40%;border-radius:50%;background:radial-gradient(circle,rgba(199,199,204,.16),transparent 70%);filter:blur(10px)}
 .planet{position:relative;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.5),transparent 42%),radial-gradient(circle at 60% 65%,rgba(255,255,255,.06),transparent 55%),linear-gradient(155deg,#3a3a40 0%,#232326 45%,#131315 100%);box-shadow:inset -32px -25px 72px rgba(0,0,0,.65),inset 18px 14px 42px rgba(255,255,255,.05),0 0 100px rgba(199,199,204,.10)}
 .planet-ring{position:absolute;top:50%;left:50%;width:440px;height:112px;transform:translate(-50%,-50%) rotate(-18deg);border-radius:50%;border:1px solid rgba(199,199,204,.28)}
 @keyframes planet-float{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,18px)}}
 @media (max-width:900px){.planet-parallax{display:none}}
-.planet-parallax-2{position:fixed;bottom:-70px;left:-70px;z-index:0;pointer-events:none}
-.planet-wrap-2{animation:planet-float-2 32s ease-in-out infinite}
+.planet-parallax-2{position:fixed;bottom:-70px;left:-70px;z-index:0;pointer-events:none;transform:translate3d(0,calc(var(--scroll-y,0px) * -0.07),0)}
+.planet-wrap-2{animation:planet-float-2 32s ease-in-out infinite;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
 .planet-2 .planet-glow{background:radial-gradient(circle,rgba(217,164,65,.18),transparent 70%)}
 .planet-2 .planet{width:190px;height:190px;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.4),transparent 42%),radial-gradient(circle at 62% 68%,rgba(255,255,255,.05),transparent 55%),linear-gradient(155deg,#4a3d2c 0%,#2a2320 45%,#14110f 100%);box-shadow:inset -22px -18px 48px rgba(0,0,0,.65),inset 14px 11px 28px rgba(255,255,255,.05),0 0 74px rgba(217,164,65,.12)}
 .planet-2 .planet-ring{width:290px;height:72px;border-color:rgba(217,164,65,.24)}
 @keyframes planet-float-2{0%,100%{transform:translate(0,0)}50%{transform:translate(12px,-14px)}}
 @media (max-width:900px){.planet-parallax-2{display:none}}
+.asteroid-parallax{position:fixed;top:22%;left:4%;z-index:0;pointer-events:none;transform:translate3d(0,calc(var(--scroll-y,0px) * -0.2),0)}
+.asteroid-wrap{animation:asteroid-float 19s ease-in-out infinite;will-change:transform;transform:translateZ(0) rotate(0deg)}
+.asteroid{position:relative;width:64px;height:52px;border-radius:52% 48% 58% 42% / 48% 44% 56% 52%;background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.28),transparent 45%),linear-gradient(150deg,#4a4a50 0%,#2c2c30 55%,#17171a 100%);box-shadow:inset -10px -8px 20px rgba(0,0,0,.6),inset 6px 5px 12px rgba(255,255,255,.05),0 0 24px rgba(199,199,204,.08)}
+.asteroid::after{content:'';position:absolute;inset:0;border-radius:inherit;background-image:radial-gradient(circle at 25% 35%,rgba(0,0,0,.25) 0 4px,transparent 5px),radial-gradient(circle at 65% 60%,rgba(0,0,0,.2) 0 3px,transparent 4px)}
+@keyframes asteroid-float{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(14px,10px) rotate(24deg)}}
+@media (max-width:900px){.asteroid-parallax{display:none}}
+.satellite-parallax{position:fixed;top:46%;right:8%;z-index:0;pointer-events:none;transform:translate3d(0,calc(var(--scroll-y,0px) * -0.16),0)}
+.satellite-wrap{animation:satellite-float 24s ease-in-out infinite;will-change:transform;transform:translateZ(0)}
+.satellite{position:relative;width:46px;height:46px;transform:rotate(-30deg);filter:drop-shadow(0 0 10px rgba(217,164,65,.18))}
+.satellite .sat-body{position:absolute;top:50%;left:50%;width:22px;height:14px;transform:translate(-50%,-50%);border-radius:3px;background:linear-gradient(155deg,#c7c7cc 0%,#8f8f96 55%,#4a4a50 100%);box-shadow:inset -3px -2px 5px rgba(0,0,0,.5),inset 2px 2px 4px rgba(255,255,255,.15)}
+.satellite .sat-panel{position:absolute;top:50%;width:16px;height:8px;transform:translateY(-50%);background:linear-gradient(155deg,rgba(217,164,65,.55),rgba(120,90,30,.45));border:1px solid rgba(217,164,65,.5)}
+.satellite .sat-panel.left{left:-19px}
+.satellite .sat-panel.right{right:-19px}
+.satellite .sat-dish{position:absolute;top:-9px;left:50%;width:10px;height:10px;transform:translateX(-50%);border-radius:50% 50% 50% 0;background:linear-gradient(155deg,#d9d9de,#8f8f96)}
+.satellite .sat-blink{position:absolute;top:50%;left:50%;width:3px;height:3px;border-radius:50%;transform:translate(6px,-8px);background:#d9a441;animation:sat-blink 2.6s ease-in-out infinite}
+@keyframes sat-blink{0%,80%,100%{opacity:.2;box-shadow:0 0 2px 0 rgba(217,164,65,.4)}90%{opacity:1;box-shadow:0 0 6px 2px rgba(217,164,65,.7)}}
+@keyframes satellite-float{0%,100%{transform:translate(0,0) rotate(-30deg)}50%{transform:translate(-20px,16px) rotate(-22deg)}}
+@media (max-width:900px){.satellite-parallax{display:none}}
+#sparkles{position:absolute;inset:0}
+.sparkle{position:absolute;border-radius:50%;background:#fff;box-shadow:0 0 4px 1px rgba(255,255,255,.5);animation:sparkle-flare 4.5s ease-in-out infinite}
+@keyframes sparkle-flare{0%,88%,100%{opacity:.32;box-shadow:0 0 3px 1px rgba(255,255,255,.28);transform:scale(1)}92%{opacity:.72;box-shadow:0 0 8px 2px rgba(255,255,255,.6),0 0 14px 4px rgba(255,255,255,.2);transform:scale(1.4)}96%{opacity:.55;box-shadow:0 0 5px 1px rgba(255,255,255,.45);transform:scale(1.1)}}
+.meteor{position:absolute;top:0;left:0;width:10px;height:10px;opacity:0;offset-rotate:auto;animation:meteor-fly var(--meteor-dur,2.4s) linear forwards}
+.meteor .meteor-rock{position:absolute;top:50%;left:50%;width:9px;height:8px;transform:translate(-50%,-50%) rotate(-25deg);border-radius:44% 56% 62% 38% / 52% 40% 60% 48%;background:radial-gradient(circle at 32% 30%,rgba(255,236,210,.85),transparent 46%),linear-gradient(150deg,#6b5040 0%,#3a2a20 55%,#1c1310 100%);box-shadow:0 0 6px 1px rgba(255,150,60,.5)}
+.meteor .meteor-trail{position:absolute;top:50%;left:0;width:190px;height:8px;transform:translate(-100%,-50%);transform-origin:100% 50%;background:linear-gradient(90deg,transparent 0%,rgba(255,120,40,0) 4%,rgba(255,140,50,.5) 45%,rgba(255,190,110,.85) 80%,rgba(255,235,200,.95) 100%);filter:blur(.5px);border-radius:50%}
+.meteor .meteor-trail::before{content:'';position:absolute;inset:0;background:inherit;filter:blur(4px);opacity:.6}
+@keyframes meteor-fly{0%{offset-distance:0%;opacity:0}6%{opacity:1}65%{opacity:1}100%{offset-distance:100%;opacity:0}}
+@supports not (offset-path:path('M0,0')){.meteor{animation:meteor-fly-fallback var(--meteor-dur,2.4s) linear forwards}@keyframes meteor-fly-fallback{0%{transform:translate(0,0);opacity:0}6%{opacity:1}65%{opacity:1}100%{transform:translate(var(--meteor-dx,-520px),var(--meteor-dy,300px));opacity:0}}}
 .cursor-glow{position:fixed;top:0;left:0;width:520px;height:520px;z-index:0;pointer-events:none;background:radial-gradient(circle,rgba(199,199,204,.06),transparent 68%);transform:translate(calc(var(--cx,50vw) - 50%),calc(var(--cy,50vh) - 50%));transition:opacity .3s ease;opacity:0}
 .cursor-glow.active{opacity:1}
 @media (hover:none),(pointer:coarse){.cursor-glow{display:none}}
@@ -191,11 +221,14 @@ html.low-perf .perf-toggle.active:hover{transform:none !important}
   .nav-backdrop.open{opacity:1;pointer-events:auto}
 }
 @media (max-width:640px){header{padding:12px 16px}.brand img{height:34px}}
-html.low-perf .cursor-glow,html.low-perf .nebula,html.low-perf .grid-overlay,html.low-perf .planet-parallax,html.low-perf .planet-parallax-2,html.low-perf .grain,html.low-perf .starfield .shooting-star{display:none!important}
+html.low-perf .cursor-glow,html.low-perf .nebula,html.low-perf .nebula-mono,html.low-perf .depth-veil,html.low-perf .grid-overlay,html.low-perf .planet-parallax,html.low-perf .planet-parallax-2,html.low-perf .asteroid-parallax,html.low-perf .satellite-parallax,html.low-perf .grain,html.low-perf .starfield .shooting-star,html.low-perf .starfield .meteor,html.low-perf #sparkles,html.low-perf .sparkle{display:none!important}
 html.low-perf .stars-layer{animation:none!important}
-html.low-perf *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:none!important;transition:none!important}
-html.perf-mid .cursor-glow,html.perf-mid .nebula,html.perf-mid .grid-overlay,html.perf-mid .planet-parallax,html.perf-mid .planet-parallax-2,html.perf-mid .grain,html.perf-mid .starfield .shooting-star{display:none!important}
-html.perf-mid header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important}
+html.low-perf .game-card{opacity:1!important}
+html.low-perf *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;filter:none!important;box-shadow:none!important;animation:none!important;transition:none!important}
+html.perf-mid .cursor-glow,html.perf-mid .nebula,html.perf-mid .nebula-mono,html.perf-mid .depth-veil,html.perf-mid .grid-overlay,html.perf-mid .planet-parallax,html.perf-mid .planet-parallax-2,html.perf-mid .asteroid-parallax,html.perf-mid .satellite-parallax,html.perf-mid .grain,html.perf-mid .starfield .shooting-star,html.perf-mid .starfield .meteor,html.perf-mid #sparkles,html.perf-mid .sparkle{display:none!important}
+html.perf-mid .tier-platinum,html.perf-mid .game-card.tier-glow-platinum{animation:none!important}
+html.perf-mid header,html.perf-mid .icon-btn,html.perf-mid .search-box,html.perf-mid .profile-card,html.perf-mid .reco-box,html.perf-mid .linux-stat,html.perf-mid .sort-tabs button,html.perf-mid .game-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;border-color:var(--border)!important}
+html.perf-mid .sort-tabs button.active,html.perf-mid .search-box button{background:var(--accent)!important;color:#111113!important}
 .hero{padding:clamp(40px,7vw,68px) 0 20px;text-align:center}
 .eyebrow{font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;gap:8px;justify-content:center;align-items:center}
 h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,50px);line-height:1.05;margin:0 0 14px;letter-spacing:-.01em}
@@ -245,26 +278,34 @@ h1 span{background:linear-gradient(100deg,var(--accent) 20%,#fff 50%,var(--accen
 .error-flag{color:#ff9a9a;font-weight:700;font-size:10.5px}
 .tier-badge{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 10px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
 .tier-badge{font-family:var(--mono);font-weight:700;font-size:10.5px;letter-spacing:.05em;padding:5px 12px;border-radius:20px;text-transform:uppercase;white-space:nowrap;border:1px solid transparent}
-.tier-platinum{background:rgba(210,225,255,.22);color:#eef4ff;border-color:rgba(210,225,255,.5);box-shadow:0 0 14px -4px rgba(210,225,255,.6)}
+.tier-platinum{background:rgba(210,225,255,.3);color:#f7fbff;border-color:rgba(220,232,255,.85);box-shadow:0 0 16px -1px rgba(220,232,255,.95),0 0 34px 2px rgba(160,200,255,.6),0 0 60px 6px rgba(140,180,255,.25);animation:platinum-badge-pulse 2.2s ease-in-out infinite}
+@keyframes platinum-badge-pulse{0%,100%{box-shadow:0 0 16px -1px rgba(220,232,255,.95),0 0 34px 2px rgba(160,200,255,.6),0 0 60px 6px rgba(140,180,255,.25)}50%{box-shadow:0 0 22px 3px rgba(220,232,255,1),0 0 48px 8px rgba(160,200,255,.85),0 0 84px 14px rgba(140,180,255,.4)}}
 .tier-gold{background:rgba(217,164,65,.26);color:#ffcf7a;border-color:rgba(217,164,65,.6);box-shadow:0 0 14px -4px rgba(217,164,65,.6)}
 .tier-silver{background:rgba(199,199,204,.24);color:#ededee;border-color:rgba(199,199,204,.55)}
 .tier-bronze{background:rgba(201,143,46,.24);color:#e3a24f;border-color:rgba(201,143,46,.55)}
 .tier-borked{background:rgba(224,122,122,.24);color:#ff9a9a;border-color:rgba(224,122,122,.55);box-shadow:0 0 14px -4px rgba(224,122,122,.5)}
 .tier-pending{background:rgba(255,255,255,.06);color:var(--text-mute);border-color:var(--border-soft)}
 .tier-unknown{background:rgba(255,255,255,.04);color:var(--text-mute);border-color:var(--border-soft)}
-.game-card.tier-glow-platinum{border-color:rgba(210,225,255,.35)}
+.game-card.tier-glow-platinum{border-color:rgba(220,232,255,.75);box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5);animation:platinum-card-pulse 2.8s ease-in-out infinite}
+.game-card.tier-glow-platinum:hover{border-color:rgba(230,240,255,.95);box-shadow:0 0 40px -2px rgba(220,232,255,.9),0 0 78px -6px rgba(160,200,255,.6),inset 0 0 26px -12px rgba(220,232,255,.6)}
+@keyframes platinum-card-pulse{0%,100%{box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5)}50%{box-shadow:0 0 42px 0px rgba(220,232,255,.95),0 0 80px -2px rgba(160,200,255,.7),inset 0 0 30px -10px rgba(220,232,255,.65)}}
 .game-card.tier-glow-gold{border-color:rgba(217,164,65,.4)}
 .game-card.tier-glow-borked{border-color:rgba(224,122,122,.4)}
 footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11px;color:var(--text-mute);border-top:1px solid var(--border-soft);position:relative;z-index:1;margin-top:40px}
 @media(max-width:640px){.game-card{grid-template-columns:auto 1fr auto;padding:9px 10px}.game-card img{width:36px;height:36px}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}body{opacity:1}}
+@media (max-width:640px),(pointer:coarse){.nebula,.nebula-mono,.grain{display:none}.stars-layer{animation:none!important}.sparkle{animation:none;opacity:.4}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}body{opacity:1}.game-card{opacity:1!important}}
 </style>
 </head><body>
 <div class="grid-overlay"></div>
+<div class="depth-veil"></div>
 <div class="nebula"><span></span><span></span><span></span></div>
-<div class="starfield" id="starfield"><div class="stars-layer s1" id="s1"></div><div class="stars-layer s2" id="s2"></div><div class="stars-layer s3" id="s3"></div></div>
+<div class="nebula-mono"><span></span></div>
+<div class="starfield" id="starfield"><div class="stars-layer s1" id="s1"></div><div class="stars-layer s2" id="s2"></div><div class="stars-layer s3" id="s3"></div><div id="sparkles"></div></div>
 <div class="planet-parallax"><div class="planet-wrap"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div>
 <div class="planet-parallax-2"><div class="planet-wrap-2 planet-2"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div>
+<div class="asteroid-parallax"><div class="asteroid-wrap"><div class="asteroid"></div></div></div>
+<div class="satellite-parallax"><div class="satellite-wrap"><div class="satellite"><div class="sat-panel left"></div><div class="sat-body"></div><div class="sat-panel right"></div><div class="sat-dish"></div><div class="sat-blink"></div></div></div></div>
 <div class="grain"></div>
 <div class="cursor-glow" id="cursor-glow"></div>
 <header><a href="index.html" class="brand" aria-label="Ir al inicio"><img width="860" height="150" loading="eager" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"></a><div class="header-right"><nav id="main-nav"><a href="index.html#minecraft">Minecraft</a><a href="index.html#cs16">CS 1.6</a><a href="index.html#haxball">Haxball</a><a href="index.html#novedades">Novedades</a><a href="utilidades.html" class="active">Utilidades</a><a href="index.html#cafecito">Cafecito</a><a href="index.html#faq">FAQ</a><a href="index.html#contact">Contacto</a></nav><button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg><span class="perf-tip" aria-hidden="true">ACTIVADO</span></button><button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button></div></header><div class="nav-backdrop" id="nav-backdrop"></div>
@@ -594,7 +635,22 @@ document.getElementById('steamInput').addEventListener('keydown', e=>{ if(e.key=
     }
     el.style.width=l.size+'px';el.style.height=l.size+'px';el.style.borderRadius='50%';el.style.background='transparent';el.style.boxShadow=shadows.join(',');
   });
-  if(reduceMotion) return;
+  // sparkle stars — a handful of stars that flare brightly at random moments
+  if(!reduceMotion && !window.__MID_OR_WORSE__){
+    const container=document.getElementById('sparkles');
+    if(container){
+      for(let i=0;i<14;i++){
+        const s=document.createElement('div'); s.className='sparkle';
+        const size=Math.random()<.3?3:2;
+        s.style.width=size+'px'; s.style.height=size+'px';
+        s.style.left=Math.random()*100+'vw'; s.style.top=Math.random()*window.innerHeight+'px';
+        s.style.animationDuration=(3.5+Math.random()*4.5)+'s';
+        s.style.animationDelay=(Math.random()*6)+'s';
+        container.appendChild(s);
+      }
+    }
+  }
+  if(reduceMotion || window.__MID_OR_WORSE__) return;
   const starfield=document.getElementById('starfield');
   const supportsOffsetPath = window.CSS && CSS.supports && CSS.supports('offset-path',"path('M0,0')");
   function spawnShootingStar(){
@@ -614,8 +670,69 @@ document.getElementById('steamInput').addEventListener('keydown', e=>{ if(e.key=
     starfield.appendChild(el);
     el.addEventListener('animationend',()=>el.remove());
   }
-  function scheduleStar(){ setTimeout(()=>{ if(!document.hidden) spawnShootingStar(); scheduleStar(); }, 2200+Math.random()*5500); }
-  setTimeout(spawnShootingStar,400); scheduleStar();
+  function spawnMeteor(){
+    if(!starfield || starfield.querySelectorAll('.meteor').length>=1) return;
+    const el=document.createElement('div'); el.className='meteor';
+    el.innerHTML='<div class="meteor-trail"></div><div class="meteor-rock"></div>';
+    const vw=window.innerWidth;
+    el.style.top=(2+Math.random()*18)+'%'; el.style.left=(5+Math.random()*60)+'%';
+    const dir=Math.random()<0.5?1:-1;
+    const dx=dir*(Math.min(vw*0.45,560)+Math.random()*160), dy=220+Math.random()*220;
+    const dur=(2.0+Math.random()*1.0);
+    el.style.setProperty('--meteor-dur',dur.toFixed(2)+'s');
+    if(supportsOffsetPath){
+      const len=Math.hypot(dx,dy)||1, perpX=-dy/len, perpY=dx/len, sign=Math.random()<0.5?1:-1, amt=30+Math.random()*40;
+      const cx=dx/2+perpX*amt*sign, cy=dy/2+perpY*amt*sign;
+      el.style.offsetPath=`path('M0,0 Q${cx.toFixed(1)},${cy.toFixed(1)} ${dx.toFixed(1)},${dy.toFixed(1)}')`;
+    } else {
+      el.style.setProperty('--meteor-dx',dx.toFixed(1)+'px'); el.style.setProperty('--meteor-dy',dy.toFixed(1)+'px');
+    }
+    starfield.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+  let starTimers=[];
+  function clearStarTimers(){ starTimers.forEach(id=>clearTimeout(id)); starTimers=[]; }
+  function scheduleStar(){
+    const id=setTimeout(()=>{
+      if(!document.hidden) spawnShootingStar();
+      scheduleStar();
+    }, 2200+Math.random()*5500);
+    starTimers.push(id);
+  }
+  function scheduleMeteor(){
+    const id=setTimeout(()=>{
+      if(!document.hidden) spawnMeteor();
+      scheduleMeteor();
+    }, 20000+Math.random()*25000);
+    starTimers.push(id);
+  }
+  const t1=setTimeout(spawnShootingStar,400); starTimers.push(t1); scheduleStar();
+  const t2=setTimeout(spawnMeteor,6000+Math.random()*4000); starTimers.push(t2); scheduleMeteor();
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){ clearStarTimers(); }
+    else { starfield.querySelectorAll('.shooting-star,.meteor').forEach(el=>el.remove()); scheduleStar(); scheduleMeteor(); }
+  });
+  window.addEventListener('perfmid:on', ()=>{
+    clearStarTimers();
+    starfield.querySelectorAll('.shooting-star,.meteor').forEach(el=>el.remove());
+    const sparkles=document.getElementById('sparkles'); if(sparkles) sparkles.innerHTML='';
+  });
+})();
+
+// ---- scroll depth (parallax de planetas + oscurecido de fondo) ----
+(function(){
+  const root=document.documentElement;
+  let ticking=false;
+  const maxDepthAt=1800;
+  function update(){
+    const y=window.scrollY||window.pageYOffset||0;
+    root.style.setProperty('--scroll-y', y+'px');
+    root.style.setProperty('--depth', Math.min(y/maxDepthAt,0.55).toFixed(3));
+    ticking=false;
+  }
+  function onScroll(){ if(!ticking){ requestAnimationFrame(update); ticking=true; } }
+  update();
+  window.addEventListener('scroll', onScroll, {passive:true});
 })();
 
 // ---- cursor glow ----
