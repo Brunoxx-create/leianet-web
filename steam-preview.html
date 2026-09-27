@@ -226,7 +226,9 @@ html.low-perf .stars-layer{animation:none!important}
 html.low-perf .game-card{opacity:1!important}
 html.low-perf *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;filter:none!important;box-shadow:none!important;animation:none!important;transition:none!important}
 html.perf-mid .cursor-glow,html.perf-mid .nebula,html.perf-mid .nebula-mono,html.perf-mid .depth-veil,html.perf-mid .grid-overlay,html.perf-mid .planet-parallax,html.perf-mid .planet-parallax-2,html.perf-mid .asteroid-parallax,html.perf-mid .satellite-parallax,html.perf-mid .grain,html.perf-mid .starfield .shooting-star,html.perf-mid .starfield .meteor,html.perf-mid #sparkles,html.perf-mid .sparkle{display:none!important}
-html.perf-mid .tier-platinum,html.perf-mid .game-card.tier-glow-platinum{animation:none!important}
+html.perf-mid .tier-platinum{animation:none!important}
+html.perf-mid .game-card.tier-glow-platinum{animation:cardin .4s ease forwards!important}
+html.low-perf .game-card.tier-glow-platinum{animation:none!important;opacity:1!important}
 html.perf-mid header,html.perf-mid .icon-btn,html.perf-mid .search-box,html.perf-mid .profile-card,html.perf-mid .reco-box,html.perf-mid .linux-stat,html.perf-mid .sort-tabs button,html.perf-mid .game-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;border-color:var(--border)!important}
 html.perf-mid .sort-tabs button.active,html.perf-mid .search-box button{background:var(--accent)!important;color:#111113!important}
 .hero{padding:clamp(40px,7vw,68px) 0 20px;text-align:center}
@@ -286,7 +288,7 @@ h1 span{background:linear-gradient(100deg,var(--accent) 20%,#fff 50%,var(--accen
 .tier-borked{background:rgba(224,122,122,.24);color:#ff9a9a;border-color:rgba(224,122,122,.55);box-shadow:0 0 14px -4px rgba(224,122,122,.5)}
 .tier-pending{background:rgba(255,255,255,.06);color:var(--text-mute);border-color:var(--border-soft)}
 .tier-unknown{background:rgba(255,255,255,.04);color:var(--text-mute);border-color:var(--border-soft)}
-.game-card.tier-glow-platinum{border-color:rgba(220,232,255,.75);box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5);animation:platinum-card-pulse 2.8s ease-in-out infinite}
+.game-card.tier-glow-platinum{border-color:rgba(220,232,255,.75);box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5);animation:cardin .4s ease forwards,platinum-card-pulse 2.8s ease-in-out infinite .4s}
 .game-card.tier-glow-platinum:hover{border-color:rgba(230,240,255,.95);box-shadow:0 0 40px -2px rgba(220,232,255,.9),0 0 78px -6px rgba(160,200,255,.6),inset 0 0 26px -12px rgba(220,232,255,.6)}
 @keyframes platinum-card-pulse{0%,100%{box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5)}50%{box-shadow:0 0 42px 0px rgba(220,232,255,.95),0 0 80px -2px rgba(160,200,255,.7),inset 0 0 30px -10px rgba(220,232,255,.65)}}
 .game-card.tier-glow-gold{border-color:rgba(217,164,65,.4)}
