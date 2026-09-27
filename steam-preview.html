@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>STEAM PREVIEW — LeiaNET Hub</title>
+<title>Linux GAMES - LeiaNET</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -156,7 +157,11 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 <div class="sort-tabs" id="sortTabs">
 <button data-sort="playtime" class="active">Tiempo jugado</button>
 <button data-sort="price">Precio actual</button>
-<button data-sort="achievements">Logros</button>
+</div>
+<div class="search-box" style="max-width:480px;margin:0 0 16px">
+<input id="gameSearch" list="gameSuggestions" type="text" placeholder="BUSCAR JUEGO — nombre o AppID…" autocomplete="off">
+<datalist id="gameSuggestions"></datalist>
+<button id="clearSearchBtn" style="display:none">Limpiar</button>
 </div>
 <div class="game-list" id="gameList"></div>
 </div>
@@ -227,10 +232,10 @@ function attachTilt(card){
 }
 
 let currentTop = [];   // los ~20 juegos con más horas de la biblioteca actual
+let allGames = [];     // biblioteca completa, para la búsqueda
 let currentSteamId = null;
 let sortMode = 'playtime';
 const priceCache = new Map();
-const achCache = new Map();
 
 async function getPrice(appid){
   if(priceCache.has(appid)) return priceCache.get(appid);
@@ -241,16 +246,6 @@ async function getPrice(appid){
     priceCache.set(appid, val);
     return val;
   }catch(e){ priceCache.set(appid, null); return null; }
-}
-async function getAchievementPct(steamid, appid){
-  const key = steamid+'_'+appid;
-  if(achCache.has(key)) return achCache.get(key);
-  try{
-    const r = await fetch(`${API_BASE}/api/achievements/${steamid}/${appid}`);
-    const d = await r.json();
-    achCache.set(key, d.pct);
-    return d.pct;
-  }catch(e){ achCache.set(key, null); return null; }
 }
 
 function renderLinuxStat(games, map){
@@ -294,38 +289,29 @@ function renderRecommendation(games, map){
 }
 
 async function renderGames(games, map){
+  allGames = games;
   currentTop = [...games].sort((a,b)=>b.playtime_forever-a.playtime_forever).slice(0, TOP_N);
   renderLinuxStat(games, map);
   renderRecommendation(games, map);
+  populateSuggestions(games);
   await paintList(map);
 }
 
-async function paintList(map){
+function populateSuggestions(games){
+  const list = document.getElementById('gameSuggestions');
+  list.innerHTML = games.map(g => `<option value="${g.name.replace(/"/g,'&quot;')}" label="AppID ${g.appid}">`).join('');
+}
+
+function renderGameRows(rows, map){
   const list = document.getElementById('gameList');
-  list.innerHTML = '<div class="hint">ordenando…</div>';
-
-  let rows = currentTop.map(g => ({ g, tier: map[String(g.appid)]?.tier || 'unknown' }));
-
-  if(sortMode === 'price'){
-    const prices = await Promise.all(rows.map(r => getPrice(r.g.appid)));
-    rows.forEach((r,i)=>r.price = prices[i]);
-    rows.sort((a,b)=>(b.price ?? -1) - (a.price ?? -1));
-  } else if(sortMode === 'achievements'){
-    const pcts = await Promise.all(rows.map(r => getAchievementPct(currentSteamId, r.g.appid)));
-    rows.forEach((r,i)=>r.pct = pcts[i]);
-    rows.sort((a,b)=>(b.pct ?? -1) - (a.pct ?? -1));
-  } else {
-    rows.sort((a,b)=>b.g.playtime_forever - a.g.playtime_forever);
-  }
-
   list.innerHTML = '';
+  if(!rows.length){ list.innerHTML = '<div class="hint">No encontramos ningún juego que coincida.</div>'; return; }
   rows.forEach((r, i)=>{
     const g = r.g;
     const hours = Math.round(g.playtime_forever/60*10)/10;
     const iconUrl = g.img_icon_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${g.appid}/${g.img_icon_url}.jpg` : '';
     let metaText = `${hours} h jugadas`;
-    if(sortMode === 'price') metaText = r.price != null ? `$${r.price} USD actual` : 'precio no disponible';
-    if(sortMode === 'achievements') metaText = r.pct != null ? `${r.pct}% de logros` : 'sin datos de logros';
+    if(sortMode === 'price' && !r.searchResult) metaText = r.price != null ? `$${r.price} USD actual` : 'precio no disponible';
     const info = map[String(g.appid)];
     const errorFlag = (info && info.errors > 0) ? `<span class="error-flag">⚠ ${info.errors} errores</span>` : '';
     const div = document.createElement('div');
@@ -342,11 +328,52 @@ async function paintList(map){
   });
 }
 
+async function paintList(map){
+  const list = document.getElementById('gameList');
+  list.innerHTML = '<div class="hint">ordenando…</div>';
+
+  let rows = currentTop.map(g => ({ g, tier: map[String(g.appid)]?.tier || 'unknown' }));
+
+  if(sortMode === 'price'){
+    const prices = await Promise.all(rows.map(r => getPrice(r.g.appid)));
+    rows.forEach((r,i)=>r.price = prices[i]);
+    rows.sort((a,b)=>(b.price ?? -1) - (a.price ?? -1));
+  } else {
+    rows.sort((a,b)=>b.g.playtime_forever - a.g.playtime_forever);
+  }
+  renderGameRows(rows, map);
+}
+
+async function runSearch(){
+  const q = document.getElementById('gameSearch').value.trim().toLowerCase();
+  const clearBtn = document.getElementById('clearSearchBtn');
+  const map = await loadProtonMap();
+  if(!q){
+    clearBtn.style.display = 'none';
+    await paintList(map);
+    return;
+  }
+  clearBtn.style.display = 'inline-block';
+  const matches = allGames.filter(g => g.name.toLowerCase().includes(q) || String(g.appid) === q);
+  const rows = matches
+    .sort((a,b)=>b.playtime_forever-a.playtime_forever)
+    .slice(0, 30)
+    .map(g => ({ g, tier: map[String(g.appid)]?.tier || 'unknown', searchResult: true }));
+  renderGameRows(rows, map);
+}
+document.getElementById('gameSearch').addEventListener('input', runSearch);
+document.getElementById('clearSearchBtn').addEventListener('click', ()=>{
+  document.getElementById('gameSearch').value = '';
+  runSearch();
+});
+
 document.getElementById('sortTabs').addEventListener('click', async e=>{
   const btn = e.target.closest('button'); if(!btn) return;
   document.querySelectorAll('#sortTabs button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   sortMode = btn.dataset.sort;
+  document.getElementById('gameSearch').value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
   await paintList(await loadProtonMap());
 });
 
