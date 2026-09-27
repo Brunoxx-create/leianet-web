@@ -1,4 +1,109 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // ---- adaptive performance tiers (mismo motor que index.html) -----------
+  (function(){
+    var root = document.documentElement;
+    var MANUAL_KEY = 'leianet-perf';
+    var AUTO_KEY   = 'leianet-perf-auto';
+    var AUTO_TTL   = 6 * 60 * 60 * 1000;
+    var TIERS = ['full', 'mid', 'low', 'ultra'];
+    window.__PERF_KEY = MANUAL_KEY;
+    window.__PERF_TIER = 'full';
+    window.__LOW_PERF__ = false;
+    window.__MID_OR_WORSE__ = false;
+    function applyClasses(tier){
+      root.classList.remove('perf-mid', 'low-perf', 'force-full-fx');
+      if(tier === 'mid'){ root.classList.add('perf-mid'); }
+      else if(tier === 'low' || tier === 'ultra'){ root.classList.add('low-perf'); }
+      else { root.classList.add('force-full-fx'); }
+    }
+    function applyTier(tier, reason){
+      var wasMidOrWorse = window.__MID_OR_WORSE__;
+      window.__PERF_TIER = tier;
+      window.__LOW_PERF__ = (tier === 'low' || tier === 'ultra');
+      window.__MID_OR_WORSE__ = (tier !== 'full');
+      applyClasses(tier);
+      try{ window.dispatchEvent(new CustomEvent('perftier:change', {detail:{tier: tier, reason: reason}})); }catch(e){}
+      if(!wasMidOrWorse && window.__MID_OR_WORSE__){
+        try{ window.dispatchEvent(new CustomEvent('perfmid:on', {detail:{tier: tier, reason: reason}})); }catch(e){}
+      }
+      if(window.__LOW_PERF__){
+        try{ window.dispatchEvent(new CustomEvent('lowperf:on', {detail:{reason: reason}})); }catch(e){}
+      }
+    }
+    window.__enableLowPerf = function(reason){ applyTier('low', reason || 'manual'); };
+    window.__disableLowPerf = function(){ applyTier('full', 'manual'); };
+    window.__setPerfTier = function(tier, reason){
+      if(TIERS.indexOf(tier) === -1) return;
+      applyTier(tier, reason || 'external');
+    };
+    var manual = null;
+    try{ manual = localStorage.getItem(MANUAL_KEY); }catch(e){}
+    if(manual === 'low'){ applyTier('low', 'manual'); return; }
+    if(manual === 'full'){ applyTier('full', 'manual'); return; }
+    try{
+      var cachedRaw = localStorage.getItem(AUTO_KEY);
+      if(cachedRaw){
+        var cached = JSON.parse(cachedRaw);
+        if(cached && TIERS.indexOf(cached.tier) !== -1 && (Date.now() - cached.ts) < AUTO_TTL){
+          applyTier(cached.tier, 'cached');
+          return;
+        }
+      }
+    }catch(e){}
+    var isBrave = false;
+    try{ isBrave = !!(navigator.brave && typeof navigator.brave.isBrave === 'function'); }catch(e){}
+    if(!isBrave){
+      try{
+        var mem = navigator.deviceMemory;
+        var cores = navigator.hardwareConcurrency;
+        var tooWeak = (typeof mem === 'number' && mem <= 2) || (typeof cores === 'number' && cores <= 2);
+        if(tooWeak){
+          applyTier('ultra', 'hardware');
+          try{ localStorage.setItem(AUTO_KEY, JSON.stringify({tier: 'ultra', ts: Date.now()})); }catch(e){}
+          return;
+        }
+      }catch(e){}
+    }
+    var ROUND_MS = 900;
+    function measure(cb){
+      var frames = 0, start = null;
+      function tick(ts){
+        if(start === null) start = ts;
+        frames++;
+        if(ts - start < ROUND_MS){ requestAnimationFrame(tick); }
+        else { cb(frames / ((ts - start) / 1000)); }
+      }
+      requestAnimationFrame(tick);
+    }
+    function finish(tier){
+      applyTier(tier, 'fps');
+      try{ localStorage.setItem(AUTO_KEY, JSON.stringify({tier: tier, ts: Date.now()})); }catch(e){}
+    }
+    measure(function(fpsFull){
+      if(fpsFull >= 50){ finish('full'); return; }
+      if(fpsFull >= 30){
+        applyTier('mid', 'fps');
+        measure(function(fpsMid){
+          if(fpsMid >= 50){ finish('mid'); return; }
+          if(fpsMid >= 15){
+            applyTier('low', 'fps');
+            measure(function(fpsLow){ finish(fpsLow >= 40 ? 'low' : 'ultra'); });
+            return;
+          }
+          finish('ultra');
+        });
+        return;
+      }
+      if(fpsFull >= 15){
+        applyTier('low', 'fps');
+        measure(function(fpsLow){ finish(fpsLow >= 40 ? 'low' : 'ultra'); });
+        return;
+      }
+      finish('ultra');
+    });
+  })();
+</script>
 <title>LeiaNET</title>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,6 +210,19 @@ h1 span{background:linear-gradient(100deg,var(--accent) 20%,#fff 50%,var(--accen
 footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11px;color:var(--text-mute);border-top:1px solid var(--border-soft);position:relative;z-index:1}
 @media(max-width:640px){.rank-card{grid-template-columns:32px 1fr auto;padding:12px}.score-num{font-size:16px}.bar-wrap{max-width:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}body{opacity:1}}
+.icon-btn{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text-dim);cursor:pointer;transition:border-color .15s,color .15s,transform .15s,background .15s}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn:active{transform:scale(.9)}
+.icon-btn svg{width:16px;height:16px}
+.perf-toggle.active{border-color:var(--ok);color:var(--ok);background:rgba(107,191,123,.1)}
+.header-right{display:flex;align-items:center;gap:14px}
+html.low-perf .planet-parallax,html.low-perf .planet-parallax-2,html.low-perf .cursor-glow,html.low-perf .nebula,html.low-perf .grid-overlay,html.low-perf .grain,html.low-perf .starfield .shooting-star,html.low-perf .starfield .meteor{display:none!important}
+html.low-perf .stars-layer{animation:none!important}
+html.low-perf body{opacity:1!important}
+html.low-perf *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;filter:none!important;box-shadow:none!important;text-shadow:none!important;animation:none!important;transition:none!important}
+html.perf-mid .planet-parallax,html.perf-mid .planet-parallax-2,html.perf-mid .cursor-glow,html.perf-mid .nebula,html.perf-mid .grid-overlay,html.perf-mid .grain,html.perf-mid .starfield .shooting-star,html.perf-mid .starfield .meteor{display:none!important}
+html.perf-mid .stars-layer{animation:none!important}
+html.perf-mid header,html.perf-mid .chip,html.perf-mid .seg,html.perf-mid .note,html.perf-mid .rank-card,html.perf-mid .sources{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important}
 </style>
 </head><body>
 <div class="grid-overlay"></div>
@@ -114,7 +232,7 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 <div class="planet-parallax-2"><div class="planet-wrap-2 planet-2"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div>
 <div class="grain"></div>
 <div class="cursor-glow" id="cursor-glow"></div>
-<header><a href="https://leianet.ar" class="brand"><span class="dotwrap"></span><span>AI COMPARE<small>leianet.ar / hub dev</small></span></a></header>
+<header><a href="https://leianet.ar" class="brand"><span class="dotwrap"></span><span>AI COMPARE<small>leianet.ar / hub dev</small></span></a><div class="header-right"><a href="utilidades.html" class="icon-btn" aria-label="Volver a Utilidades" title="Volver a Utilidades"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></a><button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></button></div></header>
 <main>
 <section class="hero">
 <div class="eyebrow">◆ leianetwork · comparador en vivo · datos verificados</div>
@@ -215,6 +333,7 @@ function renderChips(){
 
 function attachTilt(card){
   if(window.matchMedia('(pointer:coarse)').matches) return;
+  if(window.__MID_OR_WORSE__) return;
   const MAX_TILT = 6; // grados — sutil, como el glass del sitio
   card.addEventListener('mouseenter', ()=>{
     card.style.setProperty('--lift','-5px');
@@ -298,7 +417,7 @@ renderList();
     }
     el.style.width=l.size+'px';el.style.height=l.size+'px';el.style.borderRadius='50%';el.style.background='transparent';el.style.boxShadow=shadows.join(',');
   });
-  if(reduceMotion) return;
+  if(reduceMotion || window.__MID_OR_WORSE__) return;
   const starfield=document.getElementById('starfield');
   const supportsOffsetPath = window.CSS && CSS.supports && CSS.supports('offset-path',"path('M0,0')");
   function spawnShootingStar(){
@@ -346,6 +465,7 @@ renderList();
 (function(){
   const glow=document.getElementById('cursor-glow');
   if(window.matchMedia('(hover:none),(pointer:coarse)').matches) return;
+  if(window.__MID_OR_WORSE__) return;
   window.addEventListener('mousemove', e=>{
     document.documentElement.style.setProperty('--cx', e.clientX+'px');
     document.documentElement.style.setProperty('--cy', e.clientY+'px');
@@ -354,5 +474,25 @@ renderList();
 })();
 
 window.addEventListener('load',()=>document.body.classList.add('loaded'));
+
+// ---- performance toggle ----
+(function(){
+  const btn = document.getElementById('perf-toggle');
+  if(!btn) return;
+  function sync(){ btn.classList.toggle('active', !!window.__LOW_PERF__); }
+  sync();
+  window.addEventListener('lowperf:on', sync);
+  window.addEventListener('perftier:change', sync);
+  btn.addEventListener('click', ()=>{
+    if(window.__LOW_PERF__){
+      window.__disableLowPerf();
+      try{ localStorage.setItem(window.__PERF_KEY, 'full'); }catch(e){}
+    } else {
+      window.__enableLowPerf('manual');
+      try{ localStorage.setItem(window.__PERF_KEY, 'low'); }catch(e){}
+    }
+    sync();
+  });
+})();
 </script>
 </body></html>
