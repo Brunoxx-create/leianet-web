@@ -1,4 +1,109 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // ---- adaptive performance tiers (mismo motor que index.html) -----------
+  (function(){
+    var root = document.documentElement;
+    var MANUAL_KEY = 'leianet-perf';
+    var AUTO_KEY   = 'leianet-perf-auto';
+    var AUTO_TTL   = 6 * 60 * 60 * 1000;
+    var TIERS = ['full', 'mid', 'low', 'ultra'];
+    window.__PERF_KEY = MANUAL_KEY;
+    window.__PERF_TIER = 'full';
+    window.__LOW_PERF__ = false;
+    window.__MID_OR_WORSE__ = false;
+    function applyClasses(tier){
+      root.classList.remove('perf-mid', 'low-perf', 'force-full-fx');
+      if(tier === 'mid'){ root.classList.add('perf-mid'); }
+      else if(tier === 'low' || tier === 'ultra'){ root.classList.add('low-perf'); }
+      else { root.classList.add('force-full-fx'); }
+    }
+    function applyTier(tier, reason){
+      var wasMidOrWorse = window.__MID_OR_WORSE__;
+      window.__PERF_TIER = tier;
+      window.__LOW_PERF__ = (tier === 'low' || tier === 'ultra');
+      window.__MID_OR_WORSE__ = (tier !== 'full');
+      applyClasses(tier);
+      try{ window.dispatchEvent(new CustomEvent('perftier:change', {detail:{tier: tier, reason: reason}})); }catch(e){}
+      if(!wasMidOrWorse && window.__MID_OR_WORSE__){
+        try{ window.dispatchEvent(new CustomEvent('perfmid:on', {detail:{tier: tier, reason: reason}})); }catch(e){}
+      }
+      if(window.__LOW_PERF__){
+        try{ window.dispatchEvent(new CustomEvent('lowperf:on', {detail:{reason: reason}})); }catch(e){}
+      }
+    }
+    window.__enableLowPerf = function(reason){ applyTier('low', reason || 'manual'); };
+    window.__disableLowPerf = function(){ applyTier('full', 'manual'); };
+    window.__setPerfTier = function(tier, reason){
+      if(TIERS.indexOf(tier) === -1) return;
+      applyTier(tier, reason || 'external');
+    };
+    var manual = null;
+    try{ manual = localStorage.getItem(MANUAL_KEY); }catch(e){}
+    if(manual === 'low'){ applyTier('low', 'manual'); return; }
+    if(manual === 'full'){ applyTier('full', 'manual'); return; }
+    try{
+      var cachedRaw = localStorage.getItem(AUTO_KEY);
+      if(cachedRaw){
+        var cached = JSON.parse(cachedRaw);
+        if(cached && TIERS.indexOf(cached.tier) !== -1 && (Date.now() - cached.ts) < AUTO_TTL){
+          applyTier(cached.tier, 'cached');
+          return;
+        }
+      }
+    }catch(e){}
+    var isBrave = false;
+    try{ isBrave = !!(navigator.brave && typeof navigator.brave.isBrave === 'function'); }catch(e){}
+    if(!isBrave){
+      try{
+        var mem = navigator.deviceMemory;
+        var cores = navigator.hardwareConcurrency;
+        var tooWeak = (typeof mem === 'number' && mem <= 2) || (typeof cores === 'number' && cores <= 2);
+        if(tooWeak){
+          applyTier('ultra', 'hardware');
+          try{ localStorage.setItem(AUTO_KEY, JSON.stringify({tier: 'ultra', ts: Date.now()})); }catch(e){}
+          return;
+        }
+      }catch(e){}
+    }
+    var ROUND_MS = 900;
+    function measure(cb){
+      var frames = 0, start = null;
+      function tick(ts){
+        if(start === null) start = ts;
+        frames++;
+        if(ts - start < ROUND_MS){ requestAnimationFrame(tick); }
+        else { cb(frames / ((ts - start) / 1000)); }
+      }
+      requestAnimationFrame(tick);
+    }
+    function finish(tier){
+      applyTier(tier, 'fps');
+      try{ localStorage.setItem(AUTO_KEY, JSON.stringify({tier: tier, ts: Date.now()})); }catch(e){}
+    }
+    measure(function(fpsFull){
+      if(fpsFull >= 50){ finish('full'); return; }
+      if(fpsFull >= 30){
+        applyTier('mid', 'fps');
+        measure(function(fpsMid){
+          if(fpsMid >= 50){ finish('mid'); return; }
+          if(fpsMid >= 15){
+            applyTier('low', 'fps');
+            measure(function(fpsLow){ finish(fpsLow >= 40 ? 'low' : 'ultra'); });
+            return;
+          }
+          finish('ultra');
+        });
+        return;
+      }
+      if(fpsFull >= 15){
+        applyTier('low', 'fps');
+        measure(function(fpsLow){ finish(fpsLow >= 40 ? 'low' : 'ultra'); });
+        return;
+      }
+      finish('ultra');
+    });
+  })();
+</script>
 <title>LeiaNET</title>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,10 +155,47 @@ a{color:inherit}
 @media (hover:none),(pointer:coarse){.cursor-glow{display:none}}
 main{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
 header{padding:14px clamp(16px,4vw,48px);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(24,24,27,.72),rgba(15,15,17,.55));backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border)}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.02em;text-decoration:none;color:var(--text)}
-.brand .dotwrap{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(107,191,123,.15);animation:pulse 2.4s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.brand small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--text-mute);letter-spacing:.06em}
+.brand{position:relative;display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;transition:transform .16s ease}
+.brand img{height:40px;width:auto;display:block}
+.brand.pressed{transform:scale(.92)}
+.header-right{display:flex;align-items:center;gap:18px}
+nav{display:flex;gap:26px;font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+nav a{text-decoration:none;color:var(--text-dim);transition:color .15s;position:relative}
+nav a:hover,nav a:focus-visible{color:var(--text)}
+nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--accent);transition:width .2s}
+nav a:hover::after{width:100%}
+nav a.active{color:var(--text)}
+nav a.active::after{width:100%}
+.icon-btn{position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--glass-fill);border:1px solid var(--glass-border);color:var(--text-dim);cursor:pointer;transition:border-color .15s,color .15s,transform .15s,background .15s}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn:active{transform:scale(.9)}
+.icon-btn svg{width:16px;height:16px}
+.perf-toggle.active{border-color:var(--ok);color:var(--ok);background:rgba(107,191,123,.1)}
+.perf-toggle{position:relative;transition:border-color .15s,color .15s,transform .18s cubic-bezier(.2,.8,.2,1),background .15s}
+.perf-toggle.active:hover{transform:scale(1.18)}
+.perf-toggle .perf-tip{position:absolute;top:calc(100% + 10px);left:50%;transform:translate(-50%,-4px);background:var(--bg-elev-2);border:1px solid var(--ok);color:var(--ok);font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;padding:5px 10px;border-radius:6px;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,transform .18s ease,visibility .18s;box-shadow:0 10px 24px -10px rgba(0,0,0,.6)}
+.perf-toggle .perf-tip::before{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-bottom-color:var(--ok)}
+.perf-toggle.active:hover .perf-tip{opacity:1;visibility:visible;transform:translate(-50%,0)}
+html.low-perf .perf-toggle.active:hover{transform:none !important}
+.nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:60}
+.nav-toggle span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .25s ease,opacity .25s ease}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media (max-width:880px){
+  nav{position:fixed;top:0;right:0;height:100vh;width:min(78vw,320px);background:var(--bg);border-left:1px solid var(--border-soft);flex-direction:column;align-items:flex-start;gap:0;padding:90px 28px 28px;transform:translateX(100%);z-index:55;display:none}
+  nav.open{transform:translateX(0);display:flex}
+  nav a{width:100%;padding:16px 0;border-bottom:1px solid var(--border-soft);font-size:14px}
+  .nav-toggle{display:flex}
+  .nav-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;z-index:49}
+  .nav-backdrop.open{opacity:1;pointer-events:auto}
+}
+@media (max-width:640px){header{padding:12px 16px}.brand img{height:34px}}
+html.low-perf .cursor-glow,html.low-perf .nebula,html.low-perf .grid-overlay,html.low-perf .planet-parallax,html.low-perf .planet-parallax-2,html.low-perf .grain,html.low-perf .starfield .shooting-star{display:none!important}
+html.low-perf .stars-layer{animation:none!important}
+html.low-perf *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:none!important;transition:none!important}
+html.perf-mid .cursor-glow,html.perf-mid .nebula,html.perf-mid .grid-overlay,html.perf-mid .planet-parallax,html.perf-mid .planet-parallax-2,html.perf-mid .grain,html.perf-mid .starfield .shooting-star{display:none!important}
+html.perf-mid header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important}
 .hero{padding:clamp(40px,7vw,68px) 0 20px;text-align:center}
 .eyebrow{font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;display:flex;gap:8px;justify-content:center;align-items:center}
 h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.6vw,50px);line-height:1.05;margin:0 0 14px;letter-spacing:-.01em}
@@ -125,7 +267,7 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 <div class="planet-parallax-2"><div class="planet-wrap-2 planet-2"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div>
 <div class="grain"></div>
 <div class="cursor-glow" id="cursor-glow"></div>
-<header><a href="https://leianet.ar" class="brand"><span class="dotwrap"></span><span>STEAM PREVIEW<small>leianet.ar / hub dev</small></span></a></header>
+<header><a href="index.html" class="brand" aria-label="Ir al inicio"><img width="860" height="150" loading="eager" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"></a><div class="header-right"><nav id="main-nav"><a href="index.html#minecraft">Minecraft</a><a href="index.html#cs16">CS 1.6</a><a href="index.html#haxball">Haxball</a><a href="index.html#novedades">Novedades</a><a href="utilidades.html" class="active">Utilidades</a><a href="index.html#cafecito">Cafecito</a><a href="index.html#faq">FAQ</a><a href="index.html#contact">Contacto</a></nav><button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg><span class="perf-tip" aria-hidden="true">ACTIVADO</span></button><button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button></div></header><div class="nav-backdrop" id="nav-backdrop"></div>
 <main>
 <section class="hero">
 <div class="eyebrow">◆ leianetwork · tus juegos en linux · fuente: protondb</div>
@@ -488,5 +630,47 @@ document.getElementById('steamInput').addEventListener('keydown', e=>{ if(e.key=
 })();
 
 window.addEventListener('load',()=>document.body.classList.add('loaded'));
+
+// ---- performance toggle ----
+(function(){
+  const btn = document.getElementById('perf-toggle');
+  if(!btn) return;
+  function sync(){ btn.classList.toggle('active', !!window.__LOW_PERF__); }
+  sync();
+  window.addEventListener('lowperf:on', sync);
+  window.addEventListener('perftier:change', sync);
+  btn.addEventListener('click', ()=>{
+    if(window.__LOW_PERF__){
+      window.__disableLowPerf();
+      try{ localStorage.setItem(window.__PERF_KEY, 'full'); }catch(e){}
+    } else {
+      window.__enableLowPerf('manual');
+      try{ localStorage.setItem(window.__PERF_KEY, 'low'); }catch(e){}
+    }
+    sync();
+  });
+})();
+
+// ---- mobile nav toggle (menu hamburguesa del header) ----
+(function(){
+  const navToggle = document.getElementById('nav-toggle');
+  const mainNav = document.getElementById('main-nav');
+  const navBackdrop = document.getElementById('nav-backdrop');
+  if(!navToggle || !mainNav || !navBackdrop) return;
+  function closeNav(){
+    navToggle.classList.remove('open');
+    navToggle.setAttribute('aria-expanded','false');
+    mainNav.classList.remove('open');
+    navBackdrop.classList.remove('open');
+  }
+  navToggle.addEventListener('click', ()=>{
+    const isOpen = mainNav.classList.toggle('open');
+    navToggle.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+    navBackdrop.classList.toggle('open', isOpen);
+  });
+  navBackdrop.addEventListener('click', closeNav);
+  mainNav.querySelectorAll('a').forEach(a=> a.addEventListener('click', closeNav));
+})();
 </script>
 </body></html>
