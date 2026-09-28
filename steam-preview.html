@@ -498,7 +498,7 @@ function renderGameRows(rows, map){
     let metaText = `${hours} h jugadas`;
     if(sortMode === 'price' && !r.searchResult) metaText = r.price != null ? `$${r.price} USD actual` : 'precio no disponible';
     const info = map[String(g.appid)];
-    const errorFlag = (info && info.errors > 0) ? `<span class="error-flag">⚠ ${info.errors} errores</span>` : '';
+    const errorFlag = (info && info.errors > 0) ? `<span class="error-flag">⚠ ${info.errors} reportes</span>` : '';
     const div = document.createElement('div');
     const glow = ['platinum','gold','borked'].includes(r.tier) ? ` tier-glow-${r.tier}` : '';
     div.className = 'game-card' + glow;
