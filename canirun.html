@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Can I Run IT? — LeiaNET</title>
+<title>LeiaNET</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f0f11;--el:#18181b;--bd:#2b2b30;--tx:#ededee;--dim:#a9aaaf;--mute:#706f74;--ac:#c7c7cc;--ok:#6bbf7b;--mid:#f5b942;--no:#ff5468}
@@ -229,9 +230,10 @@ if(hp.has('gpu')||hp.has('cpu')||hp.has('ram')){
 }
 // Catálogo de tu backend: los requisitos llegan como texto y se convierten con las tablas de arriba
 const API='https://steam-api.leianet.ar',UNK={};
+const MEMO=new Map(),fc=(x,tab)=>{const k=(tab===CI?'c':'g')+x;if(!MEMO.has(k))MEMO.set(k,find(x,tab));return MEMO.get(k)};
 function lvl(r){
   if(!r)return null;
-  const m=(list,tab,n)=>{const v=(list||[]).map(x=>{const e=find(x,tab);if(!e)UNK[x]=(UNK[x]||0)+1;return e&&e.s}).filter(z=>z!=null);return v.length?Math.min(...v):(n||0)};
+  const m=(list,tab,n)=>{const v=(list||[]).map(x=>{const e=fc(x,tab);if(!e)UNK[x]=(UNK[x]||0)+1;return e&&e.s}).filter(z=>z!=null);return v.length?Math.min(...v):(n||0)};
   return[m(r.c,CI,r.cn),m(r.g,GI,r.gn),r.r||0];
 }
 fetch(API+'/api/catalog').then(r=>r.json()).then(list=>{
