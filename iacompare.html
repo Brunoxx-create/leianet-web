@@ -269,7 +269,7 @@ html.perf-mid header,html.perf-mid .chip,html.perf-mid .seg,html.perf-mid .note,
 <section class="hero">
 <div class="eyebrow">◆ leianetwork · comparador en vivo · datos verificados</div>
 <h1>¿Qué IA usar <span>hoy?</span></h1>
-<p>Rankeamos Anthropic, OpenAI, Google, xAI, DeepSeek, Alibaba, Moonshot, Z.AI y Meta — elegí una categoría y mirá el top, con precio real y fuentes abajo de cada sección.</p>
+<p>Rankeamos Anthropic, OpenAI, Google, xAI, DeepSeek, Alibaba, Moonshot, Z.AI, Meta y Mistral — elegí una categoría y mirá el top, con precio real y fuentes abajo de cada sección.</p>
 </section>
 <div class="note"><p><strong>Metodología:</strong> el precio (input/output por millón de tokens) y la ventana de contexto son datos verificables tomados de las páginas oficiales de precios de cada proveedor (linkeadas abajo). Los puntajes por categoría son un índice cualitativo propio 0–100, construido a partir de leaderboards públicos como Artificial Analysis Intelligence Index y LLM-Stats — no un benchmark único, así que tomalo como guía, no como dato exacto.</p></div>
 <div class="controls">
@@ -282,7 +282,7 @@ html.perf-mid header,html.perf-mid .chip,html.perf-mid .seg,html.perf-mid .note,
 <div class="rank-list" id="rankList"></div>
 <div class="sources" id="sourcesBox"></div>
 </main>
-<footer>AI COMPARE · parte de LeiaNET · hub para devs y gamers · Ultima actualizacion 25/9/26 · leianet.ar</footer>
+<footer>AI COMPARE · parte de LeiaNET · hub para devs y gamers · Ultima actualizacion 28/9/26 · leianet.ar</footer>
 <script>
 const CATS = [
   {id:'general', label:'General', icon:'★'},
@@ -303,24 +303,24 @@ const CATS = [
 const MODELS = [
   {n:'Claude Fable 5.1',vendor:'Anthropic',ctx:'1M',price:[10,50],s:{razonamiento:96,matematicas:93,programacion:96,agentico:97,rag:93,chatbot:90,escritura:95,imagenes:55,video:15,contexto:90,costo:38}},
   {n:'Claude Opus 5.5',vendor:'Anthropic',ctx:'1M',price:[4,20],s:{razonamiento:96,matematicas:92,programacion:97,agentico:97,rag:93,chatbot:91,escritura:95,imagenes:58,video:18,contexto:90,costo:58}},
-  {n:'Claude Sonnet 5',vendor:'Anthropic',ctx:'1M',price:[2,10],s:{razonamiento:91,matematicas:87,programacion:94,agentico:93,rag:90,chatbot:90,escritura:92,imagenes:55,video:15,contexto:88,costo:80}},
+  {n:'Claude Sonnet 5.5',vendor:'Anthropic',ctx:'1M',price:[2,10],s:{razonamiento:94,matematicas:90,programacion:96,agentico:95,rag:91,chatbot:91,escritura:93,imagenes:56,video:15,contexto:90,costo:80}},
   {n:'Claude Haiku 4.5',vendor:'Anthropic',ctx:'200K',price:[1,5],s:{razonamiento:80,matematicas:76,programacion:83,agentico:80,rag:78,chatbot:84,escritura:82,imagenes:45,video:10,contexto:75,costo:92}},
   {n:'GPT-6 Astra',vendor:'OpenAI',ctx:'1M',price:[10,50],s:{razonamiento:97,matematicas:95,programacion:95,agentico:96,rag:90,chatbot:91,escritura:90,imagenes:88,video:60,contexto:90,costo:38}},
-  {n:'GPT-5.6 Sol',vendor:'OpenAI',ctx:'1.05M',price:[4,20],s:{razonamiento:92,matematicas:91,programacion:91,agentico:90,rag:87,chatbot:90,escritura:88,imagenes:85,video:55,contexto:90,costo:76}},
+  {n:'GPT-6 Sol',vendor:'OpenAI',ctx:'1.05M',price:[2,10],s:{razonamiento:91,matematicas:90,programacion:91,agentico:91,rag:87,chatbot:90,escritura:88,imagenes:85,video:55,contexto:90,costo:80}},
   {n:'GPT-5.6 Terra',vendor:'OpenAI',ctx:'1.05M',price:[2,12],s:{razonamiento:85,matematicas:83,programacion:84,agentico:80,rag:80,chatbot:86,escritura:83,imagenes:75,video:35,contexto:88,costo:87}},
-  {n:'GPT-5.6 Luna',vendor:'OpenAI',ctx:'1.05M',price:[0.2,1.2],s:{razonamiento:74,matematicas:70,programacion:73,agentico:65,rag:68,chatbot:80,escritura:74,imagenes:40,video:0,contexto:80,costo:99}},
-  {n:'Gemini 3.1 Pro',vendor:'Google',ctx:'2M',price:[2,12],s:{razonamiento:93,matematicas:90,programacion:89,agentico:88,rag:92,chatbot:88,escritura:87,imagenes:90,video:85,contexto:99,costo:87}},
+  {n:'GPT-6 Luna',vendor:'OpenAI',ctx:'1.05M',price:[0.1,0.5],s:{razonamiento:74,matematicas:70,programacion:73,agentico:65,rag:68,chatbot:80,escritura:74,imagenes:40,video:0,contexto:80,costo:99}},
+  {n:'Gemini 3.1 Pro',vendor:'Google',ctx:'1M',price:[2,12],s:{razonamiento:93,matematicas:90,programacion:89,agentico:88,rag:92,chatbot:88,escritura:87,imagenes:90,video:85,contexto:99,costo:87}},
   {n:'Gemini 3.8 Flash',vendor:'Google',ctx:'1M',price:[0.75,3.75],s:{razonamiento:83,matematicas:80,programacion:81,agentico:76,rag:83,chatbot:85,escritura:80,imagenes:80,video:78,contexto:95,costo:95}},
-  {n:'Grok 4.6',vendor:'xAI',ctx:'500K',price:[2,6],s:{razonamiento:88,matematicas:87,programacion:86,agentico:82,rag:78,chatbot:85,escritura:82,imagenes:68,video:30,contexto:80,costo:90}},
+  {n:'Grok 4.7',vendor:'xAI',ctx:'500K',price:[2,6],s:{razonamiento:89,matematicas:88,programacion:88,agentico:85,rag:79,chatbot:85,escritura:82,imagenes:68,video:30,contexto:80,costo:90}},
   {n:'Grok 4.1 Fast',vendor:'xAI',ctx:'2M',price:[0.2,0.5],s:{razonamiento:76,matematicas:73,programacion:74,agentico:68,rag:72,chatbot:80,escritura:75,imagenes:0,video:0,contexto:97,costo:99}},
-  {n:'DeepSeek V4 Pro',vendor:'DeepSeek',ctx:'164K',price:[0.435,0.87],s:{razonamiento:89,matematicas:90,programacion:90,agentico:80,rag:80,chatbot:82,escritura:80,imagenes:0,video:0,contexto:65,costo:98}},
-  {n:'DeepSeek V4 Flash',vendor:'DeepSeek',ctx:'164K',price:[0.14,0.28],s:{razonamiento:78,matematicas:78,programacion:79,agentico:68,rag:70,chatbot:76,escritura:74,imagenes:0,video:0,contexto:65,costo:100}},
-  {n:'Qwen 3.8 Max',vendor:'Alibaba',ctx:'256K',price:[1.2,6],s:{razonamiento:87,matematicas:86,programacion:87,agentico:78,rag:82,chatbot:82,escritura:80,imagenes:60,video:25,contexto:78,costo:85}},
-  {n:'Kimi K3',vendor:'Moonshot AI',ctx:'256K',price:null,s:{razonamiento:86,matematicas:82,programacion:87,agentico:83,rag:80,chatbot:80,escritura:79,imagenes:0,video:0,contexto:78,costo:0}},
-  {n:'GLM-5.3',vendor:'Z.AI',ctx:'200K',price:null,s:{razonamiento:83,matematicas:80,programacion:85,agentico:76,rag:77,chatbot:79,escritura:77,imagenes:0,video:0,contexto:70,costo:0}},
-  {n:'Llama 4 Maverick',vendor:'Meta (vía Groq)',ctx:'256K',price:null,s:{razonamiento:84,matematicas:79,programacion:81,agentico:74,rag:77,chatbot:82,escritura:79,imagenes:55,video:10,contexto:78,costo:0}},
-  {n:'Mistral Large 3',vendor:'Mistral',ctx:'256K',price:null,s:{razonamiento:84,matematicas:81,programacion:83,agentico:77,rag:80,chatbot:82,escritura:81,imagenes:30,video:0,contexto:78,costo:0}},
-  {n:'Pixtral Large',vendor:'Mistral',ctx:'128K',price:null,s:{razonamiento:79,matematicas:74,programacion:76,agentico:64,rag:72,chatbot:74,escritura:72,imagenes:85,video:20,contexto:70,costo:0}},
+  {n:'DeepSeek V4 Pro',vendor:'DeepSeek',ctx:'1M',price:[1.32,3.96],s:{razonamiento:89,matematicas:90,programacion:90,agentico:80,rag:80,chatbot:82,escritura:80,imagenes:0,video:0,contexto:85,costo:92}},
+  {n:'DeepSeek V4.1 Flash',vendor:'DeepSeek',ctx:'1M',price:[0.3,1.2],s:{razonamiento:85,matematicas:85,programacion:86,agentico:76,rag:77,chatbot:80,escritura:77,imagenes:45,video:0,contexto:85,costo:98}},
+  {n:'Qwen 3.8 Max',vendor:'Alibaba',ctx:'1M',price:[2,6],s:{razonamiento:88,matematicas:87,programacion:88,agentico:80,rag:83,chatbot:83,escritura:81,imagenes:65,video:30,contexto:85,costo:90}},
+  {n:'Kimi K3',vendor:'Moonshot AI',ctx:'1M',price:[3,15],s:{razonamiento:87,matematicas:83,programacion:88,agentico:84,rag:81,chatbot:80,escritura:79,imagenes:50,video:15,contexto:86,costo:70}},
+  {n:'GLM-5.3',vendor:'Z.AI',ctx:'1M',price:[1.4,4.4],s:{razonamiento:84,matematicas:81,programacion:86,agentico:80,rag:78,chatbot:79,escritura:77,imagenes:0,video:0,contexto:84,costo:92}},
+  {n:'Muse Spark 1.3',vendor:'Meta',ctx:'1M',price:[1.25,4.25],s:{razonamiento:88,matematicas:85,programacion:87,agentico:89,rag:82,chatbot:86,escritura:82,imagenes:70,video:40,contexto:88,costo:93}},
+  {n:'Mistral Large 3',vendor:'Mistral',ctx:'256K',price:[0.5,1.5],s:{razonamiento:84,matematicas:81,programacion:83,agentico:77,rag:80,chatbot:82,escritura:81,imagenes:30,video:0,contexto:78,costo:97}},
+  {n:'Mistral Medium 3.5',vendor:'Mistral',ctx:'256K',price:[1.5,7.5],s:{razonamiento:80,matematicas:76,programacion:82,agentico:74,rag:76,chatbot:78,escritura:78,imagenes:40,video:0,contexto:78,costo:88}},
 ];
 
 function computeScore(m, cat){
@@ -343,10 +343,16 @@ const SOURCES_GENERAL = [
 ];
 const SOURCES_COSTO = [
   ['Anthropic — API Pricing (Claude)','https://www.anthropic.com/pricing'],
+  ['Anthropic — Claude Sonnet 5.5','https://www.anthropic.com/claude-sonnet-5-5'],
   ['OpenAI — API Pricing (GPT)','https://developers.openai.com/api/docs/pricing'],
   ['Google — Gemini API Pricing','https://ai.google.dev/gemini-api/docs/pricing'],
   ['xAI — Grok API Pricing','https://docs.x.ai/developers/pricing'],
-  ['DeepSeek — API Pricing','https://api-docs.deepseek.com/quick_start/pricing'],
+  ['DeepSeek — API Pricing (V4 Pro en horario pico; -50% fuera de pico)','https://api-docs.deepseek.com/quick_start/pricing'],
+  ['Mistral — API Pricing','https://mistral.ai/pricing/api'],
+  ['OpenRouter — Qwen 3.8 Max','https://openrouter.ai/qwen/qwen3.8-max-0902'],
+  ['OpenRouter — Kimi K3 (oficial Moonshot: $3 / $15)','https://openrouter.ai/moonshotai/kimi-k3'],
+  ['OpenRouter — GLM-5.3 (oficial Z.AI: $1.4 / $4.4)','https://openrouter.ai/z-ai/glm-5.3'],
+  ['OpenRouter — Meta Muse Spark 1.3','https://openrouter.ai/meta/muse-spark-1.3'],
 ];
 
 let activeCat='general', topN=15;
@@ -422,7 +428,7 @@ function renderSources(){
   const extra = activeCat==='costo' ? [] : SOURCES_COSTO.slice(0,0);
   box.innerHTML = `<h4>Fuentes usadas en esta sección (${CATS.find(c=>c.id===activeCat).label})</h4><ul>${
     list.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')
-  }${activeCat!=='costo'?`<li>Precios de cada modelo: ver páginas oficiales de precios (Anthropic, OpenAI, Google, xAI, DeepSeek) — mismas que en la categoría Costo.</li>`:''}</ul>`;
+  }${activeCat!=='costo'?`<li>Precios de cada modelo: ver páginas de precios de cada proveedor — mismas que en la categoría Costo.</li>`:''}</ul>`;
 }
 
 document.getElementById('topSeg').addEventListener('click',e=>{
