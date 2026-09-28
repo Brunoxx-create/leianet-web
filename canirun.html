@@ -1206,7 +1206,18 @@ if(hp.has('gpu')||hp.has('cpu')||hp.has('ram')){
 // Catálogo de tu backend: los requisitos llegan como texto y se convierten con las tablas de arriba
 const API='https://steam-api.leianet.ar',UNK={};
 // Imagen del juego (opcional): si el catalogo trae una URL (img/image/header) o el appid de Steam, se muestra la portada.
-const imgOf=x=>{const u=x.img||x.image||x.header||x.header_image||x.cover;if(typeof u==='string'&&/^https?:\/\//.test(u))return u;const id=+(x.id||x.appid||x.app_id||x.steam_appid);return id>0?'https://cdn.cloudflare.steamstatic.com/steam/apps/'+id+'/header.jpg':''};
+// Imagenes manuales: nombre EXACTO del juego (como sale en el catalogo) -> archivo en assets/games/. Tienen prioridad sobre las de Steam.
+const MANUAL_IMG={
+  'Rocket League':'assets/games/rocket-league.webp',
+  'Minecraft (última versión)':'assets/games/minecraft.webp',
+  'Roblox':'assets/games/roblox.webp',
+  'VALORANT':'assets/games/valorant.webp',
+  'League of Legends':'assets/games/league-of-legends.webp',
+  'Minecraft (PVP 1.8.8)':'assets/games/minecraft-pvp.webp',
+  'Uncharted: Legacy of Thieves Collection':'assets/games/uncharted.webp',
+  'Fortnite':'assets/games/fortnite.webp'
+};
+const imgOf=x=>{if(x.n&&MANUAL_IMG[x.n])return MANUAL_IMG[x.n];const u=x.img||x.image||x.header||x.header_image||x.cover;if(typeof u==='string'&&/^https?:\/\//.test(u))return u;const id=+(x.id||x.appid||x.app_id||x.steam_appid);return id>0?'https://cdn.cloudflare.steamstatic.com/steam/apps/'+id+'/header.jpg':''};
 const MEMO=new Map(),fc=(x,tab)=>{const k=(tab===CI?'c':'g')+x;if(!MEMO.has(k))MEMO.set(k,find(x,tab));return MEMO.get(k)};
 function lvl(r){
   if(!r)return null;
@@ -1218,7 +1229,7 @@ fetch(API+'/api/catalog').then(r=>r.json()).then(list=>{
   list.forEach(x=>{
     if(!x.n)return;
     const ex=have.get(cp(x.n));
-    if(ex){if(!ex[4])ex[4]=imgOf(x);return;}
+    if(ex){if(!ex[4]||MANUAL_IMG[x.n])ex[4]=imgOf(x);return;}
     const mn=lvl(x.min)||[0,0,0];
     if(!mn[0]&&!mn[1]&&!mn[2])return;
     GAMES.push([x.n,(x.g||[]).map(t=>String(t).trim().toLowerCase()).filter(Boolean).join(','),mn,lvl(x.rec)||mn,imgOf(x)]);
