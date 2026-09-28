@@ -181,7 +181,8 @@
 .novedad-texto u{text-decoration:underline}
 .novedad-texto s{text-decoration:line-through;opacity:.75}
 @media (max-width:640px){.novedades-wrap{margin-top:14px}.novedad-card{padding:14px 16px;gap:12px}.novedad-titulo{font-size:14.5px}.novedad-texto{font-size:13px}.novedad-imagen{height:180px}}
-html.low-perf .cir-row .g-img,html.perf-mid .cir-row .g-img{transition:none!important;filter:none!important}html.low-perf .cir-col,html.perf-mid .cir-col{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;transform:none!important}
+html.low-perf .cir-row .g-img,html.perf-mid .cir-row .g-img{transition:none!important;filter:none!important}
+html.low-perf .cir-col,html.perf-mid .cir-col{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;transform:none!important}
 html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important}
 </style>
 
@@ -216,6 +217,21 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
 .cir-col h3 span{margin-left:auto;font-family:var(--mono);font-weight:500;font-size:12px;color:var(--text-mute)}
 .cir-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-soft)}
 .cir-row:last-child{border-bottom:none}
+.cir-more{display:block;width:100%;margin-top:10px;padding:11px 12px;background:var(--accent-soft);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;letter-spacing:.02em;cursor:pointer;transition:background .15s,border-color .15s}
+.cir-more:hover{background:var(--bg-elev-2);border-color:var(--accent)}
+.cir-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,6,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.cir-modal-box{width:min(680px,100%);max-height:min(82vh,860px);display:flex;flex-direction:column;padding:18px 20px;transform:none!important;background:var(--bg-elev)}
+.cir-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--border-soft)}
+.cir-modal-head h3{display:flex;align-items:center;gap:9px;margin:0}
+.cir-modal-head h3 i{width:10px;height:10px;border-radius:50%}
+.cir-modal-head h3 span{font-family:var(--mono);font-weight:500;font-size:12px;color:var(--text-mute)}
+.cir-modal-x{background:none;border:1px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:8px;font-size:22px;line-height:1;cursor:pointer}
+.cir-modal-x:hover{border-color:var(--accent)}
+.cir-modal-list{overflow-y:auto;overscroll-behavior:contain;padding-right:6px;margin-top:4px}
+html.cir-modal-open{overflow:hidden}
+html.low-perf .cir-modal,html.perf-mid .cir-modal{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(6,6,8,.9)}
+a.cir-link{color:inherit;text-decoration:none;cursor:pointer;transition:background .15s}
+a.cir-link:hover{background:var(--accent-soft)}
 .cir-row .g-img{width:92px;height:43px;flex-shrink:0;border-radius:6px;object-fit:cover;background:var(--bg);border:1px solid var(--border-soft)}
 .cir-row div{min-width:0}
 .cir-row b{font-weight:500;font-size:14px;color:var(--text)}
@@ -1155,6 +1171,21 @@ function verdict(game,h){
   return{s:'min',lim:names[rc.indexOf(Math.min(...rc))]};
 }
 
+let LAST=null;
+function rowHtml(k,g,v){return rowOpen(g)+(g[4]?'<img class="g-img" src="'+g[4]+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<div><b>'+g[0]+'</b>'+(v.near?'<span class="casi">casi</span>':'')+
+  '<small>'+g[1].split(',').join(', ')+(k==='no'?' · te limita la '+v.lim:k==='min'?' · bajo lo recomendado: '+v.lim:'')+'</small></div>'+rowClose(g)}
+function closeAll(){const m=document.getElementById('cirModal');if(m)m.remove();document.documentElement.classList.remove('cir-modal-open')}
+function openAll(k){
+  if(!LAST)return;closeAll();
+  const m=LAST.meta.find(x=>x[0]===k),list=LAST.cols[k];if(!m)return;
+  const el=document.createElement('div');el.id='cirModal';el.className='cir-modal';
+  el.innerHTML='<div class="cir-modal-box card" role="dialog" aria-modal="true" aria-label="'+m[1]+'"><div class="cir-modal-head"><h3><i style="background:'+m[2]+'"></i>'+m[1]+'<span>'+list.length+' juegos</span></h3><button type="button" class="cir-modal-x" aria-label="Cerrar">&times;</button></div><div class="cir-modal-list">'+list.map(([g,v])=>rowHtml(k,g,v)).join('')+'</div></div>';
+  document.body.appendChild(el);document.documentElement.classList.add('cir-modal-open');
+  el.addEventListener('click',e=>{if(e.target===el||e.target.closest('.cir-modal-x'))closeAll()});
+  const l=el.querySelector('.cir-modal-list');l.scrollTop=0;el.querySelector('.cir-modal-x').focus();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-more]');if(b)openAll(b.dataset.more)});
 function render(){
   const h=hw(),q=cp($('q').value);
   const cols={ok:[],min:[],no:[]};
@@ -1169,11 +1200,13 @@ function render(){
   const total=cols.ok.length+cols.min.length+cols.no.length;
   $('sum').textContent=(cols.ok.length+cols.min.length)+' de '+total+' juegos corren en tu PC';
   const meta=[['ok','Corren bien','var(--ok)'],['min','Corren en mínimos','var(--mid)'],['no','No corren','var(--no)']];
+  LAST={cols,meta};
   $('cols').innerHTML=meta.map(([k,t,c])=>'<section class="card cir-col"><h3><i style="background:'+c+'"></i>'+t+'<span>'+cols[k].length+'</span></h3>'+
-    cols[k].slice(0,60).map(([g,v])=>'<div class="cir-row">'+(g[4]?'<img class="g-img" src="'+g[4]+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<div><b>'+g[0]+'</b>'+(v.near?'<span class="casi">casi</span>':'')+
-    '<small>'+g[1].split(',').join(', ')+(k==='no'?' · te limita la '+v.lim:k==='min'?' · bajo lo recomendado: '+v.lim:'')+'</small></div></div>').join('')+(cols[k].length>60?'<div class="cir-row"><div><small>y '+(cols[k].length-60)+' más: usá el buscador</small></div></div>':'')+'</section>').join('');
+    cols[k].slice(0,60).map(([g,v])=>rowHtml(k,g,v)).join('')+(cols[k].length>60?'<button type="button" class="cir-more" data-more="'+k+'">+'+(cols[k].length-60)+' juegos · click para ver todos</button>':'')+'</section>').join('');
 }
 
+function rowOpen(g){return g[5]?'<a class="cir-row cir-link" href="'+g[5]+'" target="_blank" rel="noopener noreferrer" title="Abrir página del juego">':'<div class="cir-row">'}
+function rowClose(g){return g[5]?'</a>':'</div>'}
 function chips(){
   const set=[...new Set(GAMES.flatMap(g=>g[1].split(',').map(t=>t.trim()).filter(Boolean)))].sort();
   $('chips').innerHTML=['todos',...set].map(x=>'<button class="chip" data-g="'+x+'" aria-pressed="'+(x===genre)+'">'+x+'</button>').join(' ');
@@ -1217,6 +1250,18 @@ const MANUAL_IMG={
   'Uncharted: Legacy of Thieves Collection':'assets/games/uncharted.webp',
   'Fortnite':'assets/games/fortnite.webp'
 };
+// Links manuales: nombre EXACTO del juego -> URL a la que manda el click (tienen prioridad sobre Steam).
+const MANUAL_LINK={
+  'Minecraft (última versión)':'https://www.minecraft.net',
+  'Minecraft (PVP 1.8.8)':'https://www.minecraft.net',
+  'Rocket League':'https://www.rocketleague.com/',
+  'Roblox':'https://www.roblox.com',
+  'VALORANT':'https://www.playvalorant.com',
+  'League of Legends':'https://www.leagueoflegends.com',
+  'Fortnite':'https://www.fortnite.com',
+  'Uncharted: Legacy of Thieves Collection':'https://store.steampowered.com/app/1659420/UNCHARTED_Legacy_of_Thieves_Collection/'
+};
+const linkOf=x=>MANUAL_LINK[x.n]||(x.id>0?'https://store.steampowered.com/app/'+x.id+'/':'');
 const imgOf=x=>{if(x.n&&MANUAL_IMG[x.n])return MANUAL_IMG[x.n];const u=x.img||x.image||x.header||x.header_image||x.cover;if(typeof u==='string'&&/^https?:\/\//.test(u))return u;const id=+(x.id||x.appid||x.app_id||x.steam_appid);return id>0?'https://cdn.cloudflare.steamstatic.com/steam/apps/'+id+'/header.jpg':''};
 const MEMO=new Map(),fc=(x,tab)=>{const k=(tab===CI?'c':'g')+x;if(!MEMO.has(k))MEMO.set(k,find(x,tab));return MEMO.get(k)};
 function lvl(r){
@@ -1229,10 +1274,10 @@ fetch(API+'/api/catalog').then(r=>r.json()).then(list=>{
   list.forEach(x=>{
     if(!x.n)return;
     const ex=have.get(cp(x.n));
-    if(ex){if(!ex[4]||MANUAL_IMG[x.n])ex[4]=imgOf(x);return;}
+    if(ex){if(!ex[4]||MANUAL_IMG[x.n])ex[4]=imgOf(x);if(!ex[5]||MANUAL_LINK[x.n])ex[5]=linkOf(x);return;}
     const mn=lvl(x.min)||[0,0,0];
     if(!mn[0]&&!mn[1]&&!mn[2])return;
-    GAMES.push([x.n,(x.g||[]).map(t=>String(t).trim().toLowerCase()).filter(Boolean).join(','),mn,lvl(x.rec)||mn,imgOf(x)]);
+    GAMES.push([x.n,(x.g||[]).map(t=>String(t).trim().toLowerCase()).filter(Boolean).join(','),mn,lvl(x.rec)||mn,imgOf(x),linkOf(x)]);
   });
   if(location.hash.includes('debug'))console.table(Object.entries(UNK).sort((a,b)=>b[1]-a[1]).slice(0,50));
   chips();render();
@@ -1243,13 +1288,13 @@ chips();render();
 // Tilt + brillo del cursor para las tarjetas de resultados (se redibujan en cada filtro, por eso delegado)
 (function(){
   if(window.matchMedia('(pointer: coarse)').matches||window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const box=document.getElementById('cols'),MAX=6;
+  const box=document.getElementById('cols'),MAX=1.6,REF=360; // grados; se escala con el alto para que las listas largas no se deformen
   if(!box) return;
   box.addEventListener('mousemove',e=>{
     const card=e.target.closest('.card'); if(!card) return;
     const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
     card.style.setProperty('--mx',(px*100)+'%');card.style.setProperty('--my',(py*100)+'%');
-    card.style.setProperty('--rx',((px-.5)*MAX*2).toFixed(2)+'deg');card.style.setProperty('--ry',((.5-py)*MAX*2).toFixed(2)+'deg');
+    const kx=Math.min(1,REF/r.width),ky=Math.min(1,REF/r.height);card.style.setProperty('--rx',((px-.5)*MAX*2*kx).toFixed(2)+'deg');card.style.setProperty('--ry',((.5-py)*MAX*2*ky).toFixed(2)+'deg');
   });
   box.addEventListener('mouseout',e=>{
     const card=e.target.closest('.card'); if(!card||card.contains(e.relatedTarget)) return;
