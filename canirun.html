@@ -195,6 +195,8 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
 .cir input:focus,.cir textarea:focus{outline:2px solid var(--accent);outline-offset:2px}
 .cir textarea{min-height:84px;font-family:var(--mono);font-size:12.5px;resize:vertical}
 .cir .hw{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:6px}
+.cir-forget{margin-top:8px;padding:0;background:none;border:0;border-bottom:1px dashed var(--text-mute);color:var(--text-mute);font-family:var(--mono);font-size:11px;cursor:pointer}
+.cir-forget:hover{color:var(--text);border-color:var(--text)}
 .cir #det,.cir #ign{font-family:var(--mono);font-size:12px;line-height:1.6;margin:12px 0 0;color:var(--text-mute)}
 .cir #ign{color:#f5b942;margin-top:6px}
 .cir details{margin-top:16px;border-top:1px solid var(--border-soft);padding-top:14px}
@@ -254,7 +256,7 @@ a.cir-link:hover{background:var(--accent-soft)}
 <div><label for="ramIn">RAM (GB)</label><input id="ramIn" type="number" min="1" max="512" placeholder="16"></div>
 </div>
 <datalist id="gl"></datalist><datalist id="cl"></datalist>
-<p id="det"></p>
+<p id="det"></p><button type="button" id="forgetPc" class="cir-forget" hidden>Olvidar mi PC guardada</button>
 <p id="ign"></p>
 <details><summary>Detectar CPU, GPU y RAM con un comando</summary>
 <p>Ninguna web puede leer tu CPU ni tu RAM desde el navegador (y Firefox/Brave limitan todavia mas). Por eso lo hace un comando: lee tu hardware y abre esta pagina con los datos en la direccion, despues del <code>#</code>, que nunca se envia a ningun servidor. Podes leerlo antes de correrlo. Si seguis con miedo, podes preguntarle a tu IA de preferencia si es seguro.</p>
@@ -1229,12 +1231,29 @@ const BASE=/^https?:/.test(location.href)?location.origin+location.pathname:'htt
 $('cmdL').textContent="xdg-open \""+BASE+"#gpu=$(lspci | grep -iE 'vga|3d' | sed 's/.*: //' | tr '\\n' ' ' | tr -cd 'A-Za-z0-9 ./_-' | sed 's/ /%20/g')&cpu=$( { grep -m1 'model name' /proc/cpuinfo || LC_ALL=C lscpu | grep -m1 'Model name'; } | cut -d: -f2 | tr -cd 'A-Za-z0-9 ./_-' | sed 's/ /%20/g')&ram=$(awk '/MemTotal/{printf \"%d\",$2/1048576+0.5}' /proc/meminfo)\"";
 $('cmdW').textContent="$g=(Get-CimInstance Win32_VideoController).Name -join ' '; $c=(Get-CimInstance Win32_Processor).Name; $r=[math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory/1GB); Start-Process ('"+BASE+"#gpu='+[uri]::EscapeDataString($g)+'&cpu='+[uri]::EscapeDataString($c)+'&ram='+$r)";
 detect();
+// PC guardada: se recuerda entre visitas (localStorage). Prioridad: comando por URL > PC guardada > deteccion automatica.
+const PC_KEY='leianet-canirun-pc';
+function savePc(){try{const d={g:$('gpuIn').value.trim(),c:$('cpuIn').value.trim(),r:$('ramIn').value.trim()};if(d.g||d.c||d.r){localStorage.setItem(PC_KEY,JSON.stringify(d));$('forgetPc').hidden=false}}catch(_){}}
+try{
+  const sv=JSON.parse(localStorage.getItem(PC_KEY)||'null');
+  if(sv&&(sv.g||sv.c||sv.r)){
+    if(sv.g)$('gpuIn').value=sv.g;
+    if(sv.c)$('cpuIn').value=sv.c;
+    if(sv.r)$('ramIn').value=sv.r;
+    $('det').textContent='Cargamos la última PC que usaste. Podés cambiar los datos cuando quieras.';
+    $('forgetPc').hidden=false;
+  }
+}catch(_){}
+$('forgetPc').addEventListener('click',()=>{try{localStorage.removeItem(PC_KEY)}catch(_){}['gpuIn','cpuIn','ramIn'].forEach(id=>$(id).value='');$('forgetPc').hidden=true;detect();render()});
+['gpuIn','cpuIn','ramIn'].forEach(id=>$(id).addEventListener('input',savePc));
+$('pasteIn').addEventListener('input',()=>setTimeout(savePc,0));
 const hp=new URLSearchParams(location.hash.slice(1));
 if(hp.has('gpu')||hp.has('cpu')||hp.has('ram')){
   const g=find(hp.get('gpu')||'',GI),c=find(hp.get('cpu')||'',CI),r=parseInt(hp.get('ram'),10);
   if(hp.get('gpu'))$('gpuIn').value=g?g.n:hp.get('gpu').slice(0,60);
   if(hp.get('cpu'))$('cpuIn').value=c?c.n:hp.get('cpu').slice(0,60);
   if(r>0&&r<=512)$('ramIn').value=r;
+  savePc();
   $('det').textContent='Datos recibidos del comando'+(g?'':'. La placa no está en nuestra lista: elegí la más parecida')+(c?'':'. Tu CPU no está en nuestra lista: elegí la más parecida')+'.';
 }
 // Catálogo de tu backend: los requisitos llegan como texto y se convierten con las tablas de arriba
