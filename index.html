@@ -446,25 +446,6 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=> toast.classList.remove('show'), 1800);
   }
-  window.addEventListener('load', ()=>{
-    setTimeout(()=>{
-      clearTimeout(toastTimer);
-      toast.textContent = 'NUEVO SERVIDOR HABILITADO';
-      toast.classList.add('show');
-      const cs16Section = document.getElementById('cs16');
-      if(cs16Section){
-        const hideOnReach = new IntersectionObserver((entries)=>{
-          entries.forEach(entry=>{
-            if(entry.isIntersecting){
-              toast.classList.remove('show');
-              hideOnReach.disconnect();
-            }
-          });
-        }, { threshold: 0.15 });
-        hideOnReach.observe(cs16Section);
-      }
-    }, 900);
-  });
   document.querySelectorAll('.copy-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const value = btn.getAttribute('data-copy');
