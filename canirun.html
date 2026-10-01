@@ -1074,17 +1074,23 @@ a.cir-link:hover{background:var(--accent-soft)}
     });
   })();
 </script>
+<script src="assets/hw-data.js?v=1"></script>
 <script>
 (function(){
 
 // Puntajes aproximados y estimados a mano (RTX 3060 = 55, Ryzen 5 5600 = 27). No son un benchmark oficial.
-const cp=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+const cp=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\((r|tm|c)\)/g,'').replace(/[^a-z0-9]/g,'');
 const P=s=>s.split(',').map(x=>{x=x.trim();const i=x.lastIndexOf(' ');return[x.slice(0,i),+x.slice(i+1)]});
 const NV=P("GT 610 1,GT 620 1,GT 630 2,GT 640 4,GT 710 1,GT 720 3,GT 730 2,GT 740 5,GT 1030 8,GTX 650 6,GTX 650 Ti 8,GTX 660 12,GTX 670 15,GTX 680 17,GTX 750 10,GTX 750 Ti 12,GTX 760 15,GTX 770 18,GTX 780 22,GTX 780 Ti 26,GTX 950 17,GTX 960 20,GTX 970 30,GTX 980 36,GTX 980 Ti 46,GTX Titan X 48,GTX 1050 20,GTX 1050 Ti 24,GTX 1060 3GB 30,GTX 1060 34,GTX 1070 44,GTX 1070 Ti 50,GTX 1080 56,GTX 1080 Ti 64,Titan Xp 68,GTX 1630 17,GTX 1650 30,GTX 1650 Super 37,GTX 1660 42,GTX 1660 Super 47,GTX 1660 Ti 48,RTX 2060 52,RTX 2060 Super 58,RTX 2070 60,RTX 2070 Super 66,RTX 2080 72,RTX 2080 Super 76,RTX 2080 Ti 88,Titan RTX 92,RTX 3050 40,RTX 3050 6GB 34,RTX 3060 55,RTX 3060 Ti 68,RTX 3070 78,RTX 3070 Ti 84,RTX 3080 98,RTX 3080 12GB 102,RTX 3080 Ti 108,RTX 3090 118,RTX 3090 Ti 128,RTX 4060 66,RTX 4060 Ti 76,RTX 4070 90,RTX 4070 Super 100,RTX 4070 Ti 108,RTX 4070 Ti Super 118,RTX 4080 125,RTX 4080 Super 128,RTX 4090 190,RTX 5050 60,RTX 5060 80,RTX 5060 Ti 90,RTX 5070 115,RTX 5070 Ti 135,RTX 5080 165,RTX 5090 250");
 const LAP=NV.filter(([n])=>/^(GTX 1\d{3}|RTX)/.test(n)&&!/GB/.test(n)).map(([n,s])=>[n+" Laptop",Math.round(s*.7),["Laptop","Mobile","Max-Q","Laptop GPU"].map(x=>cp(n+" "+x)).join("|")]);
 const OTHER=P("GTX 950M 9,GTX 960M 11,GTX 965M 14,GTX 970M 22,GTX 980M 28,RTX 4050 Laptop 44,MX110 3,MX130 4,MX150 7,MX230 5,MX250 8,MX330 9,MX350 11,MX450 15,MX550 17,MX570 19,GTX 260 3,GTX 460 8,GTX 560 Ti 11,GTX 570 13,GTX 580 15,GTX 590 20,Quadro K620 4,Quadro K2200 11,Quadro M2000 14,Quadro P400 3,Quadro P620 8,Quadro P1000 13,Quadro P2000 24,Quadro P4000 40,Quadro P5000 52,Quadro RTX 4000 56,Quadro RTX 5000 68,RTX A2000 42,RTX A4000 62,RTX A5000 90,RTX A6000 112,Tesla T4 50,Tesla P4 32,HD 5450 1,HD 6450 1,HD 7750 6,HD 7770 8,HD 7850 12,HD 7870 15,HD 7950 18,HD 7970 22,R5 230 1,R7 240 2,R7 250 6,R7 260X 10,R9 270X 15,R9 280X 22,R9 290 30,R9 290X 33,R9 380 22,R9 390 34,R9 Fury 40,R9 Fury X 44,RX 460 14,RX 470 26,RX 480 34,RX 550 12,RX 560 16,RX 570 30,RX 580 34,RX 590 38,RX Vega 56 48,RX Vega 64 54,Radeon VII 64,RX 5500 XT 32,RX 5600 XT 52,RX 5700 60,RX 5700 XT 68,RX 6400 22,RX 6500 XT 28,RX 6600 62,RX 6600 XT 70,RX 6650 XT 72,RX 6700 XT 88,RX 6750 XT 94,RX 6800 108,RX 6800 XT 118,RX 6900 XT 126,RX 6950 XT 134,RX 7600 66,RX 7600 XT 74,RX 7700 XT 100,RX 7800 XT 112,RX 7900 GRE 122,RX 7900 XT 140,RX 7900 XTX 165,RX 9060 XT 88,RX 9070 120,RX 9070 XT 135,RX 5500M 26,RX 5600M 44,RX 5700M 52,RX 6600M 52,RX 6700M 66,RX 6800M 88,RX 7600M 54,RX 7600M XT 60,RX 7600S 50,RX 7700S 60,RX 7900M 110,HD 6570 4,R5 220 2,GT 430 3,Radeon Pro WX 3200 12,Radeon Pro WX 5100 30,Radeon Pro W6600 60,Radeon Pro W7800 130,Intel Arc A310 16,Intel Arc A380 30,Intel Arc A580 52,Intel Arc A750 60,Intel Arc A770 66,Intel Arc B570 62,Intel Arc B580 72");
-const IGP=[["Intel HD 2000",1],["Intel HD 3000",1.5],["Intel HD 4000",2],["Intel HD 4600",3],["Intel HD 530",4],["Intel HD 630",5],["Intel UHD 610",3],["Intel UHD 620",5],["Intel UHD 630",6],["Intel UHD 730",8],["Intel UHD 750",10],["Intel UHD 770",11],["Intel Iris Xe",13],["Intel Arc Graphics (integrada)",20,"arcgraphics"],["AMD Vega 3",4],["AMD Vega 6",6],["AMD Vega 7",8],["AMD Vega 8",9],["AMD Vega 11",11],["AMD Radeon 610M",5],["AMD Radeon 660M",14],["AMD Radeon 680M",22],["AMD Radeon 740M",15],["AMD Radeon 760M",20],["AMD Radeon 780M",26],["AMD Radeon 890M",34],["AMD Radeon Graphics (integrada)",12,"amdradeontmgraphics"]];
+const IGP=[["Intel HD 2000",1],["Intel HD 3000",1.5],["Intel HD 4000",2],["Intel HD 4600",3],["Intel HD 530",4],["Intel HD 630",5],["Intel UHD 610",3],["Intel UHD 620",5],["Intel UHD 630",6],["Intel UHD 730",8],["Intel UHD 750",10],["Intel UHD 770",11],["Intel Iris Xe",13],["Intel Arc Graphics (integrada)",20,"arcgraphics"],["AMD Vega 3",4],["AMD Vega 6",6],["AMD Vega 7",8],["AMD Vega 8",9],["AMD Vega 11",11],["AMD Radeon 610M",5],["AMD Radeon 660M",14],["AMD Radeon 680M",22],["AMD Radeon 740M",15],["AMD Radeon 760M",20],["AMD Radeon 780M",26],["AMD Radeon 890M",34],["AMD Radeon Graphics (integrada)",5,"amdradeongraphics|radeongraphics",1]];
 const GPUS=[...NV,...LAP,...OTHER,...IGP];
+// Base ampliada (assets/hw-data.js). Si el archivo no carga, el sitio sigue andando con la lista basica.
+const HW=window.HWD||{};
+const addTab=(tab,rows)=>{const seen=new Set(tab.map(r=>cp(r[0])));rows.forEach(r=>{const k=cp(r[0]);if(k&&!seen.has(k)){seen.add(k);tab.push(r)}})};
+if(HW.gpu)addTab(GPUS,P(HW.gpu));
+if(HW.igpu)addTab(GPUS,P(HW.igpu).map(([n,s])=>[n,s,(HW.ialias||{})[n],(HW.igen||[]).includes(n)?1:0]));
 
 const INTEL={
 2:"i3-2100 3,i3-2120 3,i5-2310 5,i5-2400 6,i5-2500 7,i5-2500K 7,i7-2600 9,i7-2600K 9,i7-2700K 10,i5-2410M 4,i7-2630QM 6,i7-2670QM 7",
@@ -1106,71 +1112,243 @@ const RY={
 7:"1700 17,1700X 18,1800X 19,2700 21,2700X 23,3700X 30,3800X 32,3800XT 33,4700G 28,5700 30,5700G 30,5700X 33,5700X3D 38,5800 35,5800X 35,5800X3D 42,5800XT 37,7700 45,7700X 47,7800X3D 55,8700G 42,9700X 50,9800X3D 65,3700U 10,4700U 17,5700U 20,5800U 21,5800H 28,6800H 34,7735HS 33,7840HS 42,7840U 34,7745HX 48,7945HX 62,8845HS 46",
 9:"3900X 36,3900XT 37,3950X 40,5900 36,5900X 44,5950X 48,7900 55,7900X 60,7900X3D 58,7950X 68,7950X3D 68,9900X 62,9950X 75,9950X3D 80,5900HX 38,6900HX 40,7940HS 45,7945HX3D 66"};
 const OT=P("Core 2 Duo E6600 1,Core 2 Duo E8400 2,Core 2 Quad Q6600 2,Core 2 Quad Q9550 3,Pentium G620 3,Pentium G2020 4,Pentium G3258 5,Pentium G4560 6,Pentium G5400 7,Pentium Gold G6400 8,Celeron G1610 2,Celeron G3900 4,Celeron G5900 5,Athlon 200GE 6,Athlon 3000G 7,Phenom II X4 955 4,Phenom II X6 1090T 6,FX-4300 5,FX-6300 6,FX-8350 8,FX-9590 9,Athlon X4 860K 6,Athlon X4 950 7,A10-7850K 5,A8-7600 4,Core Ultra 5 125H 30,Core Ultra 7 155H 36,Core Ultra 5 245K 50,Core Ultra 5 245KF 50,Core Ultra 7 265K 62,Core Ultra 7 265KF 62,Core Ultra 9 285K 72,Xeon E3-1230 v2 10,Xeon E3-1230 v3 12,Xeon E3-1231 v3 13,Xeon E3-1245 v3 14,Xeon E3-1270 v5 16,Xeon E5-2620 v3 12,Xeon E5-2630 v4 15,Xeon E5-2650 v2 12,Xeon E5-2660 v3 16,Xeon E5-2666 v3 17,Xeon E5-2670 10,Xeon E5-2670 v3 18,Xeon E5-2673 v3 17,Xeon E5-2678 v3 19,Xeon E5-2680 v2 15,Xeon E5-2680 v4 22,Xeon E5-2690 v4 24,Xeon E5-2697 v3 22,Core i3-530 3,Core i3-540 3,Core i3-3225 4,A6-3650 3");
-const gen=m=>{const n=+m.match(/-(\d{4,5})/)[1];return n<1400?Math.floor(n/100):Math.floor(n/1000)};
+const gen=m=>{const x=m.match(/-(\d{3,5})/);if(!x)return 12;const n=+x[1];return n<1000?1:n<1400?Math.floor(n/100):Math.floor(n/1000)};
 const CPUS=[...OT];
 P(Object.values(INTEL).join(",")).forEach(([m,s])=>{m="Core "+m;CPUS.push([m,s]);
   if(gen(m)>=9&&/^Core i\d-\d{4,5}K?$/.test(m))CPUS.push([m.replace(/K?$/,x=>x+"F"),s])});
 Object.entries(RY).forEach(([k,v])=>P(v).forEach(([m,s])=>CPUS.push(["Ryzen "+k+" "+m,s])));
 
-// Gráfica integrada de cada CPU (null = no tiene)
+// CPUs ampliadas (assets/hw-data.js)
+if(HW.intel)addTab(CPUS,P(HW.intel).flatMap(([m,s])=>{m='Core '+m;const r=[[m,s]];if(gen(m)>=9&&/^Core i\d-\d{4,5}K?$/.test(m))r.push([m.replace(/K?$/,x=>x+'F'),s]);return r}));
+['amd','other'].forEach(k=>HW[k]&&addTab(CPUS,P(HW[k])));
+
+// Gráfica integrada de cada CPU (null = no trae)
+const AIG={};Object.entries(HW.amdIg||{}).forEach(([g,l])=>l.split(',').forEach(t=>AIG[t.trim()]=g));
+const IGT=[
+[/^N(95|97|100|150|200|250|300|305|355)$/,'Intel UHD (Alder Lake-N)'],
+[/^(N2[0-9]{2}|N26\d\d|N4[5]\d|N5[5]\d|D\d{3,4}|C2\d{3})$/,'Intel GMA X4500'],
+[/^(N2\d{3}|J1\d{3}|J2\d{3}|Z3\d{3})/,'Intel HD (Bay Trail)'],
+[/^(N3[01]\d\d|N37\d\d|J3[01]\d\d|J37\d\d|x[5-7]-Z8\d{3})/,'Intel HD (Braswell)'],
+[/^(N42|J42)/,'Intel HD 505'],[/^(N33|N34|J33|J34)/,'Intel HD 500'],
+[/^(N4[01]\d\d|J4[01]\d\d)/,'Intel UHD 600'],[/^(N5000|N5030|J5005)/,'Intel UHD 605'],
+[/^(N45|N51|N50|N6|J64)/,'Intel UHD (Jasper Lake)'],
+[/^E\d{4}$/,'Intel GMA X4500'],
+[/^(G5[3-5]\d|G6\d\d|G8\d\d)$/,'Intel HD 2000'],[/^(G16\d\d|G2\d{3})$/,'Intel HD 2500'],
+[/^(G18\d\d|G3[2-4]\d\d)$/,'Intel HD (Haswell GT1)'],
+[/^G4560/,'Intel HD 610'],[/^G46\d\d/,'Intel HD 630'],[/^(G39\d\d|G4[0-5]\d\d)$/,'Intel HD 510'],
+[/^G49\d\d/,'Intel UHD 610'],[/^G54\d\d/,'Intel UHD 610'],[/^G5[56]\d\d/,'Intel UHD 630'],
+[/^G59\d\d/,'Intel UHD 610'],[/^G64\d\d/,'Intel UHD 610'],[/^G6[56]\d\d/,'Intel UHD 630'],[/^(G69|G74)\d\d/,'Intel UHD 710'],
+[/^(8\d\d|B\d+)$/,'Intel HD 2000'],[/^(10\d\d[UM]?|2020M|2117U)/,'Intel HD 2500'],[/^29\d\d/,'Intel HD (Haswell GT1)'],
+[/^3(85|86|95|96)\d[UY]/,'Intel HD 510'],[/^3556U/,'Intel HD (Haswell GT1)'],[/^3[2-8]\d\d[UY]/,'Intel HD 5300'],
+[/^44\d\d[UY]/,'Intel HD 610'],[/^(4205U|5205U|5305U|5405U|6405U)/,'Intel UHD 610'],
+[/^(6305|7305|7505|8505)/,'Intel UHD (Xe 48EU)']
+];
 function igpuOf(n){
   let m;
-  if(/^Core Ultra/.test(n))return n.endsWith("F")?null:"Intel Arc Graphics (integrada)";
-  if(/^(Pentium|Celeron)/.test(n))return"Intel UHD 610";
-  if(/^Athlon (200GE|3000G)/.test(n))return"AMD Vega 3";
-  if(m=n.match(/^Core i\d-(\d{4,5})(\w*)$/)){
-    const g=gen(n),x=m[2];
-    if(/F$/.test(x)||/^Core i7-(3820|3930K|4930K|5820K|5960X|6800K|6950X|7800X|7820X)$/.test(n))return null;
-    if(g>=11&&/[HUG]/.test(x))return"Intel Iris Xe";
-    if(g>=12)return/^Core i[79]/.test(n)?"Intel UHD 770":"Intel UHD 730";
-    return{2:"Intel HD 3000",3:"Intel HD 4000",4:"Intel HD 4600",5:"Intel HD 4600",6:"Intel HD 530",7:"Intel HD 630",8:"Intel UHD 630",9:"Intel UHD 630",10:"Intel UHD 630",11:"Intel UHD 750"}[g];
+  if(/^Core Ultra/.test(n)){
+    if(/F$/.test(n))return null;
+    m=n.match(/^Core Ultra \d (\d{3})([A-Z]*)$/);const d=m?+m[1]:0,x=m?m[2]:'';
+    if(x==='V')return d<230?'Intel Arc 130V':'Intel Arc 140V';
+    if(x==='HX')return'Intel Graphics (Arrow Lake HX)';
+    if(x==='H')return d>=200?(d<240?'Intel Arc 130T':'Intel Arc 140T'):'Intel Arc Graphics (integrada)';
+    if(x==='U')return'Intel Graphics (Meteor Lake U)';
+    return'Intel Graphics (Arrow Lake)';
   }
+  if(/^Core [357] \d/.test(n))return'Intel Iris Xe (80EU)';
+  if(/^Core i[3579]-N\d+$/.test(n)||/^Core 3 N/.test(n))return'Intel UHD (Alder Lake-N)';
+  if(/^Core i\d-7Y/.test(n))return'Intel HD 615';
+  if(m=n.match(/^Core i([3579])-(\d{3,5})([A-Z]*)(\d?)$/)){
+    const t=m[1],g=gen(n),sx=m[3],dg=m[4],num=+m[2];
+    if(/F$/.test(sx)||/^(X|XE)$/.test(sx)||/^Core i7-(3820|3930K|3960X|3970X|4820K|4930K|4960X|5820K|5930K|5960X|6800K|6850K|6900K|6950X|7740X)$/.test(n))return null;
+    if(g===1)return(sx==='M'||((t==='3'||t==='5')&&/^(5|6)\d\d$/.test(m[2])&&/^K?$/.test(sx)))?'Intel HD (Ironlake)':null;
+    if(g===2){if(/P$/.test(sx))return null;return(/[KMS]$/.test(sx)||/^(2105|2125)$/.test(m[2]))?'Intel HD 3000':'Intel HD 2000'}
+    if(g===3){if(/P$/.test(sx))return null;return(/^(M|QM|U|Y|K|XM)$/.test(sx)||t==='7')?'Intel HD 4000':'Intel HD 2500'}
+    if(g===4){
+      if(/^Core i7-4(750|770|850|860|870|980)HQ$/.test(n))return'Intel Iris Pro 5200';
+      if(/^(U|Y)$/.test(sx))return sx==='Y'?'Intel HD 4200':num===4258?'Intel Iris 5100':'Intel HD 4400';
+      if(/^(HQ|H|MQ|M|MX|QM)$/.test(sx))return'Intel HD 4600';
+      return t==='3'?'Intel HD 4400':'Intel HD 4600';
+    }
+    if(g===5){
+      if(sx==='C')return'Intel Iris Pro 6200';
+      if(sx==='U')return[5257,5287,5557].includes(num)?'Intel Iris 6100':'Intel HD 5500';
+      if(sx==='HQ')return num===5700?'Intel HD 5600':'Intel Iris Pro 6200';
+      return'Intel HD 5500';
+    }
+    if(g===6){
+      if(/^Core i7-6(770|870|970)HQ$/.test(n))return'Intel Iris Pro 580';
+      if(sx==='U')return[6157,6260,6267,6287,6360,6560,6567,6660].includes(num)?'Intel Iris 540':'Intel HD 520';
+      if(sx==='Y')return'Intel HD 515';
+      if(sx==='P')return'Intel HD 510';
+      return'Intel HD 530';
+    }
+    if(g===7){
+      if(sx==='U')return[7260,7267,7287,7360,7567,7660].includes(num)?'Intel Iris Plus 640':'Intel HD 620';
+      if(sx==='Y')return'Intel HD 615';
+      return'Intel HD 630';
+    }
+    if(g===8){
+      if(sx==='U')return[8259,8269,8279,8557,8559,8569].includes(num)?'Intel Iris Plus 655':'Intel UHD 620';
+      if(sx==='Y')return'Intel UHD 615';
+      if(sx==='G')return'Intel HD 630';
+      return'Intel UHD 630';
+    }
+    if(g===9)return'Intel UHD 630';
+    if(g===10){
+      if(sx==='G')return dg==='1'?'Intel UHD G1':dg==='4'?'Intel Iris Plus G4':'Intel Iris Plus G7';
+      if(sx==='U')return'Intel UHD 620';
+      if(sx==='Y')return'Intel UHD 615';
+      return'Intel UHD 630';
+    }
+    if(g===11){
+      if(sx==='G')return dg==='4'||t==='3'?'Intel UHD (Xe 48EU)':t==='5'?'Intel Iris Xe (80EU)':'Intel Iris Xe';
+      if(/^(H|HK)$/.test(sx))return'Intel UHD (Xe 32EU)';
+      return num===11400?'Intel UHD 730':'Intel UHD 750';
+    }
+    if(sx==='HX')return'Intel UHD 770';
+    if(/^(U|UL|P|H|HK)$/.test(sx))return t==='3'?'Intel UHD (Xe 48EU)':t==='5'?'Intel Iris Xe (80EU)':'Intel Iris Xe';
+    return[12100,12300,12400,13100,13400,14100,14400].includes(num)?'Intel UHD 730':'Intel UHD 770';
+  }
+  if(/^Core 2/.test(n))return'Intel GMA X4500';
+  if(/^Xeon/.test(n)){
+    if(m=n.match(/^Xeon E3-12[2467]5 v(\d)$/))return({3:'Intel HD 4600',5:'Intel HD 530',6:'Intel HD 630'})[m[1]]||null;
+    if(/^Xeon E-2\d{3}G$/.test(n))return'Intel UHD 630';
+    return null;
+  }
+  if(/^(Pentium|Celeron|Atom)/.test(n)){
+    const tl=n.replace(/^((Intel|Celeron|Pentium|Atom|Silver|Gold) )+/,'');
+    for(const [r,g] of IGT)if(r.test(tl))return g;
+    return'Intel UHD 610';
+  }
+  if(/^Intel N\d+$/.test(n))return'Intel UHD (Alder Lake-N)';
+  // AMD
+  if(/^Ryzen AI/.test(n)){
+    if(/HX/.test(n))return'AMD Radeon 890M';
+    if(/Max\+ 395/.test(n))return'AMD Radeon 8060S';
+    if(/Max/.test(n))return'AMD Radeon 8050S';
+    m=n.match(/AI [3579] (\d{3})/);const d=m?+m[1]:0;
+    return d>=365?'AMD Radeon 880M':d>=350?'AMD Radeon 860M':'AMD Radeon 840M';
+  }
+  if(/^Ryzen Threadripper/.test(n))return null;
+  const tail=n.split(' ').pop();
+  if(/^(Ryzen|Athlon)/.test(n)&&AIG[tail])return AIG[tail];
+  if(/^Athlon (Silver|Gold)/.test(n))return'AMD Vega 3';
   if(m=n.match(/^Ryzen \d (\d{4})(\w*)$/)){
     const d=+m[1],x=m[2];
     if(/F$/.test(x)||d<2000)return null;
-    const apu=/^(G|GE|GT|U|H|HS|HX)$/.test(x);
-    if(d<6000)return apu?(d==3400||d==2400?"AMD Vega 11":"AMD Vega 8"):null;
-    if(d<7000)return apu?"AMD Radeon 680M":null;
-    if(x==="HX")return"AMD Radeon 610M";
-    if(d>=8000&&x==="G")return d>=8700?"AMD Radeon 780M":d>=8600?"AMD Radeon 760M":"AMD Radeon 740M";
-    if(apu)return[7840,7940,8845].includes(d)?"AMD Radeon 780M":"AMD Radeon 680M";
-    return"AMD Radeon Graphics (integrada)";
+    const apu=/^(G|GE|GT|U|H|HS|HX|C)$/.test(x);
+    if(d<6000)return apu?(d==3400||d==2400?'AMD Vega 11':'AMD Vega 8'):null;
+    if(d<7000)return apu?'AMD Radeon 680M':null;
+    if(x==='HX')return'AMD Radeon 610M';
+    if(d>=8000&&x==='G')return d>=8700?'AMD Radeon 780M':d>=8600?'AMD Radeon 760M':'AMD Radeon 740M';
+    if(apu)return[7840,7940,8845].includes(d)?'AMD Radeon 780M':'AMD Radeon 680M';
+    return'AMD Radeon Graphics (integrada)';
   }
+  if(/^A[46]-(5000|5100|5200)$/.test(n))return'AMD Radeon HD 8330';
+  if(m=n.match(/^A(\d+)-(\d)(\d{3})/)){
+    const a=+m[1],y=+m[2];
+    if(y<=4)return y===3?(a>=8?'AMD Radeon HD 6550D':'AMD Radeon HD 6530D'):'AMD Radeon HD 7540D';
+    if(y===5)return a<=4?'AMD Radeon HD 7480D':a===6?'AMD Radeon HD 7540D':a===8?'AMD Radeon HD 7560D':'AMD Radeon HD 7660D';
+    if(y===6)return a<=4?'AMD Radeon HD 8370D':a===6?'AMD Radeon HD 8470D':a===8?'AMD Radeon HD 8570D':'AMD Radeon HD 8670D';
+    return a<=4?'AMD Radeon R3 (APU)':(a<=6||a===9)?'AMD Radeon R5 (APU)':'AMD Radeon R7 (APU)';
+  }
+  if(/^(E1|E2|E|C)-/.test(n))return'AMD Radeon HD 6310';
   return null;
 }
 const IG={};CPUS.forEach(([n])=>IG[n]=igpuOf(n));
+
 // Los juegos vienen del backend (/api/catalog)
 const GAMES=[];let CERR=false;
 
 const $=id=>document.getElementById(id);
-const keys=n=>{const a=cp(n),b=cp(n.replace(/^(Intel|AMD|NVIDIA|Arc|Core|Xeon) /,'')),f=x=>x.replace(/(u?hd)(\d+)/,'$1graphics$2');return[...new Set([a,b,f(a),f(b)])]};
-const idx=t=>t.map(([n,s,a])=>({n,s,k:a?a.split('|'):keys(n)}));
+const keys=n=>{const a=cp(n),b=cp(n.replace(/^(Intel|AMD|NVIDIA|Arc|Core|Xeon) /,'')),f=x=>x.replace(/(u?hd|iris(?:plus|pro)?)(g?\d+)/,'$1graphics$2'),r=[a,b,f(a),f(b)],t=n.match(/^(?:Celeron|Pentium|Athlon|Atom)(?: (?:Silver|Gold))? ([A-Za-z]\d{3,5}[A-Za-z]*)$/);if(t)r.push(cp(t[1]));return[...new Set(r)]};
+const idx=t=>t.map(([n,s,a,f])=>({n,s,f:!!f,k:a?a.split('|'):keys(n)}));
 const GI=idx(GPUS),CI=idx(CPUS);
-const find=(text,tab)=>{const t=cp(text),m=[];tab.forEach(e=>{const k=e.k.filter(k=>t.includes(k)).sort((x,y)=>y.length-x.length)[0];if(k)m.push([e,k])});
-  const mx=m.filter(([,k])=>!m.some(([,j])=>j!==k&&j.includes(k)));return(mx.sort((x,y)=>y[0].s-x[0].s)[0]||[null])[0]};
+
+// ── Emparejamiento aproximado: si no está el modelo exacto, usamos el más cercano de la misma familia ──
+function cparse(x){
+  const t=' '+x.toLowerCase().replace(/\((r|tm|c)\)/g,'').replace(/@[^\n]*/g,'').replace(/\b(with|w\/)\s[^\n]*/g,'').replace(/\b(cpu|processor|intel|amd|pro)\b/g,' ').replace(/\s+/g,' ')+' ';
+  const cl=s=>/^(u|ul|ue|g\d|y|p|e|v|c)/.test(s)?'U':/^(h|hq|hk|hx|qm|mq|mx|m|q|xm)/.test(s)?'H':'D';
+  let m;
+  if(m=t.match(/core ultra ([3579]) (\d{3})([a-z]*)/))return{f:'cu'+m[1],g:Math.floor(m[2]/100),k:m[2]%100,c:cl(m[3])};
+  if(m=t.match(/core ([357]) (\d{3})([a-z]*)/))return{f:'cs'+m[1],g:1,k:+m[2],c:cl(m[3])};
+  if(m=t.match(/\bi([3579])[- ]?(\d{3,5})([a-z]{0,3})/)){const n=+m[2];return{f:'i'+m[1],g:gen('-'+n),k:n<1400?n%100:n%1000,c:cl(m[3])}}
+  if(m=t.match(/ryzen ([3579]) (\d{4})([a-z0-9]*)/)){const n=+m[2];return{f:'r'+m[1],g:Math.floor(n/1000),k:n%1000,c:/^(u|c)/.test(m[3])?'U':/^h/.test(m[3])?'H':'D'}}
+  if(m=t.match(/ryzen ai (?:max\+? )?(?:[3579] )?(?:hx )?(\d{3})/))return{f:'rai',g:3,k:+m[1],c:'H'};
+  if(m=t.match(/threadripper (\d{4})/))return{f:'trip',n:+m[1]};
+  if(m=t.match(/xeon (gold|silver|bronze|platinum) (\d{4})/))return{f:'xeon'+m[1],n:+m[2]};
+  if(m=t.match(/xeon ([exwl]\d?)[- ]?(\d{4})(?: (v\d))?/))return{f:'xeon'+m[1],n:+m[2],v:m[3]||''};
+  if(m=t.match(/core 2 (duo|quad|extreme) ([a-z])-?(\d{3,4})/))return{f:'c2'+m[1]+m[2],n:+m[3]};
+  if(m=t.match(/\b(celeron|pentium|athlon|sempron|atom)\b(?: (?:silver|gold|ii|x[234]|dual-core|quad-core|64))* ?([a-z]?)-?(\d{3,5})/))return{f:m[1]+m[2],n:+m[3]};
+  if(m=t.match(/\bfx-?(\d{4})/))return{f:'fx',n:+m[1]};
+  if(m=t.match(/\ba(4|6|8|9|10|12)-(\d{4})/))return{f:'a'+m[1],n:+m[2]};
+  if(m=t.match(/phenom (?:ii )?x(\d) ?(\d{3,4})/))return{f:'ph'+m[1],n:+m[2]};
+  if(m=t.match(/\bn(\d{2,3})\b/))return{f:'aln',n:+m[1]};
+  return null;
+}
+const cdist=(a,b)=>a.f!==b.f?1e9:a.g!=null?(b.g==null?1e9:Math.abs(a.g-b.g)*1000+Math.abs(a.k-b.k)+(a.c===b.c?0:1500)):Math.abs(a.n-b.n)+((a.v||'')===(b.v||'')?0:150);
+function nearCpu(text){
+  const p=cparse(text);if(!p)return null;
+  let best=null,bd=1e9;
+  CI.forEach(e=>{const q=e.p===undefined?(e.p=cparse(e.n)):e.p;if(!q)return;const d=cdist(p,q);if(d<bd||(d===bd&&best&&e.s<best.s)){bd=d;best=e}});
+  return best&&bd<=(p.g!=null?2600:1200)?Object.assign({},best,{ap:1}):null;
+}
+function gparse(x){
+  const t=' '+x.toLowerCase().replace(/\((r|tm|c)\)/g,'').replace(/[-_\/,]/g,' ').replace(/\s+/g,' ')+' ',o=[],mob=/laptop|mobile|max ?q|notebook/.test(t);
+  const R=(re,fn)=>{let m;while(m=re.exec(t)){const r=fn(m);if(r)o.push(r)}};
+  R(/\b(?:gtx|rtx|gts|gt|geforce|quadro)\s?(\d{3,4})(m?x?)\b\s?(ti)?\s?(super)?/g,m=>({f:'nv',n:+m[1],r:(m[3]?1:0)+(m[4]?1:0),m:mob||!!m[2]}));
+  R(/\bmx\s?(\d{3})\b/g,m=>({f:'mx',n:+m[1],r:0,m:true}));
+  R(/\brx\s?(\d{3,4})\s?(m|s|xt|xtx|gre)?\b/g,m=>({f:'rx',n:+m[1],r:({xt:1,xtx:2,gre:1})[m[2]]||0,m:mob||m[2]==='m'||m[2]==='s'}));
+  R(/\br([579])\s?(m?)(\d{3})(x?)\b/g,m=>({f:'r'+m[1],n:+m[3],r:0,m:mob||!!m[2]}));
+  R(/\bvega\s?(\d{1,2})\b/g,m=>({f:'vega',n:+m[1],r:0,m:false}));
+  R(/\bradeon\s?(\d{3})m\b/g,m=>({f:'rm',n:+m[1],r:0,m:true}));
+  R(/\b(u?hd|iris(?: plus| pro| xe)?)\s?(?:graphics\s?)?(?:p\s?)?(\d{3,4})(m|d|g)?\b/g,m=>{const k=m[1],n=+m[2],pre=t.slice(Math.max(0,m.index-40),m.index);return{f:k==='uhd'?'uhd':k==='hd'?((n<1000||/intel/.test(pre))?'hd':'hdr'):'iris',n,r:0,m:mob}});
+  R(/\barc\s?(?:pro\s?)?([ab])\s?(\d{2,3})(m?)\b/g,m=>({f:'arc'+m[1],n:+m[2],r:0,m:mob||!!m[3]}));
+  return o;
+}
+const GTH={vega:4,rm:60,mx:40,arca:60,arcb:60};
+function nearGpu(text){
+  const c=gparse(text);if(!c.length)return null;
+  let res=null;
+  c.forEach(p=>{let best=null,bd=1e9;
+    GI.forEach(e=>{const qs=e.gp===undefined?(e.gp=gparse(e.n)):e.gp;qs.forEach(q=>{if(q.f!==p.f)return;const d=Math.abs(q.n-p.n)+10*Math.abs(q.r-p.r)+(q.m===p.m?0:25);if(d<bd||(d===bd&&best&&e.s<best.s)){bd=d;best=e}})});
+    if(best&&bd<=(GTH[p.f]||120)&&(!res||best.s>res.s))res=best});
+  return res?Object.assign({},res,{ap:1}):null;
+}
+const ctxt=(s,cpu)=>{s=s.replace(/@[^\n]*/g,'').replace(/\b(with|w\/)\s[^\n]*/gi,'').replace(/\b(cpu|processor)\b/gi,'');if(cpu)s=s.replace(/\bpro\b/gi,'');return cp(s)};
+const find=(text,tab,fb)=>{
+  const t=ctxt(text,tab===CI),m=[];
+  tab.forEach(e=>{const k=e.k.filter(k=>t.includes(k)).sort((x,y)=>y.length-x.length)[0];if(k)m.push([e,k])});
+  const mx=m.filter(([,k])=>!m.some(([,j])=>j!==k&&j.includes(k)));
+  const r=(mx.sort((x,y)=>y[0].s-x[0].s)[0]||[null])[0];
+  return r||(fb?(tab===CI?nearCpu(text):nearGpu(text)):null);
+};
 const threads=navigator.hardwareConcurrency||4;
 let genre='todos';
 
-GPUS.forEach(g=>$('gl').insertAdjacentHTML('beforeend','<option value="'+g[0]+'">'));
-CPUS.forEach(c=>$('cl').insertAdjacentHTML('beforeend','<option value="'+c[0]+'">'));
+$('gl').innerHTML=GPUS.map(g=>'<option value="'+g[0]+'">').join('');
+$('cl').innerHTML=CPUS.map(c=>'<option value="'+c[0]+'">').join('');
 
 function detect(){
   let raw='';
   try{const c=document.createElement('canvas'),x=c.getContext('webgl'),e=x.getExtension('WEBGL_debug_renderer_info');raw=e?x.getParameter(e.UNMASKED_RENDERER_WEBGL):''}catch(_){}
-  const g=find(raw,GI);
+  const g=find(raw,GI,1);
   if(g)$('gpuIn').value=g.n;
   if(navigator.deviceMemory)$('ramIn').value=navigator.deviceMemory;
   $('det').textContent=raw
-    ?'Tu navegador informó la placa: '+raw.replace(/^ANGLE \(|\)$/g,'')+(g?'.':'. No la reconocimos, elegila de la lista.')
+    ?'Tu navegador informó la placa: '+raw.replace(/^ANGLE \(|\)$/g,'')+(g?(g.ap?'. Aproximamos con la más parecida ('+g.n+').':'.'):'. No la reconocimos, elegila de la lista.')
     :'Tu navegador no comparte datos de hardware. Completalos a mano o usá el comando.';
   if(navigator.deviceMemory>=8)$('det').textContent+=' Los navegadores informan como máximo 8 GB de RAM: corregilo si tenés más.';
 }
 
 function hw(){
-  const g0=find($('gpuIn').value,GI),c=find($('cpuIn').value,CI);
+  const gt=$('gpuIn').value,ct=$('cpuIn').value;
+  const g0=find(gt,GI,1),c=find(ct,CI,1);
   let g=g0,ig=false;
-  if(!g&&c&&IG[c.n]){g=GI.find(x=>x.n===IG[c.n]);ig=!!g}
-  return{g:g?g.s:0,gk:!!g,ig,gn:g?g.n:'',cn:c?c.n:'',c:c?c.s:threads*2,r:+$('ramIn').value||0};
+  // Si la placa es una integrada "genérica" (ej. "AMD Radeon Graphics") y sabemos el CPU, usamos la integrada real de ese CPU
+  if((!g||g.f)&&c&&IG[c.n]){const x=GI.find(x=>x.n===IG[c.n]);if(x){g=x;ig=true}}
+  return{g:g?g.s:0,gk:!!g,ig,gn:g?g.n:'',cn:c?c.n:'',c:c?c.s:threads*2,r:+$('ramIn').value||0,
+    ga:g0&&g0.ap&&!ig?g0.n:'',ca:c&&c.ap?c.n:'',gq:gt.trim(),cq:ct.trim()};
 }
 
 function verdict(game,h){
@@ -1202,7 +1380,11 @@ function render(){
   const h=hw(),q=cp($('q').value);
   const cols={ok:[],min:[],no:[]};
   $('msg').textContent='';
-  $('ign').textContent=h.ig?'Sin placa elegida: usamos la gráfica integrada de tu CPU ('+h.gn+').':'';
+  const nt=[];
+  if(h.ca)nt.push('Tu procesador ('+h.cq.slice(0,45)+') no está exacto en la lista: usamos el más parecido, '+h.ca+'.');
+  if(h.ga)nt.push('Tu placa ('+h.gq.slice(0,45)+') no está exacta en la lista: usamos la más parecida, '+h.ga+'.');
+  if(h.ig)nt.push('Sin placa elegida: usamos la gráfica integrada de tu CPU ('+h.gn+').');
+  $('ign').textContent=nt.join(' ');
   if(!h.gk){$('cols').innerHTML='';$('sum').textContent='';$('msg').textContent=h.cn?'Tu '+h.cn+' no tiene gráfica integrada: elegí una placa de video.':'Elegí tu placa de video o un procesador para ver los resultados.';return}
   if(!GAMES.length){$('cols').innerHTML='';$('sum').textContent='';$('msg').textContent=CERR?'No se pudo cargar el catálogo de juegos. Probá de nuevo en un rato.':'Cargando juegos…';return}
   GAMES.forEach(g=>{
@@ -1226,9 +1408,10 @@ function chips(){
 $('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;genre=b.dataset.g;chips();render()});
 
 $('pasteIn').addEventListener('input',()=>{
-  const t=$('pasteIn').value,g=find(t,GI),c=find(t,CI);
+  const t=$('pasteIn').value,g=find(t,GI,1),c=find(t,CI,1);
   if(g)$('gpuIn').value=g.n;
   if(c)$('cpuIn').value=c.n;
+  if((g&&g.ap)||(c&&c.ap))$('det').textContent='Algún dato no estaba exacto: usamos el modelo más parecido ('+[g&&g.ap&&g.n,c&&c.ap&&c.n].filter(Boolean).join(' / ')+').';
   const m=t.match(/MemTotal:\s+(\d+)\s*kB/i);
   let r=m?Math.round(m[1]/1048576):null;
   if(!r){const l=t.split(/\n/).map(s=>s.trim()).find(s=>/^\d{1,3}$/.test(s));if(l)r=+l}
@@ -1258,12 +1441,12 @@ $('forgetPc').addEventListener('click',()=>{try{localStorage.removeItem(PC_KEY)}
 $('pasteIn').addEventListener('input',()=>setTimeout(savePc,0));
 const hp=new URLSearchParams(location.hash.slice(1));
 if(hp.has('gpu')||hp.has('cpu')||hp.has('ram')){
-  const g=find(hp.get('gpu')||'',GI),c=find(hp.get('cpu')||'',CI),r=parseInt(hp.get('ram'),10);
-  if(hp.get('gpu'))$('gpuIn').value=g?g.n:hp.get('gpu').slice(0,60);
-  if(hp.get('cpu'))$('cpuIn').value=c?c.n:hp.get('cpu').slice(0,60);
+  const g=find(hp.get('gpu')||'',GI,1),c=find(hp.get('cpu')||'',CI,1),r=parseInt(hp.get('ram'),10);
+  if(hp.get('gpu'))$('gpuIn').value=g&&!g.ap?g.n:hp.get('gpu').slice(0,80);
+  if(hp.get('cpu'))$('cpuIn').value=c&&!c.ap?c.n:hp.get('cpu').slice(0,80);
   if(r>0&&r<=512)$('ramIn').value=r;
   savePc();
-  $('det').textContent='Datos recibidos del comando'+(g?'':'. La placa no está en nuestra lista: elegí la más parecida')+(c?'':'. Tu CPU no está en nuestra lista: elegí la más parecida')+'.';
+  $('det').textContent='Datos recibidos del comando'+(g&&!g.ap?'':g?'. Tu placa no está exacta: usamos la más parecida ('+g.n+')':'. La placa no está en nuestra lista: elegí la más parecida')+(c&&!c.ap?'':c?'. Tu CPU no está exacta: usamos la más parecida ('+c.n+')':'. Tu CPU no está en nuestra lista: elegí la más parecida')+'.';
 }
 // Catálogo de tu backend: los requisitos llegan como texto y se convierten con las tablas de arriba
 const API='https://steam-api.leianet.ar',UNK={};
