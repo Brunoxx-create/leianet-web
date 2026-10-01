@@ -235,9 +235,9 @@ html.low-perf .stars-layer{animation:none!important}
 html.low-perf .game-card{opacity:1!important}
 html.low-perf *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;filter:none!important;box-shadow:none!important;animation:none!important;transition:none!important}
 html.perf-mid .cursor-glow,html.perf-mid .nebula,html.perf-mid .nebula-mono,html.perf-mid .depth-veil,html.perf-mid .grid-overlay,html.perf-mid .planet-parallax,html.perf-mid .planet-parallax-2,html.perf-mid .asteroid-parallax,html.perf-mid .satellite-parallax,html.perf-mid .grain,html.perf-mid .starfield .shooting-star,html.perf-mid .starfield .meteor,html.perf-mid #sparkles,html.perf-mid .sparkle{display:none!important}
-html.perf-mid .tier-platinum{animation:none!important}
-html.perf-mid .game-card.tier-glow-platinum{animation:cardin .4s ease forwards!important}
-html.low-perf .game-card.tier-glow-platinum{animation:none!important;opacity:1!important}
+html.perf-mid .tier-platinum,html.perf-mid .tier-native{animation:none!important}
+html.perf-mid .game-card.tier-glow-platinum,html.perf-mid .game-card.tier-glow-native{animation:cardin .4s ease forwards!important}
+html.low-perf .game-card.tier-glow-platinum,html.low-perf .game-card.tier-glow-native{animation:none!important;opacity:1!important}
 html.perf-mid header,html.perf-mid .icon-btn,html.perf-mid .search-box,html.perf-mid .profile-card,html.perf-mid .reco-box,html.perf-mid .linux-stat,html.perf-mid .sort-tabs button,html.perf-mid .game-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;border-color:var(--border)!important}
 html.perf-mid .sort-tabs button.active,html.perf-mid .search-box button{background:var(--accent)!important;color:#111113!important}
 .hero{padding:clamp(40px,7vw,68px) 0 20px;text-align:center}
@@ -289,17 +289,22 @@ h1 span{background:linear-gradient(100deg,var(--accent) 20%,#fff 50%,var(--accen
 .error-flag{color:#ff9a9a;font-weight:700;font-size:10.5px}
 .tier-badge{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 10px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
 .tier-badge{font-family:var(--mono);font-weight:700;font-size:10.5px;letter-spacing:.05em;padding:5px 12px;border-radius:20px;text-transform:uppercase;white-space:nowrap;border:1px solid transparent}
-.tier-platinum{background:rgba(210,225,255,.3);color:#f7fbff;border-color:rgba(220,232,255,.85);box-shadow:0 0 16px -1px rgba(220,232,255,.95),0 0 34px 2px rgba(160,200,255,.6),0 0 60px 6px rgba(140,180,255,.25);animation:platinum-badge-pulse 2.2s ease-in-out infinite}
-@keyframes platinum-badge-pulse{0%,100%{box-shadow:0 0 16px -1px rgba(220,232,255,.95),0 0 34px 2px rgba(160,200,255,.6),0 0 60px 6px rgba(140,180,255,.25)}50%{box-shadow:0 0 22px 3px rgba(220,232,255,1),0 0 48px 8px rgba(160,200,255,.85),0 0 84px 14px rgba(140,180,255,.4)}}
+.tier-platinum{background:rgba(210,225,255,.22);color:#f1f7ff;border-color:rgba(220,232,255,.6);box-shadow:0 0 10px -2px rgba(220,232,255,.55),0 0 20px 0 rgba(160,200,255,.3);animation:platinum-badge-pulse 2.6s ease-in-out infinite}
+@keyframes platinum-badge-pulse{0%,100%{box-shadow:0 0 10px -2px rgba(220,232,255,.55),0 0 20px 0 rgba(160,200,255,.3)}50%{box-shadow:0 0 13px -1px rgba(220,232,255,.7),0 0 26px 2px rgba(160,200,255,.4)}}
+.tier-native{background:rgba(14,110,52,.45);color:#8dffb8;border-color:#22c55e;text-shadow:0 0 8px rgba(80,255,140,.8);box-shadow:0 0 16px -1px rgba(34,197,94,.9),0 0 34px 2px rgba(22,163,74,.6),0 0 60px 6px rgba(22,163,74,.25);animation:native-badge-pulse 2.2s ease-in-out infinite}
+@keyframes native-badge-pulse{0%,100%{box-shadow:0 0 16px -1px rgba(34,197,94,.9),0 0 34px 2px rgba(22,163,74,.6),0 0 60px 6px rgba(22,163,74,.25)}50%{box-shadow:0 0 22px 3px rgba(52,224,110,1),0 0 48px 8px rgba(22,163,74,.85),0 0 84px 14px rgba(22,163,74,.4)}}
 .tier-gold{background:rgba(217,164,65,.26);color:#ffcf7a;border-color:rgba(217,164,65,.6);box-shadow:0 0 14px -4px rgba(217,164,65,.6)}
 .tier-silver{background:rgba(199,199,204,.24);color:#ededee;border-color:rgba(199,199,204,.55)}
 .tier-bronze{background:rgba(201,143,46,.24);color:#e3a24f;border-color:rgba(201,143,46,.55)}
 .tier-borked{background:rgba(224,122,122,.24);color:#ff9a9a;border-color:rgba(224,122,122,.55);box-shadow:0 0 14px -4px rgba(224,122,122,.5)}
 .tier-pending{background:rgba(255,255,255,.06);color:var(--text-mute);border-color:var(--border-soft)}
 .tier-unknown{background:rgba(255,255,255,.04);color:var(--text-mute);border-color:var(--border-soft)}
-.game-card.tier-glow-platinum{border-color:rgba(220,232,255,.75);box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5);animation:cardin .4s ease forwards,platinum-card-pulse 2.8s ease-in-out infinite .4s}
-.game-card.tier-glow-platinum:hover{border-color:rgba(230,240,255,.95);box-shadow:0 0 40px -2px rgba(220,232,255,.9),0 0 78px -6px rgba(160,200,255,.6),inset 0 0 26px -12px rgba(220,232,255,.6)}
-@keyframes platinum-card-pulse{0%,100%{box-shadow:0 0 28px -6px rgba(220,232,255,.7),0 0 56px -8px rgba(160,200,255,.45),inset 0 0 24px -14px rgba(220,232,255,.5)}50%{box-shadow:0 0 42px 0px rgba(220,232,255,.95),0 0 80px -2px rgba(160,200,255,.7),inset 0 0 30px -10px rgba(220,232,255,.65)}}
+.game-card.tier-glow-platinum{border-color:rgba(220,232,255,.5);box-shadow:0 0 18px -8px rgba(220,232,255,.45),0 0 36px -12px rgba(160,200,255,.3),inset 0 0 16px -14px rgba(220,232,255,.35);animation:cardin .4s ease forwards,platinum-card-pulse 3.2s ease-in-out infinite .4s}
+.game-card.tier-glow-platinum:hover{border-color:rgba(230,240,255,.75);box-shadow:0 0 26px -4px rgba(220,232,255,.6),0 0 50px -8px rgba(160,200,255,.4),inset 0 0 18px -12px rgba(220,232,255,.45)}
+@keyframes platinum-card-pulse{0%,100%{box-shadow:0 0 18px -8px rgba(220,232,255,.45),0 0 36px -12px rgba(160,200,255,.3),inset 0 0 16px -14px rgba(220,232,255,.35)}50%{box-shadow:0 0 26px -4px rgba(220,232,255,.6),0 0 52px -8px rgba(160,200,255,.42),inset 0 0 20px -12px rgba(220,232,255,.45)}}
+.game-card.tier-glow-native{border-color:rgba(34,197,94,.8);box-shadow:0 0 28px -6px rgba(34,197,94,.75),0 0 56px -8px rgba(22,163,74,.5),inset 0 0 24px -14px rgba(34,197,94,.5);animation:cardin .4s ease forwards,native-card-pulse 2.8s ease-in-out infinite .4s}
+.game-card.tier-glow-native:hover{border-color:rgba(74,222,128,.95);box-shadow:0 0 40px -2px rgba(34,197,94,.9),0 0 78px -6px rgba(22,163,74,.6),inset 0 0 26px -12px rgba(34,197,94,.6)}
+@keyframes native-card-pulse{0%,100%{box-shadow:0 0 28px -6px rgba(34,197,94,.75),0 0 56px -8px rgba(22,163,74,.5),inset 0 0 24px -14px rgba(34,197,94,.5)}50%{box-shadow:0 0 42px 0px rgba(52,224,110,.95),0 0 80px -2px rgba(22,163,74,.7),inset 0 0 30px -10px rgba(34,197,94,.65)}}
 .game-card.tier-glow-gold{border-color:rgba(217,164,65,.4)}
 .game-card.tier-glow-borked{border-color:rgba(224,122,122,.4)}
 footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11px;color:var(--text-mute);border-top:1px solid var(--border-soft);position:relative;z-index:1;margin-top:40px}
@@ -397,10 +402,16 @@ function tierClass(tier){
   return 'tier-' + (tier || 'unknown');
 }
 function tierLabel(tier){
-  const labels = {platinum:'Platinum',gold:'Gold',silver:'Silver',bronze:'Bronze',borked:'Borked',pending:'Pocos reportes',unknown:'Sin datos'};
+  const labels = {native:'NATIVO',platinum:'Platinum',gold:'Gold',silver:'Silver',bronze:'Bronze',borked:'Borked',pending:'Pocos reportes',unknown:'Sin datos'};
   return labels[tier] || labels.unknown;
 }
-const WORKING_TIERS = ['platinum','gold','silver','bronze'];
+const WORKING_TIERS = ['native','platinum','gold','silver','bronze'];
+// Si el juego es nativo (native:true o tier:'native') gana sobre el rating de ProtonDB
+function effTier(info){
+  if(!info) return 'unknown';
+  if(info.native === true || info.native === 1 || info.tier === 'native') return 'native';
+  return info.tier || 'unknown';
+}
 
 function attachTilt(card){
   if(window.matchMedia('(pointer:coarse)').matches) return;
@@ -444,14 +455,14 @@ async function getPrice(appid){
 
 function renderLinuxStat(games, map){
   const withData = games.filter(g => map[String(g.appid)]);
-  const working = withData.filter(g => WORKING_TIERS.includes(map[String(g.appid)].tier));
+  const working = withData.filter(g => WORKING_TIERS.includes(effTier(map[String(g.appid)])));
   const el = document.getElementById('linuxStat');
   el.style.display = 'block';
   el.innerHTML = `<span class="big-num">${working.length} / ${games.length}</span>juegos de tu biblioteca corren en Linux según ProtonDB (${withData.length} tienen datos, el resto no fue reportado).`;
 }
 
 function renderRecommendation(games, map){
-  const rated = games.map(g => ({...g, tier: map[String(g.appid)]?.tier || 'unknown'}));
+  const rated = games.map(g => ({...g, tier: effTier(map[String(g.appid)])}));
   const totalHours = rated.reduce((a,g)=>a+g.playtime_forever,0)/60;
   const workingHours = rated.filter(g=>WORKING_TIERS.includes(g.tier)).reduce((a,g)=>a+g.playtime_forever,0)/60;
   const top5 = [...rated].sort((a,b)=>b.playtime_forever-a.playtime_forever).slice(0,5);
@@ -509,7 +520,7 @@ function renderGameRows(rows, map){
     const info = map[String(g.appid)];
     const errorFlag = (info && info.errors > 0) ? `<span class="error-flag">⚠ ${info.errors} reportes</span>` : '';
     const div = document.createElement('div');
-    const glow = ['platinum','gold','borked'].includes(r.tier) ? ` tier-glow-${r.tier}` : '';
+    const glow = ['native','platinum','gold','borked'].includes(r.tier) ? ` tier-glow-${r.tier}` : '';
     div.className = 'game-card' + glow;
     div.style.animationDelay = (i*30)+'ms';
     div.innerHTML = `
@@ -526,7 +537,7 @@ async function paintList(map){
   const list = document.getElementById('gameList');
   list.innerHTML = '<div class="hint">ordenando…</div>';
 
-  let rows = currentTop.map(g => ({ g, tier: map[String(g.appid)]?.tier || 'unknown' }));
+  let rows = currentTop.map(g => ({ g, tier: effTier(map[String(g.appid)]) }));
 
   if(sortMode === 'price'){
     const prices = await Promise.all(rows.map(r => getPrice(r.g.appid)));
@@ -552,7 +563,7 @@ async function runSearch(){
   const rows = matches
     .sort((a,b)=>b.playtime_forever-a.playtime_forever)
     .slice(0, 30)
-    .map(g => ({ g, tier: map[String(g.appid)]?.tier || 'unknown', searchResult: true }));
+    .map(g => ({ g, tier: effTier(map[String(g.appid)]), searchResult: true }));
   renderGameRows(rows, map);
 }
 document.getElementById('gameSearch').addEventListener('input', runSearch);
