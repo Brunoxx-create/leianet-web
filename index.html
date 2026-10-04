@@ -193,8 +193,31 @@
 html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important}
 </style>
 <link rel="stylesheet" href="assets/leia-fx.css"><style id="hx-nv-css">
-#novedades-container .novedad-texto{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;line-clamp:6;overflow:hidden}
-#novedades-container .novedad-imagen{height:150px}
+#novedades-container{display:flex;flex-direction:column;gap:10px}
+.nv-row{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:14px;padding:14px 16px 14px 18px;box-shadow:var(--glass-shadow-sm);transition:border-color .2s,transform .3s cubic-bezier(.2,.8,.2,1),background .2s,box-shadow .3s;animation:nv-in .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 60ms)}
+.nv-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--nv-color,var(--accent))}
+.nv-row::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-18deg);transition:left .55s ease;pointer-events:none}
+.nv-row:hover,.nv-row:focus-visible{border-color:var(--nv-color,var(--glass-border-hover));background:var(--glass-fill-strong);transform:translateX(5px);box-shadow:0 18px 40px -22px var(--nv-color,#000),inset 0 1px 0 rgba(255,255,255,.12)}
+.nv-row:hover::after{left:120%}
+.nv-row:active{transform:translateX(5px) scale(.99)}
+.nv-row:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.nv-row .novedad-icono{flex-shrink:0}
+.nv-row-main{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.nv-row-main .novedad-header{margin:0}
+.nv-row-main .novedad-titulo{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nv-row-go{width:16px;height:16px;flex-shrink:0;color:var(--text-mute);transition:transform .25s ease,color .2s}
+.nv-row:hover .nv-row-go{transform:translateX(4px);color:var(--nv-color,var(--accent))}
+@keyframes nv-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.nv-row.tipo-importante,.nv-detail.tipo-importante{--nv-color:#d9a441;--nv-soft:rgba(217,164,65,.14)}
+.nv-row.tipo-anuncio,.nv-detail.tipo-anuncio{--nv-color:#7aa3ff;--nv-soft:rgba(122,163,255,.14)}
+.nv-row.tipo-error,.nv-detail.tipo-error{--nv-color:#ff5468;--nv-soft:rgba(255,84,104,.14)}
+.nv-row.tipo-info,.nv-detail.tipo-info{--nv-color:#6bbf7b;--nv-soft:rgba(107,191,123,.14)}
+.nv-row.tipo-actualizacion,.nv-detail.tipo-actualizacion{--nv-color:#4fd1c5;--nv-soft:rgba(79,209,197,.14)}
+.nv-row.tipo-mantenimiento,.nv-detail.tipo-mantenimiento{--nv-color:#f0994d;--nv-soft:rgba(240,153,77,.14)}
+.nv-row.tipo-evento,.nv-detail.tipo-evento{--nv-color:#b48af0;--nv-soft:rgba(180,138,240,.14)}
+.nv-row.tipo-exito,.nv-detail.tipo-exito{--nv-color:#4fd162;--nv-soft:rgba(79,209,98,.14)}
+.nv-row.tipo-alerta,.nv-detail.tipo-alerta{--nv-color:#ff7a45;--nv-soft:rgba(255,122,69,.14)}
+.nv-row.tipo-nuevo,.nv-detail.tipo-nuevo{--nv-color:#ff7ab8;--nv-soft:rgba(255,122,184,.14)}
 .nv-more{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-weight:600;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text);background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:10px;padding:11px 18px;cursor:pointer;transition:border-color .2s,color .2s,background .2s,transform .2s}
 .nv-more[hidden]{display:none}
 .nv-more:hover{border-color:var(--glass-border-hover);color:var(--accent);background:var(--glass-fill-strong);transform:translateX(3px)}
@@ -203,17 +226,28 @@ html.low-perf .novedad-card,html.perf-mid .novedad-card{backdrop-filter:none!imp
 .nv-modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility .25s}
 .nv-modal.open{opacity:1;visibility:visible;pointer-events:auto}
 .nv-backdrop{position:absolute;inset:0;background:rgba(5,5,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.nv-dialog{position:relative;width:min(760px,100%);max-height:86vh;display:flex;flex-direction:column;background:var(--bg-elev);border:1px solid var(--glass-border);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);transform:translateY(14px) scale(.98);transition:transform .3s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+.nv-dialog{position:relative;width:min(760px,100%);max-height:88vh;display:flex;flex-direction:column;background:var(--bg-elev);border:1px solid var(--glass-border);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);transform:translateY(14px) scale(.98);transition:transform .3s cubic-bezier(.2,.8,.2,1);overflow:hidden}
 .nv-modal.open .nv-dialog{transform:none}
-.nv-dialog-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--glass-border);flex-shrink:0}
-.nv-dialog-head h3{margin:0;font-family:var(--display);font-weight:600;font-size:16px}
-.nv-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--glass-border);color:var(--text-dim);cursor:pointer;transition:border-color .15s,color .15s}
-.nv-close:hover{border-color:var(--accent);color:var(--accent)}
-.nv-close svg{width:16px;height:16px}
-.nv-dialog-body{padding:16px 20px 22px;overflow-y:auto;overscroll-behavior:contain}
+.nv-dialog-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--glass-border);flex-shrink:0}
+.nv-dialog-head h3{margin:0;font-family:var(--display);font-weight:600;font-size:16px;flex:1;min-width:0}
+.nv-close,.nv-back{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--glass-border);color:var(--text-dim);cursor:pointer;transition:border-color .15s,color .15s,transform .15s}
+.nv-back[hidden]{display:none}
+.nv-close:hover,.nv-back:hover{border-color:var(--accent);color:var(--accent)}
+.nv-back:hover{transform:translateX(-2px)}
+.nv-close svg,.nv-back svg{width:16px;height:16px}
+.nv-dialog-body{padding:16px 18px 22px;overflow-y:auto;overscroll-behavior:contain;min-height:0}
+.nv-list{display:flex;flex-direction:column;gap:10px}
+.nv-list[hidden],.nv-detail[hidden]{display:none}
+.nv-detail{animation:nv-in .4s cubic-bezier(.2,.7,.2,1) both}
+.nv-detail .nv-d-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.nv-detail .novedad-icono{width:42px;height:42px;font-size:1.15rem}
+.nv-detail .nv-d-title{font-family:var(--display);font-weight:700;font-size:clamp(20px,3.4vw,26px);line-height:1.2;margin:0 0 16px;color:var(--text)}
+.nv-detail .nv-d-img{display:block;width:100%;height:auto;max-height:min(58vh,480px);object-fit:contain;object-position:center;border-radius:12px;margin:0 0 16px;border:1px solid var(--glass-border);background:linear-gradient(155deg,rgba(255,255,255,.05),rgba(0,0,0,.25))}
+.nv-detail .novedad-texto{font-size:14.5px;line-height:1.75;overflow-wrap:anywhere}
 body.nv-lock{overflow:hidden}
+@media (max-width:640px){.nv-modal{padding:10px}.nv-dialog{max-height:92vh}.nv-row{padding:12px 12px 12px 16px;gap:11px}.nv-row-main .novedad-titulo{font-size:14px}}
+@media (prefers-reduced-motion:reduce){.nv-row,.nv-detail{animation:none}}
 html.low-perf .nv-backdrop,html.perf-mid .nv-backdrop{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-@media (max-width:640px){.nv-modal{padding:10px}.nv-dialog{max-height:90vh}}
 </style><script>(function(){var r=document.documentElement;r.classList.add("fx-pre");setTimeout(function(){r.classList.remove("fx-pre")},4500)})()</script></head><body><noscript><style>body{opacity:1 !important}</style></noscript><div class="grid-overlay"></div><div class="depth-veil"></div><div class="nebula"><span></span><span></span><span></span><span></span></div><div class="nebula-mono"><span></span></div><div class="starfield"><div class="stars-layer s1" id="stars-s1"></div><div class="stars-layer s2" id="stars-s2"></div><div class="stars-layer s3" id="stars-s3"></div><div id="sparkles"></div></div><div class="planet-parallax"><div class="planet-wrap"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div><div class="planet-parallax-2"><div class="planet-wrap-2 planet-2"><div class="planet-glow"></div><div class="planet-ring"></div><div class="planet"></div></div></div><div class="asteroid-parallax"><div class="asteroid-wrap"><div class="asteroid"></div></div></div><div class="satellite-parallax"><div class="satellite-wrap"><div class="satellite"><div class="sat-panel left"></div><div class="sat-body"></div><div class="sat-panel right"></div><div class="sat-dish"></div><div class="sat-blink"></div></div></div></div><div class="ambient"><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="grain"></div><div class="cursor-glow" id="cursor-glow"></div><div class="scroll-progress"><div class="bar" id="scroll-progress-bar"></div></div><header><a href="#" class="brand" id="brand-home" aria-label="Ir al inicio"><img width="860" height="150" loading="eager" decoding="async" fetchpriority="high" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"></a><div class="header-right"><nav id="main-nav"><a href="#minecraft">Minecraft</a><a href="#cs16">CS 1.6</a><a href="#haxball">Haxball</a><a href="#novedades">Novedades</a><a href="utilidades.html">Utilidades</a><a href="#cafecito">Cafecito</a><a href="#faq">FAQ</a><a href="#contact">Contacto</a></nav><button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg><span class="perf-tip" aria-hidden="true">ACTIVADO</span></button><button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button></div></header><div class="nav-backdrop" id="nav-backdrop"></div><main><section class="hero"><div><h1>Los clásicos<br>nunca pasan de <span>moda.</span></h1><p class="lead">Minecraft, Counter-Strike 1.6 y Haxball, listos para conectarte. Copiá la IP y jugá.</p><div class="hero-cta"><a href="#minecraft" class="btn primary">Ver servidores</a><a href="#novedades" class="btn">Novedades</a></div><div class="hero-live"><span class="dot"></span>servidores en vivo · leianet.ar</div></div><div class="status-card-wrap"><div class="hero-glass-orb" aria-hidden="true"></div><div class="status-card"><div class="status-head"><span class="lbl">Estado de los servidores</span><span class="all-ok warn"><svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
  A medias
  </span></div><div class="status-list"><div class="status-row"><div class="status-row-info"><div class="status-icon"><img width="1024" height="1024" loading="lazy" decoding="async" src="assets/minecraft_color.webp" alt=""></div><div><div class="name">Minecraft</div><div class="sub">1 servidor</div></div></div><div class="status-pill offline"><span class="pulse-dot"></span> Offline</div></div><div class="status-row"><div class="status-row-info"><div class="status-icon"><img width="256" height="256" loading="lazy" decoding="async" src="assets/logo_cs2.webp" alt=""></div><div><div class="name">Counter-Strike 1.6</div><div class="sub">3 servidores</div></div></div><div class="status-pill warn"><svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
@@ -238,7 +272,7 @@ html.low-perf .nv-backdrop,html.perf-mid .nv-backdrop{backdrop-filter:none!impor
  soporte@leianet.ar
  </a></div><div class="contact-card reveal" style="--i:1"><div class="contact-icon discord"><img width="500" height="500" loading="lazy" decoding="async" src="assets/icon_discord.webp" alt="Discord"></div><h4>Sumate al Discord</h4><p>Anuncios, soporte, reportes de bugs y toda la comunidad de LeiaNET.</p><a class="btn discord" href="https://discord.gg/3Hsy6JrSMH" target="_blank" rel="noopener"><img width="500" height="500" loading="lazy" decoding="async" src="assets/icon_discord.webp" alt="">
  Unirme al servidor
- </a></div></div></section></main><footer><div class="fbrand"><img width="860" height="150" loading="lazy" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"><span>© 2026 LeiaNET</span></div><div class="fmeta"><b>leianet.ar</b></div></footer><div class="nv-modal" id="nv-modal" aria-hidden="true"><div class="nv-backdrop" data-close></div><div class="nv-dialog" role="dialog" aria-modal="true" aria-label="Todas las novedades"><div class="nv-dialog-head"><h3>Todas las novedades</h3><button type="button" class="nv-close" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="nv-dialog-body novedades-list" id="nv-all"></div></div></div><div id="toast">IP copiada ✓</div><button id="back-to-top" class="back-to-top" aria-label="Volver arriba" title="Volver arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button><button id="twitch-chat-toggle" class="twitch-chat-toggle" aria-label="Abrir chat de Twitch" aria-expanded="false" aria-controls="twitch-chat-panel" title="Chat de Twitch"><svg class="twitch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.2 0-2.35-.27-3.37-.76L3 21l1.76-6.13A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01" stroke-width="2.4"/></svg><svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg><span class="chat-badge" id="twitch-chat-badge" aria-hidden="true"></span></button><div id="twitch-chat-panel" class="twitch-chat-panel" role="dialog" aria-modal="false" aria-label="Chat de Twitch de leian3t"><div class="twitch-chat-head"><div class="twitch-chat-title"><span class="twitch-dot"></span><span>Chat en vivo</span></div><a href="https://www.twitch.tv/leian3t" target="_blank" rel="noopener" class="twitch-chat-link" title="Ver canal en Twitch" aria-label="Ver canal en Twitch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></div><div class="twitch-chat-body"><div class="twitch-chat-loading">Cargando chat…</div><div class="twitch-chat-fallback"><p>No se pudo cargar el chat embebido acá. Podés abrirlo directo en Twitch:</p><a class="btn primary" href="https://www.twitch.tv/popout/leian3t/chat" target="_blank" rel="noopener">Abrir chat en Twitch</a></div><iframe id="twitch-chat-iframe" title="Chat de Twitch de leian3t" scrolling="no" loading="lazy"></iframe></div></div>
+ </a></div></div></section></main><footer><div class="fbrand"><img width="860" height="150" loading="lazy" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"><span>© 2026 LeiaNET</span></div><div class="fmeta"><b>leianet.ar</b></div></footer><div class="nv-modal" id="nv-modal" aria-hidden="true"><div class="nv-backdrop" data-close></div><div class="nv-dialog" role="dialog" aria-modal="true" aria-label="Novedades"><div class="nv-dialog-head"><button type="button" class="nv-back" id="nv-back" aria-label="Volver a la lista" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><h3 id="nv-title">Todas las novedades</h3><button type="button" class="nv-close" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="nv-dialog-body"><div class="nv-list" id="nv-all"></div><div class="nv-detail" id="nv-detail" hidden></div></div></div></div><div id="toast">IP copiada ✓</div><button id="back-to-top" class="back-to-top" aria-label="Volver arriba" title="Volver arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button><button id="twitch-chat-toggle" class="twitch-chat-toggle" aria-label="Abrir chat de Twitch" aria-expanded="false" aria-controls="twitch-chat-panel" title="Chat de Twitch"><svg class="twitch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.2 0-2.35-.27-3.37-.76L3 21l1.76-6.13A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01" stroke-width="2.4"/></svg><svg class="close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg><span class="chat-badge" id="twitch-chat-badge" aria-hidden="true"></span></button><div id="twitch-chat-panel" class="twitch-chat-panel" role="dialog" aria-modal="false" aria-label="Chat de Twitch de leian3t"><div class="twitch-chat-head"><div class="twitch-chat-title"><span class="twitch-dot"></span><span>Chat en vivo</span></div><a href="https://www.twitch.tv/leian3t" target="_blank" rel="noopener" class="twitch-chat-link" title="Ver canal en Twitch" aria-label="Ver canal en Twitch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></div><div class="twitch-chat-body"><div class="twitch-chat-loading">Cargando chat…</div><div class="twitch-chat-fallback"><p>No se pudo cargar el chat embebido acá. Podés abrirlo directo en Twitch:</p><a class="btn primary" href="https://www.twitch.tv/popout/leian3t/chat" target="_blank" rel="noopener">Abrir chat en Twitch</a></div><iframe id="twitch-chat-iframe" title="Chat de Twitch de leian3t" scrolling="no" loading="lazy"></iframe></div></div>
 <script>
   // starfield generator — random dots per layer via box-shadow (cheap, no DOM bloat)
   (function(){
@@ -1010,44 +1044,98 @@ html.low-perf .nv-backdrop,html.perf-mid .nv-backdrop{backdrop-filter:none!impor
       return partes[2] + '/' + partes[1] + '/' + partes[0];
     }
 
-    function tarjeta(n){
-      var tipo = TIPOS_VALIDOS.indexOf(n.tipo) !== -1 ? n.tipo : 'info';
-      var imagenHtml = n.imagen ? '<img class="novedad-imagen" src="' + escapeHtml(n.imagen) + '" alt="" loading="lazy">' : '';
-      return '' +
-        '<div class="novedad-card tipo-' + tipo + '">' +
-          '<div class="novedad-icono">' + (ICONOS[tipo] || 'ℹ️') + '</div>' +
-          '<div style="min-width:0">' +
-            '<div class="novedad-header">' +
-              '<span class="novedad-badge">' + tipo.toUpperCase() + '</span>' +
-              '<span class="novedad-fecha">' + formatearFecha(n.fecha) + '</span>' +
-            '</div>' +
-            '<div class="novedad-titulo">' + escapeHtml(n.titulo || '') + '</div>' +
-            imagenHtml +
-            '<div class="novedad-texto">' + formatearTexto(n.texto || '') + '</div>' +
-          '</div>' +
-        '</div>';
-    }
-
+    var LIMITE_HOME = 3; // filas visibles en la web; el resto va en "VER TODO"
     var todas = [];
     var modal = document.getElementById('nv-modal');
     var btnMas = document.getElementById('nv-ver-todo');
+    var vistaLista = document.getElementById('nv-all');
+    var vistaDetalle = document.getElementById('nv-detail');
+    var btnBack = document.getElementById('nv-back');
+    var tituloModal = document.getElementById('nv-title');
+    var ultimoFoco = null;
 
-    function abrirModal(){
+    function tipoDe(n){ return TIPOS_VALIDOS.indexOf(n.tipo) !== -1 ? n.tipo : 'info'; }
+
+    function fila(n, idx){
+      var tipo = tipoDe(n);
+      return '<button type="button" class="nv-row tipo-' + tipo + '" data-i="' + idx + '" style="--i:' + idx + '">' +
+        '<span class="novedad-icono">' + (ICONOS[tipo] || 'ℹ️') + '</span>' +
+        '<span class="nv-row-main">' +
+          '<span class="novedad-header"><span class="novedad-badge">' + tipo.toUpperCase() + '</span>' +
+          '<span class="novedad-fecha">' + formatearFecha(n.fecha) + '</span></span>' +
+          '<span class="novedad-titulo">' + escapeHtml(n.titulo || '') + '</span>' +
+        '</span>' +
+        '<svg class="nv-row-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+      '</button>';
+    }
+
+    function detalle(n){
+      var tipo = tipoDe(n);
+      vistaDetalle.className = 'nv-detail tipo-' + tipo;
+      vistaDetalle.innerHTML =
+        '<div class="nv-d-top">' +
+          '<span class="novedad-icono">' + (ICONOS[tipo] || 'ℹ️') + '</span>' +
+          '<span class="novedad-badge">' + tipo.toUpperCase() + '</span>' +
+          '<span class="novedad-fecha">' + formatearFecha(n.fecha) + '</span>' +
+        '</div>' +
+        '<h4 class="nv-d-title">' + escapeHtml(n.titulo || '') + '</h4>' +
+        (n.imagen ? '<img class="nv-d-img" src="' + escapeHtml(n.imagen) + '" alt="">' : '') +
+        '<div class="novedad-texto">' + formatearTexto(n.texto || '') + '</div>';
+    }
+
+    var sonido = null;
+    function click(){
+      try{ if(!sonido){ sonido = new Audio('assets/clicksound.mp3'); sonido.volume = 0.5; }
+        var s = sonido.cloneNode(); s.volume = sonido.volume; s.play().catch(function(){}); }catch(e){}
+    }
+
+    function verLista(){
+      vistaDetalle.hidden = true;
+      vistaLista.hidden = false;
+      btnBack.hidden = true;
+      tituloModal.textContent = 'Todas las novedades';
+      vistaLista.parentNode.scrollTop = 0;
+    }
+    function verDetalle(idx){
+      var n = todas[idx]; if(!n) return;
+      detalle(n);
+      vistaLista.hidden = true;
+      vistaDetalle.hidden = false;
+      btnBack.hidden = false;
+      tituloModal.textContent = 'Novedad';
+      vistaDetalle.parentNode.scrollTop = 0;
+    }
+    function abrirModal(idx){
       if(!modal) return;
-      document.getElementById('nv-all').innerHTML = todas.map(tarjeta).join('');
+      ultimoFoco = document.activeElement;
+      vistaLista.innerHTML = todas.map(fila).join('');
+      if(typeof idx === 'number') verDetalle(idx); else verLista();
       modal.classList.add('open');
       modal.setAttribute('aria-hidden','false');
       document.body.classList.add('nv-lock');
+      click();
     }
     function cerrarModal(){
       if(!modal) return;
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden','true');
       document.body.classList.remove('nv-lock');
+      if(ultimoFoco && ultimoFoco.focus){ try{ ultimoFoco.focus({preventScroll:true}); }catch(e){} }
     }
-    if(btnMas) btnMas.addEventListener('click', abrirModal);
+    function filaClick(e){
+      var b = e.target.closest('.nv-row'); if(!b) return;
+      var idx = parseInt(b.getAttribute('data-i'), 10);
+      if(modal.classList.contains('open')){ click(); verDetalle(idx); }
+      else abrirModal(idx);
+    }
+
+    if(btnMas) btnMas.addEventListener('click', function(){ abrirModal(); });
+    var cont0 = document.getElementById('novedades-container');
+    if(cont0) cont0.addEventListener('click', filaClick);
+    if(vistaLista) vistaLista.addEventListener('click', filaClick);
+    if(btnBack) btnBack.addEventListener('click', function(){ click(); verLista(); });
     if(modal) modal.addEventListener('click', function(e){
-      if(e.target.closest('[data-close]')) cerrarModal();
+      if(e.target.closest('[data-close]')){ click(); cerrarModal(); }
     });
     document.addEventListener('keydown', function(e){
       if(e.key === 'Escape' && modal && modal.classList.contains('open')) cerrarModal();
@@ -1060,16 +1148,11 @@ html.low-perf .nv-backdrop,html.perf-mid .nv-backdrop{backdrop-filter:none!impor
         cont.innerHTML = '<div class="novedades-empty">Sin novedades por el momento.</div>';
         return;
       }
-      todas = lista.slice(0, CANTIDAD_A_MOSTRAR);
-      // en la tarjeta solo se muestra la ultima (el backend manda la mas nueva primero)
-      cont.innerHTML = tarjeta(todas[0]);
+      todas = lista.slice(0, CANTIDAD_A_MOSTRAR); // el backend manda la mas nueva primero
+      cont.innerHTML = todas.slice(0, LIMITE_HOME).map(fila).join('');
       var cuenta = document.getElementById('nv-count');
       if(cuenta) cuenta.textContent = '(' + todas.length + ')';
-      if(btnMas){
-        var texto = cont.querySelector('.novedad-texto');
-        var recortado = texto && texto.scrollHeight > texto.clientHeight + 1;
-        btnMas.hidden = !(todas.length > 1 || recortado);
-      }
+      if(btnMas) btnMas.hidden = todas.length <= LIMITE_HOME;
     }
 
     fetch(NOVEDADES_API_URL)
