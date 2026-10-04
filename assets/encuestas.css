@@ -1,0 +1,67 @@
+/* LeiaNET — encuestas (sección Novedades) */
+.polls-list{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.polls-list:empty{display:none}
+
+.poll-card{--pc:#c78cff;--pc-soft:rgba(199,140,255,.14);position:relative;overflow:hidden;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:16px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow);padding:18px 22px 18px 24px;animation:poll-in .5s cubic-bezier(.2,.7,.2,1) both}
+.poll-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--pc)}
+.poll-card.is-closed{--pc:#d9a441;--pc-soft:rgba(217,164,65,.13)}
+@keyframes poll-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.poll-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.poll-badge{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid var(--pc);color:var(--pc);background:var(--pc-soft)}
+.poll-chip{font-family:var(--mono);font-size:11px;color:var(--text-mute);border:1px solid var(--border-soft);border-radius:20px;padding:2px 9px}
+.poll-timer{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--text-dim);font-variant-numeric:tabular-nums}
+.poll-q{font-family:var(--display);font-weight:600;font-size:16.5px;line-height:1.35;margin:0 0 14px;color:var(--text);overflow-wrap:anywhere}
+
+/* --- votar --- */
+.poll-opts{display:flex;flex-direction:column;gap:8px}
+.poll-opt{position:relative;display:flex;align-items:center;gap:12px;margin:0;padding:12px 14px;border:1px solid var(--border-soft);border-radius:11px;background:rgba(0,0,0,.18);cursor:pointer;color:var(--text);font-family:var(--body);font-size:14px;transition:border-color .15s,background .15s,transform .15s}
+.poll-opt:hover{border-color:var(--glass-border-hover);transform:translateX(3px)}
+.poll-opt.sel{border-color:var(--pc);background:var(--pc-soft)}
+.poll-opt input{position:absolute;opacity:0;pointer-events:none}
+.poll-mark{width:18px;height:18px;flex-shrink:0;border-radius:50%;border:2px solid var(--text-mute);transition:border-color .15s,background .15s,box-shadow .15s}
+.poll-mark.sq{border-radius:5px}
+.poll-opt.sel .poll-mark{border-color:var(--pc);background:var(--pc);box-shadow:inset 0 0 0 3px #18181b}
+.poll-opt.sel .poll-mark.sq{box-shadow:none;background:var(--pc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/80% no-repeat}
+.poll-opt input:focus-visible + .poll-mark{outline:2px solid var(--accent);outline-offset:3px}
+.poll-opt-text{min-width:0;overflow-wrap:anywhere}
+
+/* honeypot: fuera de pantalla, invisible para personas */
+.poll-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}
+
+.poll-actions{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.poll-btn{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:#111113;background:linear-gradient(155deg,#fff,var(--pc) 70%);border:1px solid rgba(255,255,255,.45);border-radius:10px;padding:11px 22px;cursor:pointer;transition:transform .15s,box-shadow .2s,opacity .2s;box-shadow:0 12px 28px -14px var(--pc)}
+.poll-btn:hover:not(:disabled){transform:translateY(-1px)}
+.poll-btn:active:not(:disabled){transform:translateY(1px) scale(.98)}
+.poll-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.poll-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.poll-msg{font-family:var(--mono);font-size:12px;color:#ff7a8a;min-height:1em}
+.poll-hint{font-family:var(--mono);font-size:11px;color:var(--text-mute);margin-top:10px}
+
+/* --- resultados --- */
+.poll-res{display:flex;flex-direction:column;gap:8px}
+.poll-bar{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border-soft);border-radius:11px;background:rgba(0,0,0,.2);font-size:14px}
+.poll-fill{position:absolute;left:0;top:0;bottom:0;width:var(--w,0%);background:linear-gradient(90deg,var(--pc-soft),rgba(199,140,255,.30));border-right:1px solid var(--pc);animation:poll-grow .8s cubic-bezier(.2,.7,.2,1) both}
+.poll-bar.win{border-color:#d9a441}
+.poll-bar.win .poll-fill{background:linear-gradient(90deg,rgba(217,164,65,.14),rgba(217,164,65,.34));border-right-color:#d9a441}
+@keyframes poll-grow{from{width:0}}
+.poll-label,.poll-num{position:relative;z-index:1}
+.poll-label{min-width:0;overflow-wrap:anywhere;color:var(--text)}
+.poll-check{margin-left:8px;color:var(--ok);font-weight:700}
+.poll-bar.win .poll-label{font-weight:600}
+.poll-num{flex-shrink:0;font-family:var(--mono);font-size:12px;color:var(--text-dim);white-space:nowrap}
+.poll-num b{color:var(--text);font-size:13px}
+.poll-foot{margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--text-mute)}
+.poll-closed{margin-top:12px;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:11px;border:1px solid rgba(217,164,65,.5);background:rgba(217,164,65,.1);font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.04em;color:#f0c168;overflow-wrap:anywhere}
+.poll-closed b{color:#fff}
+
+@media (max-width:640px){
+  .poll-card{padding:15px 16px 15px 18px}
+  .poll-q{font-size:15px}
+  .poll-timer{margin-left:0;width:100%}
+  .poll-bar{flex-wrap:wrap;gap:4px 12px}
+  .poll-btn{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){.poll-card,.poll-fill{animation:none}.poll-opt{transition:none}}
+html.low-perf .poll-card,html.perf-mid .poll-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;animation:none!important}
+html.low-perf .poll-fill,html.perf-mid .poll-fill{animation:none!important}

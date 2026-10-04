@@ -190,6 +190,18 @@ h1.admin-h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,
 .imagen-preview-wrap img{max-width:100%;max-height:180px;border-radius:9px;display:block;border:1px solid var(--glass-border)}
 .imagen-preview-wrap button{margin-top:8px;background:rgba(255,84,104,.14);border:1px solid rgba(255,84,104,.35);color:#ff5468;padding:6px 12px;font-size:.78rem;border-radius:7px;cursor:pointer;box-shadow:none}
 .imagen-preview-wrap button:hover{transform:none}
+/* --- encuestas --- */
+.dur-custom{display:none;gap:10px;margin-top:8px}.dur-custom.show{display:flex}.dur-custom input{flex:1 1 40%}.dur-custom select{flex:1 1 60%}
+.opt-row{display:flex;align-items:center;gap:10px;margin-top:8px}.opt-row span{font-family:var(--mono);font-size:12px;color:var(--text-mute);width:18px;flex-shrink:0}
+.item.enc{align-items:flex-start;flex-wrap:wrap}.item .acciones{display:flex;gap:8px;flex-shrink:0}
+.item button.cerrar{margin:0;background:rgba(217,164,65,.14);border:1px solid rgba(217,164,65,.4);color:#d9a441;padding:8px 14px;font-size:.78rem;box-shadow:none;font-family:var(--body);font-weight:600}
+.item button.cerrar:hover{transform:none;background:rgba(217,164,65,.24)}
+.item .res{margin-top:6px;font-size:12.5px;color:var(--text-dim);font-family:var(--mono);line-height:1.6}
+.item .res b{color:var(--text)}
+.estado-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;margin-left:8px}.estado-tag.act{color:var(--ok)}.estado-tag.cer{color:#d9a441}
+.titulo-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.titulo-row .section-title{margin:0}
+.titulo-row button{margin:0;padding:7px 12px;font-size:.78rem;background:var(--glass-fill);color:var(--text-dim);border:1px solid var(--glass-border);box-shadow:none;font-family:var(--body)}
+.hint{font-size:12px;color:var(--text-mute);font-family:var(--mono);margin-top:8px;line-height:1.5}
 @media (max-width:640px){main.admin-main{padding:20px 14px 40px}.admin-card{padding:20px 18px 22px;border-radius:13px}}
 </style>
 <link rel="preload" href="assets/fonts/chakra-petch-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="assets/leia-fx.css"><link rel="stylesheet" href="assets/leia-pages.css"></head><body><div class="grid-overlay"></div><div class="depth-veil"></div><div class="nebula"><span></span><span></span><span></span><span></span></div><div class="nebula-mono"><span></span></div><div class="starfield"><div class="stars-layer s1" id="stars-s1"></div><div class="stars-layer s2" id="stars-s2"></div><div class="stars-layer s3" id="stars-s3"></div><div id="sparkles"></div></div><div class="ambient"><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="grain"></div><div class="cursor-glow" id="cursor-glow"></div><div class="scroll-progress"><div class="bar" id="scroll-progress-bar"></div></div><header><a href="index.html" class="brand" aria-label="Ir al sitio"><img width="860" height="150" loading="eager" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK" style="height:38px"></a><div class="header-right"><a href="index.html" class="back-link">&larr; Volver al sitio</a><button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg><span class="perf-tip" aria-hidden="true">ACTIVADO</span></button></div></header>
@@ -242,6 +254,54 @@ h1.admin-h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,
 
 <button onclick="publicar()">Publicar</button>
 <div id="estado"></div>
+</div>
+
+<div class="admin-card">
+<h2 class="section-title">Crear encuesta</h2>
+<p class="hint" style="margin:-6px 0 14px">Usa el mismo token de arriba. Se muestra en Novedades. Siempre son 3 opciones.</p>
+
+<label>Pregunta</label>
+<input type="text" id="enc-pregunta" maxlength="140" placeholder="¿Qué mapa querés en el server de CS?">
+
+<label>Opciones</label>
+<div class="opt-row"><span>1</span><input type="text" class="enc-op" maxlength="60" placeholder="Opción 1"></div>
+<div class="opt-row"><span>2</span><input type="text" class="enc-op" maxlength="60" placeholder="Opción 2"></div>
+<div class="opt-row"><span>3</span><input type="text" class="enc-op" maxlength="60" placeholder="Opción 3"></div>
+
+<label>Tipo de voto</label>
+<select id="enc-multiple">
+  <option value="0">Una sola opción</option>
+  <option value="1">Múltiple choice (se pueden elegir varias)</option>
+</select>
+
+<label>Duración</label>
+<select id="enc-duracion" onchange="toggleDuracionCustom()">
+  <option value="30">30 minutos</option>
+  <option value="60">1 hora</option>
+  <option value="360">6 horas</option>
+  <option value="720">12 horas</option>
+  <option value="1440" selected>24 horas</option>
+  <option value="4320">3 días</option>
+  <option value="10080">1 semana</option>
+  <option value="custom">Personalizada…</option>
+</select>
+<div class="dur-custom" id="enc-custom">
+  <input type="number" id="enc-custom-n" min="1" step="1" value="2" placeholder="Cantidad">
+  <select id="enc-custom-u">
+    <option value="1">minutos</option>
+    <option value="60" selected>horas</option>
+    <option value="1440">días</option>
+  </select>
+</div>
+<p class="hint">Cuando se cumple el tiempo se muestra “VOTACIÓN CERRADA. GANADOR: …”. Máximo 30 días.</p>
+
+<button onclick="publicarEncuesta()">Publicar encuesta</button>
+<div id="estadoEncuesta" style="margin-top:14px;font-size:.85rem;font-family:var(--mono)"></div>
+</div>
+
+<div class="admin-card">
+<div class="titulo-row"><h2 class="section-title">Encuestas</h2><button type="button" onclick="cargarEncuestas()">Actualizar</button></div>
+<div id="listaEncuestas" style="margin-top:6px"><p class="hint">Ingresá el token para ver las encuestas.</p></div>
 </div>
 
 <div class="admin-card">
@@ -661,5 +721,113 @@ h1.admin-h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,
   }
 
   cargarLista();
+
+  // =================== ENCUESTAS ===================
+  const API_ENC = 'https://novedades.leianet.ar/api/encuestas';
+  const escH = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function toggleDuracionCustom(){
+    document.getElementById('enc-custom').classList.toggle('show', document.getElementById('enc-duracion').value === 'custom');
+  }
+
+  function duracionEnMinutos(){
+    const v = document.getElementById('enc-duracion').value;
+    if(v !== 'custom') return parseInt(v, 10);
+    const n = parseInt(document.getElementById('enc-custom-n').value, 10);
+    return n * parseInt(document.getElementById('enc-custom-u').value, 10);
+  }
+
+  function fmtRestante(ms){
+    const s = Math.max(0, Math.floor(ms / 1000));
+    const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+    if(d) return d + 'd ' + h + 'h';
+    if(h) return h + 'h ' + m + 'm';
+    return Math.max(1, m) + 'm';
+  }
+
+  async function publicarEncuesta(){
+    const token = document.getElementById('token').value;
+    const est = document.getElementById('estadoEncuesta');
+    const pregunta = document.getElementById('enc-pregunta').value.trim();
+    const opciones = Array.from(document.querySelectorAll('.enc-op')).map((i) => i.value.trim());
+    const duracionMin = duracionEnMinutos();
+    const err = (m) => { est.textContent = m; est.className = 'err'; };
+
+    if(!token) return err('Poné el token arriba.');
+    if(!pregunta) return err('Falta la pregunta.');
+    if(opciones.some((o) => !o)) return err('Completá las 3 opciones.');
+    if(new Set(opciones.map((o) => o.toLowerCase())).size !== 3) return err('Las opciones no pueden repetirse.');
+    if(!Number.isInteger(duracionMin) || duracionMin < 1 || duracionMin > 43200) return err('Duración inválida (1 minuto a 30 días).');
+
+    est.textContent = 'Publicando…'; est.className = '';
+    try{
+      const res = await fetch(API_ENC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+        body: JSON.stringify({ pregunta, opciones, multiple: document.getElementById('enc-multiple').value === '1', duracionMin }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok) throw new Error(data.error || 'Error al publicar la encuesta');
+      est.textContent = 'Encuesta publicada.'; est.className = 'ok';
+      document.getElementById('enc-pregunta').value = '';
+      document.querySelectorAll('.enc-op').forEach((i) => { i.value = ''; });
+      cargarEncuestas();
+    }catch(e){ err('Error: ' + e.message); }
+  }
+
+  async function cargarEncuestas(){
+    const token = document.getElementById('token').value;
+    const cont = document.getElementById('listaEncuestas');
+    if(!token){ cont.innerHTML = '<p class="hint">Ingresá el token para ver las encuestas.</p>'; return; }
+    try{
+      const res = await fetch(API_ENC + '/admin', { headers: { 'x-auth-token': token } });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok) throw new Error(data.error || 'No se pudo cargar');
+      const ahora = data.ahora || Date.now();
+      cont.innerHTML = '';
+      if(!data.encuestas.length){ cont.innerHTML = '<p class="hint">Todavía no hay encuestas.</p>'; return; }
+      data.encuestas.forEach((p) => {
+        const total = p.total || 0;
+        const lineas = p.opciones.map((o) => {
+          const v = o.votos || 0, pct = total ? Math.round(v / total * 1000) / 10 : 0;
+          return escH(o.texto) + ': <b>' + v + '</b> (' + pct + '%)';
+        }).join('<br>');
+        const div = document.createElement('div');
+        div.className = 'item enc';
+        div.innerHTML =
+          '<div class="info" style="flex:1 1 220px">' +
+            '<div class="tipo">' + (p.multiple ? 'MÚLTIPLE' : 'ÚNICA') +
+              '<span class="estado-tag ' + (p.cerrada ? 'cer' : 'act') + '">' + (p.cerrada ? 'CERRADA' : 'ACTIVA · cierra en ' + fmtRestante(p.cierra - ahora)) + '</span></div>' +
+            '<div class="titulo">' + escH(p.pregunta) + '</div>' +
+            '<div class="res">' + lineas + '<br>' + total + (p.multiple ? (total === 1 ? ' votante' : ' votantes') : (total === 1 ? ' voto' : ' votos')) + '</div>' +
+          '</div><div class="acciones"></div>';
+        const acc = div.querySelector('.acciones');
+        if(!p.cerrada){
+          const c = document.createElement('button');
+          c.className = 'cerrar'; c.textContent = 'Cerrar ya';
+          c.onclick = () => accionEncuesta('POST', p.id + '/cerrar', '¿Cerrar esta encuesta ahora?');
+          acc.appendChild(c);
+        }
+        const b = document.createElement('button');
+        b.className = 'del'; b.textContent = 'Borrar';
+        b.onclick = () => accionEncuesta('DELETE', p.id, '¿Borrar esta encuesta y sus votos?');
+        acc.appendChild(b);
+        cont.appendChild(div);
+      });
+    }catch(e){
+      cont.innerHTML = '<p class="hint err">' + escH(e.message) + '</p>';
+    }
+  }
+
+  async function accionEncuesta(metodo, ruta, pregunta){
+    const token = document.getElementById('token').value;
+    if(!token){ alert('Necesitas el token.'); return; }
+    if(!confirm(pregunta)) return;
+    const res = await fetch(API_ENC + '/' + ruta, { method: metodo, headers: { 'x-auth-token': token } });
+    if(res.ok) cargarEncuestas(); else alert('No se pudo completar la acción.');
+  }
+
+  document.getElementById('token').addEventListener('change', cargarEncuestas);
+  cargarEncuestas();
 </script>
 <script src="assets/vendor/gsap.min.js"></script><script src="assets/vendor/ScrollTrigger.min.js"></script><script src="assets/vendor/SplitText.min.js"></script><script src="assets/leia-fx.js"></script></body></html>
