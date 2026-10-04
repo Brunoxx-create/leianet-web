@@ -115,8 +115,6 @@
 </script>
 <title>Steam In Linux - LeiaNET</title><meta name="description" content="Steam Preview de LeiaNET: pegá tu SteamID64 o perfil de Steam y mirá qué juegos de tu biblioteca corren en Linux, según los datos de ProtonDB."><link rel="canonical" href="https://leianet.ar/steam-preview.html"><meta property="og:title" content="Steam Preview - LeiaNET"><meta property="og:description" content="Mirá qué juegos de tu biblioteca de Steam corren en Linux, según ProtonDB."><meta property="og:type" content="website"><meta property="og:url" content="https://leianet.ar/steam-preview.html"><meta property="og:image" content="https://leianet.ar/assets/logo_leianetwork.png"><meta name="twitter:card" content="summary">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f0f11;--bg-elev:#18181b;--bg-elev-2:#201f23;--border:#2b2b30;--border-soft:#232326;--text:#ededee;--text-dim:#a9aaaf;--text-mute:#706f74;--accent:#c7c7cc;--accent-soft:rgba(199,199,204,.12);--ok:#6bbf7b;--mono:'JetBrains Mono',monospace;--display:'Chakra Petch',sans-serif;--body:'Inter',sans-serif;--glass-fill:linear-gradient(155deg,rgba(255,255,255,.09),rgba(255,255,255,.015) 55%,rgba(255,255,255,.03));--glass-fill-strong:linear-gradient(155deg,rgba(255,255,255,.14),rgba(255,255,255,.02) 55%,rgba(255,255,255,.05));--glass-border:rgba(255,255,255,.15);--glass-border-hover:rgba(255,255,255,.30);--glass-blur:blur(20px) saturate(170%);--glass-shadow:0 24px 60px -28px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.09);--iris-a:rgba(140,170,255,.5);--iris-b:rgba(217,164,65,.45);--iris-c:rgba(199,140,255,.4);--coffee:#d9a441}
 *{box-sizing:border-box}
@@ -312,7 +310,7 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 @media (max-width:640px),(pointer:coarse){.nebula,.nebula-mono,.grain{display:none}.stars-layer{animation:none!important}.sparkle{animation:none;opacity:.4}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}body{opacity:1}.game-card{opacity:1!important}}
 </style>
-</head><body>
+<link rel="preload" href="assets/fonts/chakra-petch-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="assets/leia-fx.css"><link rel="stylesheet" href="assets/leia-pages.css"><script>(function(){var r=document.documentElement;r.classList.add("fx-pre");setTimeout(function(){r.classList.remove("fx-pre")},4500)})()</script></head><body>
 <div class="grid-overlay"></div>
 <div class="depth-veil"></div>
 <div class="nebula"><span></span><span></span><span></span></div>
@@ -325,7 +323,7 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 <div class="grain"></div>
 <div class="cursor-glow" id="cursor-glow"></div>
 <header><a href="index.html" class="brand" aria-label="Ir al inicio"><img width="860" height="150" loading="eager" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"></a><div class="header-right"><nav id="main-nav"><a href="index.html#minecraft">Minecraft</a><a href="index.html#cs16">CS 1.6</a><a href="index.html#haxball">Haxball</a><a href="index.html#novedades">Novedades</a><a href="utilidades.html" class="active">Utilidades</a><a href="index.html#cafecito">Cafecito</a><a href="index.html#faq">FAQ</a><a href="index.html#contact">Contacto</a></nav><button class="icon-btn perf-toggle" id="perf-toggle" aria-label="Alternar modo de rendimiento" title="Modo rendimiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg><span class="perf-tip" aria-hidden="true">ACTIVADO</span></button><button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button></div></header><div class="nav-backdrop" id="nav-backdrop"></div>
-<main>
+<main class="sub">
 <section class="hero">
 <div class="eyebrow">◆ leianetwork · tus juegos en linux · fuente: protondb</div>
 <h1>Tus juegos en <span>Linux</span></h1>
@@ -336,7 +334,7 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 </div>
 <div class="hint">ej: 76561199091579261 · o "bruno7a0" · o steamcommunity.com/id/bruno7a0</div>
 <div id="errorMsg"></div>
-</section>
+</section><div class="ticker" aria-hidden="true"><div class="ticker-track"><div class="ticker-group"><span class="ticker-item solid"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item solid"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item solid"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item solid"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span><span class="ticker-item"><img src="assets/favicon-180.png" alt="" width="180" height="180">LEIANET</span></div></div></div>
 <div id="loading">consultando steam…</div>
 <div class="profile-card" id="profileCard">
 <div class="profile-head">
@@ -365,7 +363,7 @@ footer{text-align:center;padding:26px 16px;font-family:var(--mono);font-size:11p
 <div class="game-list" id="gameList"></div>
 </div>
 </main>
-<footer>STEAM PREVIEW — parte de LeiaNET · datos de Steam Web API + ProtonDB · leianet.ar</footer>
+<footer><div class="fbrand"><img width="860" height="150" loading="lazy" decoding="async" src="assets/logo_leianetwork.webp" alt="LeiaNETWORK"><span>© 2026 LeiaNET</span></div><div class="fmeta">STEAM PREVIEW · datos de Steam Web API + ProtonDB · <b>leianet.ar</b></div></footer>
 <script>
 const API_BASE = 'https://steam-api.leianet.ar';
 const PROTONDB_URL = './protondb-summary.json'; // subilo junto a este HTML
@@ -812,4 +810,4 @@ window.addEventListener('load',()=>document.body.classList.add('loaded'));
   mainNav.querySelectorAll('a').forEach(a=> a.addEventListener('click', closeNav));
 })();
 </script>
-</body></html>
+<script src="assets/vendor/gsap.min.js"></script><script src="assets/vendor/ScrollTrigger.min.js"></script><script src="assets/vendor/SplitText.min.js"></script><script src="assets/leia-fx.js"></script></body></html>
