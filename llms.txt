@@ -1,8 +1,16 @@
 # LeiaNET
 
-> LeiaNET (LeiaNETWORK) es una red argentina de servidores gratuitos de Minecraft, Counter-Strike 1.6 y Haxball, hosteados de forma independiente y sin fines de lucro. Cualquiera puede conectarse sin pagar membresía.
+> LeiaNET (LeiaNETWORK) es un hub argentino para gamers y devs: utilidades web gratuitas y servidores gratuitos de Minecraft, Counter-Strike 1.6 y Haxball, hosteados de forma independiente y sin fines de lucro. Todo es de uso libre, sin membresía.
 
-LeiaNET surgió de la idea de administrar servidores propios de Minecraft y fue creciendo hasta sumar CS 1.6, Haxball y otros proyectos gaming bajo una misma identidad e infraestructura.
+LeiaNET surgió de la idea de administrar servidores propios de Minecraft y fue creciendo hasta sumar CS 1.6, Haxball y, ahora, utilidades para gamers y devs bajo una misma identidad e infraestructura.
+
+## Utilidades
+
+- [Utilidades](https://leianet.ar/utilidades.html): página con todas las herramientas gratuitas de LeiaNET
+- [AI Compare](https://leianet.ar/iacompare.html): ranking de modelos de IA por categoría, con precio por millón de tokens, ventana de contexto y fuentes
+- [Steam In Linux](https://leianet.ar/steam-preview.html): qué juegos de tu biblioteca de Steam corren en Linux, según datos de ProtonDB
+- [Can I Run IT?](https://leianet.ar/canirun.html): elegí tu hardware y mirá qué juegos corre tu PC
+- [Minecraft Server](https://leianet.ar/minecraft-server.html): generador de servers de Minecraft (Vanilla, Paper, Purpur, Folia, Fabric, Forge, NeoForge), con server.properties, plugins/mods de Modrinth y un zip con script de instalación
 
 ## Servidores
 
