@@ -1,5 +1,5 @@
 /* LeiaNET — encuestas (sección Novedades) */
-.polls-list{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.polls-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
 .polls-list:empty{display:none}
 
 .poll-card{--pc:#c78cff;--pc-soft:rgba(199,140,255,.14);position:relative;overflow:hidden;background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:16px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow);padding:18px 22px 18px 24px;animation:poll-in .5s cubic-bezier(.2,.7,.2,1) both}
@@ -65,3 +65,11 @@
 @media (prefers-reduced-motion:reduce){.poll-card,.poll-fill{animation:none}.poll-opt{transition:none}}
 html.low-perf .poll-card,html.perf-mid .poll-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg-elev)!important;animation:none!important}
 html.low-perf .poll-fill,html.perf-mid .poll-fill{animation:none!important}
+
+/* --- fila compacta (usa el estilo .nv-row de las novedades) --- */
+.poll-row{--nv-color:#c78cff;--nv-soft:rgba(199,140,255,.14)}
+.poll-row.is-closed{--nv-color:#d9a441;--nv-soft:rgba(217,164,65,.14)}
+/* --- la encuesta dentro del modal: sin caja propia --- */
+.poll-in-modal{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0!important;animation:none!important;overflow:visible!important;border-radius:0}
+.poll-in-modal::before{display:none}
+.poll-in-modal .poll-q{font-size:clamp(18px,3vw,22px)}
