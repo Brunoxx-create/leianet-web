@@ -171,10 +171,72 @@
       (ver ? resultados(p) : formulario(p)) + '</article>';
   }
 
+  /* ---------- fila compacta + modal (mismo estilo que las novedades) ---------- */
+  var modal = document.createElement('div');
+  modal.className = 'nv-modal poll-modal';
+  modal.setAttribute('aria-hidden', 'true');
+  modal.innerHTML = '<div class="nv-backdrop" data-close></div>' +
+    '<div class="nv-dialog" role="dialog" aria-modal="true" aria-label="Encuesta">' +
+      '<div class="nv-dialog-head"><h3>📊 Encuesta</h3>' +
+      '<button type="button" class="nv-close" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>' +
+      '<div class="nv-dialog-body" id="poll-modal-body"></div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  var mBody = modal.querySelector('#poll-modal-body');
+  var openId = null, lastFocus = null, sonido = null;
+
+  function click(){
+    try{
+      if(!sonido){ sonido = new Audio('assets/clicksound.mp3'); sonido.volume = 0.5; }
+      var a = sonido.cloneNode(); a.volume = sonido.volume; a.play().catch(function(){});
+    }catch(e){}
+  }
+
+  function fila(p, i){
+    var cerr = p.cerrada;
+    return '<button type="button" class="nv-row poll-row' + (cerr ? ' is-closed' : '') + '" data-id="' + p.id + '" style="--i:' + i + '">' +
+      '<span class="novedad-icono">' + (cerr ? '🔒' : '📊') + '</span>' +
+      '<span class="nv-row-main">' +
+        '<span class="novedad-header"><span class="novedad-badge">Encuesta</span>' +
+        (cerr
+          ? '<span class="novedad-fecha">Cerrada</span>'
+          : '<span class="novedad-fecha" data-cierra="' + p.cierra + '">Cierra en ' + fmt(p.cierra - now()) + '</span>') +
+        '</span>' +
+        '<span class="novedad-titulo">' + esc(p.pregunta) + '</span>' +
+      '</span>' +
+      '<svg class="nv-row-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+    '</button>';
+  }
+
+  function pintarModal(){
+    var p = openId && find(openId);
+    if(!p){ cerrarModal(); return; }
+    mBody.innerHTML = card(p).replace('class="poll-card', 'class="poll-card poll-in-modal');
+  }
+  function abrirModal(id){
+    if(!find(id)) return;
+    lastFocus = document.activeElement;
+    openId = id;
+    pintarModal();
+    mBody.scrollTop = 0;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('nv-lock');
+    click();
+  }
+  function cerrarModal(){
+    openId = null;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('nv-lock');
+    if(lastFocus && lastFocus.focus){ try{ lastFocus.focus({ preventScroll: true }); }catch(e){} }
+  }
+
   function render(){
     var activas = polls.filter(function(p){ return !p.cerrada; });
     var cerradas = polls.filter(function(p){ return p.cerrada; }).slice(0, MAX_CERRADAS);
-    host.innerHTML = activas.concat(cerradas).map(card).join('');
+    host.innerHTML = activas.concat(cerradas).map(fila).join('');
+    if(openId) pintarModal();
   }
 
   /* ---------- datos ---------- */
@@ -195,7 +257,7 @@
 
   /* ---------- votar ---------- */
   function pintarEstado(id){
-    var c = host.querySelector('.poll-card[data-id="' + id + '"]'); if(!c) return;
+    var c = mBody.querySelector('.poll-card[data-id="' + id + '"]'); if(!c) return;
     var s = state(id), b = c.querySelector('.poll-btn'), m = c.querySelector('.poll-msg');
     if(b){ b.disabled = s.busy || !s.sel.length; b.textContent = s.busy ? 'Verificando…' : 'Votar'; }
     if(m) m.textContent = s.msg;
@@ -204,7 +266,7 @@
   function votar(id){
     var p = find(id), s = state(id);
     if(!p || s.busy || !s.sel.length) return;
-    var c = host.querySelector('.poll-card[data-id="' + id + '"]');
+    var c = mBody.querySelector('.poll-card[data-id="' + id + '"]');
     var hpEl = c && c.querySelector('input[name="sitio_web"]');
     var hp = hpEl ? hpEl.value : '';
     s.busy = true; s.msg = ''; pintarEstado(id);
@@ -233,7 +295,7 @@
   }
 
   /* ---------- eventos ---------- */
-  host.addEventListener('change', function(e){
+  mBody.addEventListener('change', function(e){
     var inp = e.target; if(!inp || inp.tagName !== 'INPUT' || inp.type === 'text') return;
     var cardEl = inp.closest('.poll-card'); if(!cardEl) return;
     var id = cardEl.getAttribute('data-id'), s = state(id);
@@ -244,6 +306,15 @@
     prepare(id).catch(function(err){ s.msg = err.message || ''; pintarEstado(id); });
   });
   host.addEventListener('click', function(e){
+    var r = e.target.closest('.poll-row'); if(r) abrirModal(r.getAttribute('data-id'));
+  });
+  modal.addEventListener('click', function(e){
+    if(e.target.closest('[data-close]')){ click(); cerrarModal(); }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && modal.classList.contains('open')) cerrarModal();
+  });
+  mBody.addEventListener('click', function(e){
     var b = e.target.closest('[data-act="votar"]'); if(!b) return;
     var cardEl = b.closest('.poll-card'); if(cardEl) votar(cardEl.getAttribute('data-id'));
   });
@@ -252,7 +323,7 @@
   setInterval(function(){
     if(document.hidden) return;
     var t = now(), vencida = false;
-    Array.prototype.forEach.call(host.querySelectorAll('[data-cierra]'), function(el){
+    Array.prototype.forEach.call(document.querySelectorAll('#encuestas-container [data-cierra], .poll-modal [data-cierra]'), function(el){
       var left = parseInt(el.getAttribute('data-cierra'), 10) - t;
       if(left <= 0){ el.textContent = 'Cerrando…'; vencida = true; }
       else el.textContent = 'Cierra en ' + fmt(left);
