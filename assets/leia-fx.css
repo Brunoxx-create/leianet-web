@@ -1,0 +1,473 @@
+/* ==========================================================================
+   LeiaNET — capa de diseño v2
+   Se carga DESPUÉS del <style> inline de index.html y lo reemplaza visualmente.
+   Se mantiene: fondo espacial (estrellas, nebulosas, planetas), paleta
+   (plata #c7c7cc, ámbar #d9a441, iris azul/violeta, verde ok) y el efecto de
+   que cada sección "se moldea" cuando pasás el mouse (ahora más profundo).
+   ========================================================================== */
+
+/* ---------- Tipografías propias (sin Google Fonts) ---------- */
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/chakra-petch-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/chakra-petch-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/chakra-petch-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/inter-latin-wght-normal.woff2) format('woff2-variations'),url(fonts/inter-latin-wght-normal.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono Variable';font-style:normal;font-display:swap;font-weight:100 800;
+  src:url(fonts/jetbrains-mono-latin-wght-normal.woff2) format('woff2-variations'),url(fonts/jetbrains-mono-latin-wght-normal.woff2) format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --display:'Chakra Petch',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono Variable','JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --hair:rgba(255,255,255,.09);
+  --hair-hot:rgba(255,255,255,.22);
+  --panel:linear-gradient(165deg,rgba(255,255,255,.065),rgba(255,255,255,.018) 58%,rgba(255,255,255,.03));
+  /* sombras en capas: offset + blur suave (nada de halos planos) */
+  --lift-sm:0 1px 0 rgba(255,255,255,.08) inset,0 1px 2px rgba(0,0,0,.4),0 8px 20px -10px rgba(0,0,0,.6);
+  --lift-md:0 1px 0 rgba(255,255,255,.1) inset,0 2px 4px rgba(0,0,0,.35),0 18px 40px -18px rgba(0,0,0,.75);
+  --lift-lg:0 1px 0 rgba(255,255,255,.12) inset,0 4px 8px rgba(0,0,0,.35),0 30px 70px -26px rgba(0,0,0,.85);
+}
+html{scroll-padding-top:84px;text-size-adjust:100%}
+body{font-family:var(--body);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;caret-color:var(--coffee)}
+p{text-wrap:pretty}
+h1,h2,h3,h4{text-wrap:balance}
+::selection{background:rgba(217,164,65,.32);color:#fff}
+.pulse-dot,.online-pill,.status-pill,.count,.fmeta,code{font-variant-numeric:tabular-nums}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--coffee);outline-offset:3px;border-radius:8px}
+
+/* ---------- Las capas de fondo siguen intactas; solo bajamos el grano ---------- */
+.grain{opacity:.03}
+
+/* ---------- Header ---------- */
+header{padding:12px clamp(18px,4vw,48px);background:linear-gradient(180deg,rgba(18,18,21,.82),rgba(15,15,17,.66));border-bottom:1px solid var(--hair);box-shadow:0 18px 40px -30px rgba(0,0,0,.9)}
+header::after{opacity:.35}
+nav{position:relative;gap:2px;font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.09em}
+nav a{padding:9px 14px;border-radius:999px;position:relative;z-index:1;transition:color .2s var(--ease-out)}
+nav a::after{display:none}
+nav a:hover,nav a:focus-visible,nav a.active{color:#fff}
+.nav-pill{position:absolute;left:0;top:0;height:0;width:0;border-radius:999px;pointer-events:none;z-index:0;opacity:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));
+  box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 6px 16px -8px rgba(0,0,0,.7)}
+.icon-btn{width:40px;height:40px;transition:border-color .2s,color .2s,background .2s,box-shadow .2s}
+.icon-btn:hover{box-shadow:0 0 0 4px rgba(217,164,65,.12)}
+.perf-toggle:hover{border-color:var(--coffee);color:var(--coffee)}
+.perf-toggle.active:hover{transform:none}
+
+/* ---------- Hero ---------- */
+.hero{max-width:1240px;grid-template-columns:minmax(0,1.3fr) minmax(0,.8fr);gap:clamp(32px,5vw,76px);padding:clamp(56px,8vw,120px) clamp(18px,4vw,48px) clamp(40px,5vw,72px);align-items:center}
+.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(2.4rem,6.3vw,6rem);line-height:.98;letter-spacing:-.01em;margin:0 0 26px;color:#e4e4e7;text-wrap:balance}
+.hero h1 span{position:relative;display:inline-block;color:#fff;background:none;-webkit-text-fill-color:#fff;animation:none}
+.hero p.lead{font-size:clamp(16px,1.3vw,18px);line-height:1.6;color:var(--text-dim);max-width:44ch;margin:0 0 32px}
+.hero-cta{gap:12px}
+.hero-live{display:flex;align-items:center;gap:10px;margin-top:30px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mute)}
+.hero-live .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(107,191,123,.14);animation:pulse 2.4s infinite}
+
+/* el h1 y compañía los maneja GSAP; sin JS quedan visibles */
+.hero h1,.hero p.lead,.hero .hero-cta,.hero .hero-live,.status-card{animation:none;opacity:1;transform:none}
+
+/* ---------- Botones ---------- */
+.btn{font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:.07em;border-radius:14px;padding:15px 24px;min-height:48px;border:1px solid var(--hair-hot);background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-sm);transition:border-color .2s,background .25s,box-shadow .3s}
+.btn:hover{border-color:rgba(255,255,255,.38);background:linear-gradient(165deg,rgba(255,255,255,.12),rgba(255,255,255,.04))}
+.btn:active{transform:none !important}
+.btn.primary{background:linear-gradient(170deg,#fff,#cfcfd4 70%);border-color:rgba(255,255,255,.6);color:#0f0f11;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(0,0,0,.3),0 16px 34px -14px rgba(199,199,204,.55)}
+.btn.primary:hover{background:linear-gradient(170deg,#fff,#e6e6ea 70%)}
+.link-btn,.copy-btn{backdrop-filter:none;-webkit-backdrop-filter:none}
+.copy-btn{min-height:38px;padding:8px 12px;border-radius:10px;transition:border-color .2s,color .2s,background .2s}
+
+/* ---------- Estado en vivo (ledger) ---------- */
+.status-card{border-radius:26px;background:var(--panel);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-lg)}
+.status-head{padding:18px 22px;border-bottom:1px solid var(--hair);background:none}
+.status-head span.lbl{font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--text-dim)}
+.status-list{padding:8px}
+.status-row{padding:14px 14px;border-bottom:0;border-radius:18px;transition:background .25s var(--ease-out)}
+.status-row:hover{background:rgba(255,255,255,.045)}
+.status-icon{width:44px;height:44px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--hair)}
+.status-row .name{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.01em}
+.hero-glass-orb{opacity:.5}
+
+/* ---------- Ticker (velocidad ligada al scroll) ---------- */
+.ticker{position:relative;overflow:hidden;padding:clamp(14px,2vw,22px) 0;border-block:1px solid var(--hair);margin:0 0 clamp(12px,3vw,40px);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
+.ticker-track{display:flex;width:max-content;will-change:transform}
+.ticker-item{display:flex;align-items:center;gap:clamp(18px,3vw,36px);padding-right:clamp(18px,3vw,36px);font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,4.2vw,3.4rem);line-height:1;letter-spacing:-.01em;text-transform:uppercase;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(237,237,238,.34)}
+.ticker-item.solid{color:#e4e4e7;-webkit-text-stroke:0}
+.ticker-item img{width:clamp(22px,3vw,34px);height:auto;opacity:.55;filter:grayscale(1)}
+
+/* ---------- Bays: cada sección es un panel moldeable ---------- */
+section.game{--bay:199,199,204;--r-tl:34;--r-tr:34;--r-br:34;--r-bl:34;--sx:50;--sy:0;--lift:0;--bx:0;--by:0;
+  position:relative;isolation:isolate;max-width:1240px;margin:clamp(20px,3vw,40px) auto;padding:clamp(28px,4vw,60px) clamp(18px,3.6vw,52px);border-top:none;scroll-margin-top:92px}
+section.game#minecraft{--bay:140,170,255}
+section.game#cs16{--bay:217,164,65}
+section.game#haxball{--bay:107,191,123}
+section.game#novedades{--bay:199,140,255}
+section.game#cafecito{--bay:217,164,65}
+section.game#social{--bay:140,170,255}
+section.game#contact{--bay:199,199,204}
+section.game::before{content:'';position:absolute;inset:0;top:0;left:0;width:auto;height:auto;z-index:-1;pointer-events:none;
+  border-radius:calc(var(--r-tl)*1px) calc(var(--r-tr)*1px) calc(var(--r-br)*1px) calc(var(--r-bl)*1px);
+  border:1px solid rgba(255,255,255,calc(.075 + .1*var(--lift)));
+  background:
+    radial-gradient(640px circle at calc(var(--sx)*1%) calc(var(--sy)*1%),rgba(var(--bay),calc(.13*var(--lift))),transparent 70%),
+    linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.008));
+  box-shadow:0 1px 0 rgba(255,255,255,calc(.05 + .07*var(--lift))) inset,0 40px 90px -50px rgba(0,0,0,.9);
+  transform:perspective(1600px) rotateX(calc(var(--bx)*1deg)) rotateY(calc(var(--by)*1deg)) scale(calc(1 + .006*var(--lift)));
+  transform-origin:calc(var(--sx)*1%) calc(var(--sy)*1%)}
+
+/* ---------- Encabezado de sección ---------- */
+.sec-index{display:none}
+.sec-head{margin-bottom:clamp(26px,3.6vw,48px);align-items:center;gap:14px 20px}
+.sec-head-main{align-items:center;gap:clamp(14px,2vw,22px)}
+.sec-head .icon-badge{width:clamp(64px,7vw,84px);height:clamp(64px,7vw,84px);border-radius:26px;background:rgba(0,0,0,.28);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-sm);transition:border-color .45s var(--ease-out),box-shadow .45s var(--ease-out),transform .6s var(--ease-out)}
+.sec-head .icon-badge img{padding:12px}
+.sec-head .icon-badge svg{max-width:46%;max-height:46%}
+.sec-head h2,.sec-head-copy h2{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,4.8vw,3.75rem);line-height:.98;letter-spacing:-.01em;margin:0}
+.sec-head:hover h2{letter-spacing:-.01em}
+.sec-head-copy{gap:10px;padding-top:0}
+.sec-head-copy .sec-sub{font-size:clamp(14px,1.2vw,16px);color:var(--text-dim);max-width:40ch}
+.sec-head .count,.online-pill{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+.online-pill{background:rgba(0,0,0,.28);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-sm);padding:9px 16px}
+.sec-head.center{flex-direction:column;text-align:center}
+.sec-head .count{padding:6px 14px;margin-left:0}
+/* color en el ícono al hover de toda la sección, no solo del encabezado */
+section.game.is-hot .icon-badge{border-color:rgba(var(--bay),.5);transform:translateY(-3px) rotate(-3deg);box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 18px 30px -14px rgba(var(--bay),.45)}
+section.game.is-hot .icon-badge img.icon-gray{opacity:0;transform:scale(1.12)}
+section.game.is-hot .icon-badge img.icon-color{opacity:1;transform:scale(1.12)}
+
+/* ---------- Tarjetas ---------- */
+.cards{gap:clamp(14px,1.6vw,22px);perspective:none}
+.card{--mx:50%;--my:50%;border-radius:24px;padding:26px;background:var(--panel);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-md);
+  transform:none;transition:border-color .3s var(--ease-out),box-shadow .4s var(--ease-out),background .3s;will-change:auto}
+.card:hover{transform:none;border-color:var(--hair-hot);box-shadow:var(--lift-lg)}
+.card::before{background:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.75),transparent 62%)}
+.card::after{background:radial-gradient(420px circle at var(--mx) var(--my),rgba(var(--bay),.16),transparent 65%)}
+.card .tag{font-size:10.5px;font-weight:600;letter-spacing:.1em;color:rgb(var(--bay));background:rgba(var(--bay),.12);border:1px solid rgba(var(--bay),.28);padding:4px 10px;border-radius:99px}
+.card h3{font-family:var(--display);font-weight:700;font-size:clamp(1.25rem,2vw,1.6rem);letter-spacing:-.01em;margin:0 0 6px}
+.card .desc{font-size:14px;line-height:1.55;color:var(--text-dim)}
+.card.card-wide{padding:30px 34px;border-radius:26px}
+.ip-row{background:rgba(0,0,0,.34);border-radius:14px;padding:10px 10px 10px 16px;box-shadow:0 2px 6px rgba(0,0,0,.4) inset,0 1px 0 rgba(255,255,255,.05)}
+.ip-row code{font-size:clamp(13px,1.2vw,15.5px);font-weight:500;letter-spacing:.01em}
+.link-btn{border-radius:14px;font-weight:700;box-shadow:var(--lift-sm);background:var(--panel)}
+.card.locked{border-color:rgba(226,45,68,.32)}
+.info-bar{border-radius:18px;background:rgba(0,0,0,.22);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;margin-top:clamp(16px,2vw,24px);padding:16px 20px}
+.info-bar p{font-size:14px}
+
+/* ---------- Novedades ---------- */
+.novedades-list{gap:16px}
+.novedad-card{border-radius:22px;background:var(--panel);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-md);padding:22px 26px 22px 30px}
+.novedad-card::before{width:2px;border-radius:2px;left:12px;top:22px;bottom:22px}
+.novedad-titulo{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.005em}
+.novedad-imagen{outline:1px solid rgba(255,255,255,.1);outline-offset:-1px;border:0}
+
+/* ---------- Cafecito ---------- */
+.cafecito-wrap{gap:clamp(14px,1.6vw,22px)}
+.cafecito-card{border-radius:26px;background:var(--panel);border:1px solid var(--hair);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-md);padding:clamp(24px,3vw,36px)}
+.cafecito-card:hover{transform:none;border-color:rgba(217,164,65,.45);box-shadow:var(--lift-lg)}
+.cafecito-msg p{font-size:15px}
+.perk-row{border-radius:16px;background:rgba(0,0,0,.22);box-shadow:none}
+.donor-title h4{font-weight:700}
+
+/* ---------- FAQ ---------- */
+.faq-list{max-width:860px}
+.faq-item{border-radius:20px;background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-sm);border:1px solid var(--hair)}
+.faq-item summary{padding:22px 24px;font-family:var(--display);font-weight:700;font-size:clamp(15px,1.4vw,17px);letter-spacing:-.01em;min-height:64px}
+.faq-item summary .plus{width:30px;height:30px;border-radius:10px}
+.faq-item .faq-a{padding:0 24px}
+.faq-item[open] .faq-a{padding:0 24px 24px}
+.faq-item .faq-a-inner{font-size:15px;color:var(--text-dim)}
+.faq-item[open]{border-color:rgba(255,255,255,.18)}
+
+/* ---------- Social + contacto ---------- */
+.social-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(12px,1.4vw,18px);justify-content:stretch}
+.social-card{border-radius:20px;padding:16px 20px;background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-sm);transition:border-color .25s,background .25s,box-shadow .3s}
+.social-card:hover{transform:none;box-shadow:var(--lift-md)}
+.social-icon{width:46px;height:46px;border-radius:14px}
+.social-name{font-family:var(--display);font-weight:700;font-size:15px}
+.contact-wrap{max-width:980px;gap:clamp(14px,1.6vw,22px)}
+.contact-card{border-radius:26px;padding:clamp(26px,3vw,38px);background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--lift-md)}
+.contact-card:hover{transform:none;box-shadow:var(--lift-lg)}
+.contact-card h4{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.005em}
+
+/* ---------- Footer ---------- */
+footer{max-width:1240px;padding:clamp(28px,4vw,48px) clamp(18px,4vw,48px) clamp(36px,5vw,56px);border-top:1px solid var(--hair)}
+
+/* ---------- Revelado: lo anima GSAP (sin JS, todo queda visible) ---------- */
+.reveal{opacity:1;transform:none;transition:none}
+.cards .reveal,.faq-list .reveal,.social-row .reveal,.contact-wrap .reveal{transition-delay:0s}
+
+/* ---------- Toast / flotantes ---------- */
+#toast{border-radius:14px;font-family:var(--mono)}
+.back-to-top,.twitch-chat-toggle{box-shadow:var(--lift-md)}
+
+/* ---------- Mobile ---------- */
+@media (max-width:880px){
+  .hero{grid-template-columns:1fr}
+  .nav-pill{display:none}
+  nav a{padding:16px 0;border-radius:0}
+  section.game{margin:14px 10px;padding:28px 16px;--r-tl:26;--r-tr:26;--r-br:26;--r-bl:26}
+  .card.card-wide{padding:22px 20px}
+}
+@media (max-width:640px){
+  .hero{padding:40px 16px 28px}
+  .hero h1{font-size:clamp(2.1rem,10.5vw,3rem);letter-spacing:-.01em}
+  .btn{padding:14px 16px}
+  .card{padding:20px 18px}
+  .sec-head h2,.sec-head-copy h2{font-size:clamp(1.7rem,8.4vw,2.3rem)}
+  .faq-item summary{padding:18px 18px}
+  .faq-item .faq-a{padding:0 18px}
+  .faq-item[open] .faq-a{padding:0 18px 20px}
+}
+/* sin hover real (touch): la sección no se moldea, pero queda enmarcada */
+@media (hover:none),(pointer:coarse){
+  section.game::before{transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .ticker-track{transform:none !important}
+  section.game::before{transform:none}
+}
+/* modos de rendimiento existentes: se respetan */
+html.low-perf section.game::before,html.perf-mid section.game::before{transform:none;box-shadow:none;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01))}
+html.low-perf .ticker-track{will-change:auto}
+
+/* pre-ocultado: evita el parpadeo antes de que GSAP tome el control.
+   Lo agrega un script inline en <head> y se quita solo (ver red de seguridad). */
+html.fx-pre .hero h1,html.fx-pre .hero p.lead,html.fx-pre .hero-cta .btn,html.fx-pre .hero-live,
+html.fx-pre .status-card,html.fx-pre .status-row,html.fx-pre .reveal:not(.sec-head),
+html.fx-pre .sec-head .icon-badge,html.fx-pre .sec-head .sec-sub,html.fx-pre .sec-head .online-pill,html.fx-pre .sec-head .count{opacity:0}
+html.fx-pre .sec-head h2{opacity:0}
+
+/* ==========================================================================
+   v3 — COMPOSICIÓN NUEVA (bento compacto)
+   Reemplaza la maqueta anterior: header isla flotante, hero en una sola
+   columna con el estado en tira de 3, y las secciones como paneles de una
+   grilla de 12 columnas. Todo a escala más chica.
+   ========================================================================== */
+
+/* ---- Header isla ---- */
+header{top:10px;margin:10px auto 0;width:min(1180px,calc(100% - 24px));padding:7px 8px 7px 16px;border-radius:18px;border:1px solid var(--hair)}
+header::after{display:none}
+.brand img{height:28px}
+nav{font-size:11px;letter-spacing:.08em}
+nav a{padding:7px 11px}
+.icon-btn{width:34px;height:34px}
+.icon-btn svg{width:15px;height:15px}
+
+/* ---- Grilla principal ---- */
+main{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;max-width:1180px;margin:0 auto;padding:6px clamp(12px,3vw,24px) 36px;align-items:stretch}
+.hero,.ticker{grid-column:1/-1}
+section.game{margin:0;max-width:none;padding:18px;--r-tl:22;--r-tr:22;--r-br:22;--r-bl:22;scroll-margin-top:84px}
+@media (min-width:981px){
+  section.game#minecraft{grid-column:span 6}
+  section.game#cs16{grid-column:span 6}
+  section.game#haxball{grid-column:span 5}
+  section.game#novedades{grid-column:span 7}
+  section.game#cafecito{grid-column:span 7}
+  section.game#faq{grid-column:span 5}
+  section.game#social{grid-column:span 7}
+  section.game#contact{grid-column:span 5}
+}
+@media (max-width:980px){
+  main{grid-template-columns:1fr;gap:12px}
+  section.game{grid-column:1/-1}
+}
+
+/* ---- Hero: una columna, título contenido, estado en tira ---- */
+.hero{display:block;max-width:none;margin:0;padding:clamp(26px,5vw,60px) 4px 6px}
+.hero>div:first-child{max-width:700px}
+.hero h1{font-size:clamp(1.9rem,4.4vw,3.2rem);line-height:1.02;letter-spacing:-.01em;margin:0 0 14px}
+.hero p.lead{font-size:15px;line-height:1.6;max-width:50ch;margin:0 0 20px}
+.hero-cta{gap:8px}
+.hero-live{margin-top:18px;font-size:10.5px}
+.status-card-wrap{margin-top:26px}
+.status-card{border-radius:20px}
+.status-head{padding:11px 16px}
+.status-head span.lbl{font-size:11px}
+.status-head .all-ok{font-size:10.5px;padding:4px 10px}
+.status-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:6px}
+.status-row{padding:9px 11px;border-radius:14px;gap:10px}
+.status-icon{width:34px;height:34px;border-radius:10px}
+.status-icon img{padding:5px}
+.status-row .name{font-size:13.5px}
+.status-row .sub{font-size:10.5px}
+.status-pill{font-size:10.5px}
+@media (max-width:760px){.status-list{grid-template-columns:1fr}}
+
+/* ---- Franja ---- */
+.ticker{margin:0;padding:9px 0}
+.ticker-item{font-size:clamp(1rem,2.2vw,1.55rem);gap:18px;padding-right:18px}
+.ticker-item img{width:18px}
+
+/* ---- Botones ---- */
+.btn{min-height:40px;padding:9px 16px;font-size:11.5px;border-radius:11px}
+.link-btn{padding:9px 12px;font-size:11px;border-radius:11px}
+.copy-btn{min-height:32px;padding:6px 10px;font-size:11px;border-radius:9px}
+
+/* ---- Encabezado de sección compacto ---- */
+.sec-head{margin-bottom:14px;gap:8px 12px;align-items:center}
+.sec-head-main{gap:12px;flex:1 1 180px}
+.sec-head .icon-badge{width:42px;height:42px;border-radius:13px}
+.sec-head .icon-badge img{padding:7px}
+.sec-head .icon-badge svg{max-width:50%;max-height:50%}
+.sec-head h2,.sec-head-copy h2{font-size:clamp(1.05rem,1.5vw,1.3rem);letter-spacing:-.005em;line-height:1.1}
+.sec-head-copy{gap:3px}
+.sec-head-copy .sec-sub{font-size:12.5px;max-width:none}
+.sec-head .count,.online-pill{font-size:10.5px;padding:5px 10px}
+.sec-head.center{flex-direction:row;justify-content:flex-start;text-align:left;align-items:center}
+.sec-head.center .count{margin-left:auto}
+section.game.is-hot .icon-badge{transform:translateY(-2px) rotate(-3deg)}
+
+/* ---- Tarjetas ---- */
+.cards{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.card{border-radius:16px;padding:16px}
+.card.card-wide,.card.card-wide{padding:16px;display:flex;flex-direction:column;align-items:stretch;gap:12px}
+.card.card-wide .card-wide-actions{flex-direction:column;align-items:stretch;gap:8px;width:100%}
+.card h3{font-size:1.02rem;margin:0 0 4px}
+.card .tag{font-size:9.5px;padding:3px 8px;margin-bottom:8px}
+.card .desc{font-size:12.5px;margin:0 0 12px}
+.card.card-wide .card-wide-info .desc{margin:0}
+.ip-row{border-radius:11px;padding:6px 6px 6px 12px}
+.ip-row code{font-size:12.5px}
+.info-bar{margin-top:10px;padding:11px 14px;border-radius:13px;gap:9px}
+.info-bar p{font-size:12px;line-height:1.55}
+.lock-badge{padding:10px 14px;gap:5px}
+.lock-title{font-size:11px}
+.chain-band{height:20px}
+
+/* ---- Novedades ---- */
+.novedades-list{gap:10px}
+.novedad-card{border-radius:16px;padding:14px 16px 14px 24px;gap:12px}
+.novedad-card::before{left:10px;top:14px;bottom:14px}
+.novedad-icono{width:32px;height:32px}
+.novedad-titulo{font-size:14.5px}
+.novedad-texto{font-size:13px}
+.novedad-imagen{height:170px;margin:8px 0}
+
+/* ---- Cafecito ---- */
+.cafecito-wrap{gap:10px}
+.cafecito-card{border-radius:18px;padding:18px}
+.cafecito-msg p{font-size:13.5px;line-height:1.65;margin:0 0 10px}
+.cafecito-msg p:last-of-type{margin-bottom:14px}
+.cafecito-note{font-size:10.5px}
+.donor-card{padding:16px}
+.donor-title{margin:0 0 12px}
+.donor-title h4{font-size:13px}
+.perk-list{gap:8px}
+.perk-row{padding:8px 10px;gap:10px;border-radius:12px}
+.perk-icon{width:28px;height:28px;border-radius:8px}
+.perk-name{font-size:12.5px}
+.perk-desc{font-size:11.5px}
+.donor-foot{font-size:10px;margin-top:10px;padding-top:10px}
+
+/* ---- FAQ ---- */
+.faq-list{max-width:none;gap:8px}
+.faq-item{border-radius:14px}
+.faq-item summary{padding:12px 14px;min-height:46px;font-size:13.5px;gap:12px}
+.faq-item summary .plus{width:24px;height:24px;border-radius:8px}
+.faq-item .faq-a{padding:0 14px}
+.faq-item[open] .faq-a{padding:0 14px 14px}
+.faq-item .faq-a-inner{font-size:13px;line-height:1.65}
+
+/* ---- Social + contacto ---- */
+.social-row{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.social-card{border-radius:14px;padding:10px 12px;gap:10px}
+.social-icon{width:34px;height:34px;border-radius:10px}
+.social-name{font-size:13px}
+.social-handle{font-size:10.5px}
+.contact-wrap{grid-template-columns:1fr;gap:10px;max-width:none}
+.contact-card{border-radius:18px;padding:18px;gap:4px}
+.contact-icon{width:38px;height:38px;border-radius:11px}
+.contact-card h4{font-size:15px}
+.contact-card p{font-size:12.5px;margin:0 0 8px}
+
+/* ---- Footer ---- */
+footer{max-width:1180px;padding:20px clamp(12px,3vw,24px) 36px}
+
+/* ---- Mobile ---- */
+@media (max-width:880px){
+  header{width:calc(100% - 16px);top:8px;margin-top:8px}
+  section.game{margin:0;padding:16px 14px;--r-tl:18;--r-tr:18;--r-br:18;--r-bl:18}
+  .hero{padding:26px 2px 4px}
+  .card.card-wide{padding:16px}
+}
+@media (max-width:640px){
+  .hero h1{font-size:clamp(1.75rem,8.2vw,2.3rem)}
+  .sec-head h2,.sec-head-copy h2{font-size:1.1rem}
+  .card{padding:14px}
+  .faq-item summary{padding:12px}
+  .faq-item .faq-a{padding:0 12px}
+  .faq-item[open] .faq-a{padding:0 12px 12px}
+}
+
+/* ==========================================================================
+   v4 — ajustes: header grande, franja arreglada con íconos, redes en tira,
+   transiciones limpias para el efecto de deformación con el mouse
+   ========================================================================== */
+header{top:12px;margin-top:12px;padding:12px 14px 12px 22px;border-radius:24px}
+.brand img{height:46px}
+nav{font-size:13px;letter-spacing:.07em}
+nav a{padding:11px 16px}
+.icon-btn{width:44px;height:44px}
+.icon-btn svg{width:18px;height:18px}
+
+.ticker-group{display:flex;align-items:center;flex-shrink:0}
+.ticker-item{gap:14px;padding-right:clamp(26px,4vw,48px)}
+.ticker-item img{width:30px;height:30px;object-fit:contain;opacity:.95;filter:none}
+.ticker-item img.generic{opacity:.55;filter:grayscale(1)}
+
+@media (min-width:981px){
+  section.game#social{grid-column:1/-1}
+  section.game#contact{grid-column:1/-1}
+}
+.social-row{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.social-card{padding:9px 11px;gap:9px}
+.social-icon{width:32px;height:32px}
+.social-name{font-size:12.5px}
+.social-handle{font-size:10px}
+.contact-wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:720px){.contact-wrap{grid-template-columns:1fr}}
+
+/* el movimiento de estos elementos lo controla GSAP: sin transiciones CSS de transform */
+.card,.cafecito-card,.contact-card,.social-card,.novedad-card,.status-card,.status-row,.faq-item,.perk-row,.info-bar{
+  transition-property:border-color,box-shadow,background,background-color,opacity}
+.perk-row:hover{transform:none}
+.cafecito-card:hover,.contact-card:hover,.social-card:hover{transform:none}
+
+@media (max-width:880px){
+  .brand img{height:38px}
+  header{padding:10px 12px 10px 16px;border-radius:20px}
+}
+
+
+/* ================= Ajustes: chips Minecraft + hover por seccion ================= */
+.mc-chips{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+.mc-chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--text-dim);background:rgba(0,0,0,.28);border:1px solid var(--hair);border-radius:99px;padding:6px 12px;white-space:nowrap}
+@media (min-width:881px){#minecraft .card.card-wide{flex-wrap:wrap;row-gap:18px}}
+
+/* colores de cada seccion (afectan luz de la seccion, brillo de tarjetas, tags e icono) */
+section.game#minecraft{--bay:111,209,74}
+section.game#cs16{--bay:255,42,42}
+section.game#haxball{--bay:57,255,20}
+
+/* capa de luz que sigue al cursor (usa --sx/--sy/--lift que ya mueve leia-fx.js) */
+section.game#minecraft::after,section.game#cs16::after,section.game#haxball::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border-radius:calc(var(--r-tl)*1px) calc(var(--r-tr)*1px) calc(var(--r-br)*1px) calc(var(--r-bl)*1px);
+  opacity:var(--lift);
+  -webkit-mask-image:radial-gradient(900px circle at calc(var(--sx)*1%) calc(var(--sy)*1%),#000,transparent 72%);
+  mask-image:radial-gradient(900px circle at calc(var(--sx)*1%) calc(var(--sy)*1%),#000,transparent 72%);
+  transform:perspective(1600px) rotateX(calc(var(--bx)*1deg)) rotateY(calc(var(--by)*1deg)) scale(calc(1 + .006*var(--lift)));
+  transform-origin:calc(var(--sx)*1%) calc(var(--sy)*1%)}
+/* Minecraft: mitad de arriba verde (pasto), mitad de abajo marron (tierra) */
+section.game#minecraft::before{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.008))}
+section.game#minecraft::after{background:linear-gradient(180deg,rgba(111,209,74,.30) 0 50%,rgba(150,98,52,.38) 50% 100%)}
+section.game#haxball::after{background:rgba(57,255,20,.20)}
+section.game#cs16::after{background:rgba(255,42,42,.20)}
+
+/* tarjetas: el brillo tambien sigue al mouse con el color de la seccion */
+#haxball .card::before,#cs16 .card::before{background:radial-gradient(260px circle at var(--mx) var(--my),rgba(var(--bay),.95),transparent 62%)}
+#haxball .card::after,#cs16 .card::after{background:radial-gradient(420px circle at var(--mx) var(--my),rgba(var(--bay),.26),transparent 65%)}
+#haxball .card:hover{border-color:rgba(57,255,20,.7);box-shadow:0 0 40px -8px rgba(57,255,20,.55),var(--lift-lg)}
+#cs16 .card:hover{border-color:rgba(255,42,42,.7);box-shadow:0 0 40px -8px rgba(255,42,42,.55),var(--lift-lg)}
+#minecraft .card::before{background:linear-gradient(180deg,#6fd14a 0 50%,#a0693a 50% 100%)}
+#minecraft .card::after{background:linear-gradient(180deg,rgba(111,209,74,.26) 0 50%,rgba(150,98,52,.34) 50% 100%);
+  -webkit-mask-image:radial-gradient(520px circle at var(--mx) var(--my),#000,transparent 72%);mask-image:radial-gradient(520px circle at var(--mx) var(--my),#000,transparent 72%)}
+#minecraft .card:hover{box-shadow:0 -18px 42px -22px rgba(111,209,74,.6),0 18px 42px -22px rgba(150,98,52,.8),var(--lift-lg)}
