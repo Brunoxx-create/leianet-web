@@ -1,0 +1,32 @@
+/* ==========================================================================
+   LeiaNET — ajustes para las páginas internas (utilidades, canirun,
+   iacompare, steam-preview, admin, 404). Se carga DESPUÉS de leia-fx.css.
+   - En el index, <main> es una grilla de 12 columnas con paneles por id;
+     acá cada bloque ocupa el ancho completo.
+   - Footer nuevo (mismo que el index) para las páginas que no traían estilos.
+   ========================================================================== */
+main.sub>*{grid-column:1/-1;min-width:0}
+main.sub{padding-top:14px}
+nav a{white-space:nowrap}
+
+footer{border-top:1px solid var(--hair);padding:clamp(28px,4vw,48px) clamp(18px,4vw,48px) clamp(36px,5vw,56px);max-width:1240px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;position:relative;z-index:1}
+footer .fbrand{display:flex;align-items:center;gap:10px;color:var(--text-mute);font-size:12.5px;font-family:var(--mono)}
+footer .fbrand img{height:20px;width:auto;opacity:.7}
+footer .fmeta{font-size:12px;color:var(--text-mute);font-family:var(--mono);text-align:right}
+footer .fmeta b{color:var(--text-dim)}
+@media (max-width:640px){footer{padding:26px 16px 32px;flex-direction:column;text-align:center;gap:10px}footer .fmeta{text-align:center}}
+
+/* heroes centrados de iacompare / steam-preview */
+main.sub .hero .eyebrow{justify-content:center}
+
+/* 404 */
+.code404{font-family:var(--display);font-weight:700;font-size:clamp(64px,16vw,120px);letter-spacing:-.02em;line-height:1;margin:6px 0 10px;color:var(--text)}
+.planet404{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d8d8dc,#6c6c72 70%);vertical-align:middle;margin:0 .06em;animation:drift404 5s ease-in-out infinite}
+html.low-perf .planet404,html.perf-mid .planet404{animation:none}
+@keyframes drift404{0%,100%{transform:translateY(0)}50%{transform:translateY(-.08em)}}
+
+/* header de admin: sus estilos genericos de <button> pisaban los iconos del header */
+header .icon-btn,header .nav-toggle{margin-top:0;padding:0;transform:none;color:var(--text-dim);background:var(--panel);border:1px solid var(--hair);box-shadow:none;font-weight:400}
+header .nav-toggle{background:none;border:none;padding:8px}
+header .icon-btn:hover{color:var(--accent)}
+header .icon-btn.perf-toggle.active{color:var(--ok);border-color:var(--ok)}
