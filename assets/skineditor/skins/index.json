@@ -1,0 +1,92 @@
+[
+ {
+  "name": "Steve",
+  "file": "char.png",
+  "slim": false
+ },
+ {
+  "name": "Steve tenista",
+  "file": "char1.png",
+  "slim": false
+ },
+ {
+  "name": "Steve esmoquin",
+  "file": "char2.png",
+  "slim": false
+ },
+ {
+  "name": "Steve atleta",
+  "file": "char3.png",
+  "slim": false
+ },
+ {
+  "name": "Steve escocés",
+  "file": "char4.png",
+  "slim": false
+ },
+ {
+  "name": "Steve prisionero",
+  "file": "char5.png",
+  "slim": false
+ },
+ {
+  "name": "Steve ciclista",
+  "file": "char6.png",
+  "slim": false
+ },
+ {
+  "name": "Steve boxeador",
+  "file": "char7.png",
+  "slim": false
+ },
+ {
+  "name": "Alex",
+  "file": "alex.png",
+  "slim": true
+ },
+ {
+  "name": "Alex tenista",
+  "file": "alex1.png",
+  "slim": true
+ },
+ {
+  "name": "Alex esmoquin",
+  "file": "alex2.png",
+  "slim": true
+ },
+ {
+  "name": "Alex atleta",
+  "file": "alex3.png",
+  "slim": true
+ },
+ {
+  "name": "Alex escocesa",
+  "file": "alex4.png",
+  "slim": true
+ },
+ {
+  "name": "Alex prisionera",
+  "file": "alex5.png",
+  "slim": true
+ },
+ {
+  "name": "Alex ciclista",
+  "file": "alex6.png",
+  "slim": true
+ },
+ {
+  "name": "Alex boxeadora",
+  "file": "alex7.png",
+  "slim": true
+ },
+ {
+  "name": "Steve Dev",
+  "file": "DevSteve.png",
+  "slim": false
+ },
+ {
+  "name": "Alex Dev",
+  "file": "DevAlex.png",
+  "slim": true
+ }
+]

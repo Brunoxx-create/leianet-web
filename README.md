@@ -1,6 +1,6 @@
 # LeiaNET — leianet.ar
 
-Sitio web oficial de **LeiaNET (LeiaNETWORK)**, un hub para gamers y devs: utilidades web gratuitas (AI Compare, Steam In Linux, Can I Run IT?, Minecraft Server) y una red de servidores gratuitos de **Minecraft**, **Counter-Strike 1.6** y **Haxball**, hosteada de forma independiente. Todo es de uso libre, sin membresía.
+Sitio web oficial de **LeiaNET (LeiaNETWORK)**, un hub para gamers y devs: utilidades web gratuitas (AI Compare, Steam In Linux, Can I Run IT?, Minecraft Server, Editor de Skins) y una red de servidores gratuitos de **Minecraft**, **Counter-Strike 1.6** y **Haxball**, hosteada de forma independiente. Todo es de uso libre, sin membresía.
 
 🔗 **[leianet.ar](https://leianet.ar)**
 

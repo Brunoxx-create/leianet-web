@@ -11,6 +11,7 @@ LeiaNET surgió de la idea de administrar servidores propios de Minecraft y fue 
 - [Steam In Linux](https://leianet.ar/steam-preview.html): qué juegos de tu biblioteca de Steam corren en Linux, según datos de ProtonDB
 - [Can I Run IT?](https://leianet.ar/canirun.html): elegí tu hardware y mirá qué juegos corre tu PC
 - [Minecraft Server](https://leianet.ar/minecraft-server.html): generador de servers de Minecraft (Vanilla, Paper, Purpur, Folia, Fabric, Forge, NeoForge), con server.properties, plugins/mods de Modrinth y un zip con script de instalación
+- [Editor de Skins](https://leianet.ar/skin-editor.html): editor de skins de Minecraft con lienzo 2D, vista 3D animada, capas, elytra y armaduras, carga por nick, link para compartir y exportación a PNG
 
 ## Servidores
 
