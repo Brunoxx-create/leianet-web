@@ -420,7 +420,8 @@ html.perf-mid .sk details.sk-panel{backdrop-filter:none!important;background:var
   <div class="row"><label style="flex:1">Pincel <input type="range" id="size" min="1" max="6" value="1"></label></div>
   <div class="row"><label><input type="checkbox" id="mir"> Espejo</label><label><input type="checkbox" id="grid" checked> Cuadrícula</label></div>
   <div class="row"><button id="bU">Deshacer</button><button id="bR">Rehacer</button></div>
-  <div class="row"><label style="flex:1">Zoom <input type="range" id="zoom" step="any" min="4" max="16" value="8"></label></div>
+  <div class="row"><button type="button" id="zOut" title="Alejar" aria-label="Alejar">−</button><label style="flex:1">Zoom <input type="range" id="zoom" step="any" min="3" max="48" value="8"></label><button type="button" id="zIn" title="Acercar" aria-label="Acercar">+</button><button type="button" id="zFit" title="Ajustar al ancho">Ajustar</button></div>
+  <p style="margin:0;color:var(--mu);font-size:11.5px">Rueda del mouse o pellizco para hacer zoom sobre el lienzo. Clic derecho o central y arrastrar (o dos dedos) para moverte.</p>
  </section>
  <section class="sk-panel"><h2>Color</h2>
   <div class="sk-colorpick"><label class="sk-swatchbtn" title="Elegir color"><input type="color" id="col" value="#3b82f6" aria-label="Color de pintura"><span class="sk-ring"><span class="sk-face"></span></span></label><div class="sk-colorinfo"><strong id="skhex">#3B82F6</strong><span>Tocá el cuadro para elegir</span></div></div><div class="row"><button id="bSave">Guardar color</button></div>
@@ -534,6 +535,30 @@ function texRect(a,b){const cs=texColors();if(!cs.length)return;const{px}=area(a
 // ---- Zoom y cuadrícula ----
 function view(){const z=+$('#zoom').value;cv.style.width=cv.style.height=64*z+'px';gv.width=gv.height=64*z;gv.style.width=gv.style.height=64*z+'px';const g=gv.getContext('2d');g.clearRect(0,0,64*z,64*z);if(!$('#grid').checked)return;g.strokeStyle='#ffffff22';g.beginPath();for(let i=0;i<=64;i++){g.moveTo(i*z+.5,0);g.lineTo(i*z+.5,64*z);g.moveTo(0,i*z+.5);g.lineTo(64*z,i*z+.5)}g.stroke();g.strokeStyle='#22d3ee88';B().forEach(b=>{const[u,v,w,h,d]=b;g.strokeRect(u*z,v*z,(2*d+2*w)*z,(d+h)*z)})}
 $('#zoom').oninput=view;$('#grid').onchange=view;
+
+// ---- Zoom del lienzo 2D: rueda, pellizco, botones y desplazamiento ----
+(function(){const z=$('#zoom'),w=cv.parentElement;
+ function setZoom(v,cx,cy){const old=+z.value;v=Math.max(+z.min,Math.min(+z.max,v));if(Math.abs(v-old)<.001)return;
+  const r=cv.getBoundingClientRect();if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2}
+  const px=(cx-r.left)/old,py=(cy-r.top)/old;z.value=v;window.__zoomTouch&&window.__zoomTouch();view();
+  const n=cv.getBoundingClientRect();w.scrollLeft+=n.left+px*v-cx;w.scrollTop+=n.top+py*v-cy}
+ w.addEventListener('wheel',e=>{e.preventDefault();setZoom(+z.value*Math.exp(-e.deltaY*(e.deltaMode?0.05:0.0015)),e.clientX,e.clientY)},{passive:false});
+ $('#zIn').onclick=()=>setZoom(+z.value*1.25);$('#zOut').onclick=()=>setZoom(+z.value/1.25);
+ $('#zFit').onclick=()=>{const a=Math.floor((w.parentElement.getBoundingClientRect().width-34)/64*100)/100;setZoom(Math.max(4,Math.min(16,a)));w.scrollLeft=w.scrollTop=0};
+ const odn=cv.onpointerdown,omv=cv.onpointermove,oup=cv.onpointerup,tps=new Set();let pan=null,pin=null;
+ const cancel=()=>{if(down){ctx.putImageData(snap,0,0);undo.pop();down=false;changed()}};
+ cv.onpointerdown=e=>{
+  if(e.pointerType=='touch'){tps.add(e.pointerId);if(tps.size>1){cancel();return}}
+  else if(e.button==1||e.button==2){e.preventDefault();cv.setPointerCapture(e.pointerId);pan={x:e.clientX,y:e.clientY,l:w.scrollLeft,t:w.scrollTop};cv.style.cursor='grabbing';return}
+  odn(e)};
+ cv.onpointermove=e=>{if(pan){w.scrollLeft=pan.l-(e.clientX-pan.x);w.scrollTop=pan.t-(e.clientY-pan.y);return}if(tps.size>1)return;omv(e)};
+ cv.onpointerup=cv.onpointercancel=e=>{tps.delete(e.pointerId);if(pan){pan=null;cv.style.cursor='';return}if(tps.size)return;oup(e)};
+ cv.oncontextmenu=e=>e.preventDefault();
+ const ti=e=>{const a=e.touches[0],b=e.touches[1];return{d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)||1,cx:(a.clientX+b.clientX)/2,cy:(a.clientY+b.clientY)/2}};
+ cv.addEventListener('touchstart',e=>{if(e.touches.length==2){cancel();pin=ti(e)}},{passive:true});
+ cv.addEventListener('touchmove',e=>{if(e.touches.length==2&&pin){e.preventDefault();const n=ti(e);setZoom(+z.value*n.d/pin.d,n.cx,n.cy);w.scrollLeft-=n.cx-pin.cx;w.scrollTop-=n.cy-pin.cy;pin=n}},{passive:false});
+ cv.addEventListener('touchend',e=>{if(e.touches.length<2)pin=null},{passive:true});
+})();
 // ---- Color ----
 const PALS={pastel:['#ffd6e0','#ffefcf','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff'],retro:['#2b2d42','#8d99ae','#ef233c','#d90429','#f77f00','#fcbf49','#eae2b7','#003049'],oscuro:['#0d0d0d','#1a1a2e','#16213e','#0f3460','#533483','#2d2d2d','#3a3a3a','#555555']};
 let hist=LS('leia.hist',[]),saved=LS('leia.saved',[]);
@@ -551,9 +576,12 @@ $('#bHsb').onclick=()=>{push();const dh=+$('#hH').value,ds=+$('#hS').value/100,d
 $('#bShade').onclick=()=>{push();const k=$('#shK').value/50,bs=B();$('#zone').value.split(',').forEach(i=>{F(bs[i]).forEach(([x,y,w,h],fi)=>{const im=ctx.getImageData(x,y,w,h),D=im.data;for(let yy=0;yy<h;yy++){const t=h>1?yy/(h-1):0,f=[.12,-.28,-.14-.12*t,.08-.2*t,-.02-.12*t,-.12-.12*t][fi]*k;for(let xx=0;xx<w;xx++){const q=(yy*w+xx)*4;if(!D[q+3])continue;for(let c=0;c<3;c++)D[q+c]=Math.max(0,Math.min(255,D[q+c]*(1+f)))}}ctx.putImageData(im,x,y)})});changed()};
 // ---- Prendas: nombre:[color por defecto, [x,y,w,h,k]] (k = tono, 0 = borra) ----
 const shade=(h,k)=>'#'+[1,3,5].map(i=>Math.min(255,Math.round(parseInt(h.substr(i,2),16)*k)).toString(16).padStart(2,'0')).join('');
-const IT={
- 'Lentes pro':['#111111',[[41,11,3,3],[42,12,1,1,0],[44,11,3,3],[45,12,1,1,0],[36,12,4,1],[48,12,4,1]]],
- 'Lentes de sol':['#111111',[[41,11,3,3],[44,11,3,3],[36,12,4,1],[48,12,4,1]]],
+const ITF=()=>{const a=slim?3:4,ox=q=>q?48:40,oy=q=>q?52:36,
+ top=q=>[ox(q)+4,oy(q)-4,a,4],bot=q=>[ox(q)+4+a,oy(q)-4,a,4],sl=q=>[ox(q),oy(q),8+2*a,3],cf=q=>[ox(q),oy(q)+9,8+2*a,3],
+ whole=q=>[[ox(q)+4,oy(q)-4,2*a,4],[ox(q),oy(q),8+2*a,12]],W='#ffffff';
+ return{
+ 'Lentes pro (Thug Life)':['#111111',[[40,11,8,1],[40,12,3,2],[45,12,3,2],[36,12,4,1],[48,12,4,1],[40,12,1,1,1,W],[42,12,1,1,1,W],[41,13,1,1,1,W],[45,12,1,1,1,W],[47,12,1,1,1,W],[46,13,1,1,1,W]]],
+ 'Lentes de sol':['#111111',[[40,12,3,2],[45,12,3,2],[43,12,2,1],[36,12,4,1],[48,12,4,1]]],
  'Antifaz':['#111111',[[32,11,32,3],[41,12,2,1,0],[45,12,2,1,0]]],
  'Auriculares':['#212121',[[34,10,4,4],[50,10,4,4],[35,8,2,2],[51,8,2,2],[40,3,8,2]]],
  'Gorra':['#d32f2f',[[40,0,8,8],[32,8,32,3],[40,11,8,1,.7]]],
@@ -562,20 +590,20 @@ const IT={
  'Barba':['#3e2723',[[40,13,8,3],[43,14,2,1,0],[32,14,8,2],[48,14,8,2]]],
  'Bigote':['#3e2723',[[42,14,4,1]]],
  'Bufanda':['#c62828',[[16,36,24,2],[20,32,8,4],[21,38,2,7,.85]]],
- 'Remera':['#e53935',[[16,32,24,16],[44,32,4,4],[40,36,16,3],[52,48,4,4],[48,52,16,3]]],
- 'Buzo':['#607d8b',[[16,32,24,16],[40,32,16,16],[48,48,16,16],[21,43,6,3,.8],[40,45,16,3,.85],[48,61,16,3,.85],[16,47,24,1,.85]]],
- 'Campera':['#2f3e46',[[16,32,24,16],[40,32,16,16],[48,48,16,16],[23,36,2,12,1.7]]],
+ 'Remera':['#e53935',[[16,32,24,16],top(0),sl(0),top(1),sl(1)]],
+ 'Buzo':['#607d8b',[[16,32,24,16],...whole(0),...whole(1),[21,43,6,3,.8],[...cf(0),.85],[...cf(1),.85],[16,47,24,1,.85]]],
+ 'Campera':['#2f3e46',[[16,32,24,16],...whole(0),...whole(1),[23,36,2,12,1.7]]],
  'Corbata':['#b71c1c',[[23,36,2,1,.8],[23,37,2,6],[23,43,2,1,.8]]],
  'Cinturón':['#4e342e',[[16,46,24,1],[23,46,2,1,2.6]]],
- 'Guantes':['#212121',[[40,45,16,3],[48,61,16,3],[48,32,4,4],[56,48,4,4]]],
+ 'Guantes':['#212121',[cf(0),cf(1),bot(0),bot(1)]],
  'Jeans':['#3b5b9d',[[0,32,16,16],[0,48,16,16],[0,47,16,1,.75],[0,63,16,1,.75]]],
  'Pantalón corto':['#b08d57',[[4,32,4,4],[4,48,4,4],[0,36,16,5],[0,52,16,5]]],
- 'Zapatillas':['#f5f5f5',[[0,45,16,3],[0,61,16,3],[8,32,4,4],[8,48,4,4],[0,47,16,1,.6],[0,63,16,1,.6]]]};
+ 'Zapatillas':['#f5f5f5',[[0,45,16,3],[0,61,16,3],[8,32,4,4],[8,48,4,4],[0,47,16,1,.6],[0,63,16,1,.6]]]}};
 let bk={};
-const put=(c,o)=>o.forEach(([x,y,w,h,k=1])=>{if(k){ctx.fillStyle=shade(c,k);ctx.fillRect(x,y,w,h)}else ctx.clearRect(x,y,w,h)});
-Object.entries(IT).forEach(([n,[c0,o]])=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<span style="flex:1">${n}</span><input type="color" value="${c0}" title="Color de ${n}">`;const pc=r.querySelector('input');
- [['Poner',1],['Quitar',0]].forEach(([t,on])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{
-  if(on){push();if(!bk[n])bk[n]=o.map(([x,y,w,h])=>[x,y,ctx.getImageData(x,y,w,h)]);put(pc.value,o)}
+const put=(c,o)=>o.forEach(([x,y,w,h,k=1,abs])=>{if(abs){ctx.fillStyle=abs;ctx.fillRect(x,y,w,h)}else if(k){ctx.fillStyle=shade(c,k);ctx.fillRect(x,y,w,h)}else ctx.clearRect(x,y,w,h)});
+Object.entries(ITF()).forEach(([n,[c0]])=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<span style="flex:1">${n}</span><input type="color" value="${c0}" title="Color de ${n}">`;const pc=r.querySelector('input');
+ [['Poner',1],['Quitar',0]].forEach(([t,on])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{const o=ITF()[n][1];
+  if(on){push();if(!$('#lo').checked){$('#lo').checked=true;vis()}if(!bk[n])bk[n]=o.map(([x,y,w,h])=>[x,y,ctx.getImageData(x,y,w,h)]);put(pc.value,o)}
   else{if(!bk[n]){msg('No hay nada para quitar de «'+n+'». Si la pintaste vos, usá Deshacer.');return}push();bk[n].slice().reverse().forEach(([x,y,d])=>ctx.putImageData(d,x,y));delete bk[n]}
   changed()};r.append(b)});$('#wear').append(r)});
 // ---- Cargar / convertir / exportar ----
@@ -589,7 +617,7 @@ $('#bExp').onclick=()=>cv.toBlob(b=>{const a=document.createElement('a');a.href=
 function base(){push();bk={};ctx.clearRect(0,0,64,64);const f=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};f(0,0,32,16,'#c68f6b');f(8,0,8,8,'#4a2f1b');f(0,8,32,3,'#4a2f1b');f(9,12,2,1,'#fff');f(10,12,1,1,'#3b4cc0');f(13,12,2,1,'#fff');f(13,12,1,1,'#3b4cc0');f(11,14,2,1,'#8a4a3a');f(16,16,24,16,'#2a9d8f');f(40,16,16,16,'#c68f6b');f(40,20,16,4,'#2a9d8f');f(32,48,16,16,'#c68f6b');f(32,52,16,4,'#2a9d8f');f(0,16,16,16,'#3d5a99');f(16,48,16,16,'#3d5a99');changed()}
 $('#bNew').onclick=base;
 // ---- Steve <-> Alex ----
-$('#slim').onchange=e=>{push();const old=B(),c0=document.createElement('canvas');c0.width=c0.height=64;c0.getContext('2d').drawImage(cv,0,0);slim=e.target.checked;const nw=B();ctx.imageSmoothingEnabled=false;[4,5,6,7].forEach(i=>{ctx.clearRect(old[i][0],old[i][1],16,16);const fo=F(old[i]),fn=F(nw[i]);fo.forEach(([x,y,w,h],k)=>ctx.drawImage(c0,x,y,w,h,...fn[k]))});build();view();changed()};
+$('#slim').onchange=e=>{push();const old=B(),c0=document.createElement('canvas');c0.width=c0.height=64;c0.getContext('2d').drawImage(cv,0,0);slim=e.target.checked;bk={};const nw=B();ctx.imageSmoothingEnabled=false;[4,5,6,7].forEach(i=>{ctx.clearRect(old[i][0],old[i][1],16,16);const fo=F(old[i]),fn=F(nw[i]);fo.forEach(([x,y,w,h],k)=>ctx.drawImage(c0,x,y,w,h,...fn[k]))});build();view();changed()};
 // ---- Vista 3D ----
 const c3=$('#c3'),R=new THREE.WebGLRenderer({canvas:c3,antialias:true,alpha:true}),S=new THREE.Scene(),C=new THREE.PerspectiveCamera(35,1,10,300);
 const tex=new THREE.CanvasTexture(cv);tex.magFilter=tex.minFilter=THREE.NearestFilter;
@@ -618,33 +646,38 @@ addF(FONDOS);fetch('assets/skineditor/fondos/index.json').then(r=>r.json()).then
 $('#lit').oninput=e=>amb.intensity=e.target.value/100;
 // ---- Pintar directo sobre el modelo 3D (raycast -> UV -> pixel del lienzo) ----
 const RC=new THREE.Raycaster(),pv=new THREE.Vector2();let drag,p3=false,paint3=false,pushed=false,pl=null,lc=null;
-const T3=['pencil','eraser','bucket','picker','tex'];
+const T3=['pencil','eraser','bucket','picker','tex','line','rect','grad'];
 function hit3(cx,cy){const r=c3.getBoundingClientRect();pv.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height*2-1));RC.setFromCamera(pv,C);const m=$('#lay').value;
  for(const h of RC.intersectObjects(all.filter(o=>o.visible))){const o=h.object.userData.o;if(!h.uv||(m=='b'&&o)||(m=='o'&&!o))continue;
   const x=Math.max(0,Math.min(63,Math.floor(h.uv.x*64))),y=Math.max(0,Math.min(63,Math.floor((1-h.uv.y)*64)));
   if(m=='a'&&!ctx.getImageData(x,y,1,1).data[3])continue;
   return{p:[x,y],k:h.object.id+':'+(h.faceIndex>>1)}}return null}
 function pickAt(x,y){const d=ctx.getImageData(x,y,1,1).data;if(d[3])setCol('#'+[...d].slice(0,3).map(v=>v.toString(16).padStart(2,'0')).join(''))}
+const SH3=['line','rect','grad'];let st3=null;
 function stroke3(cx,cy){const h=hit3(cx,cy);if(!h){pl=null;return}
- if(!pushed){push();pushed=true;bag=[]}
- const c=tool=='eraser'?null:tool=='tex'?nextTex:color,f=(x,y)=>dot(x,y,c);
- if(pl&&pl.k==h.k)line(pl.p,h.p,f);else f(h.p[0],h.p[1]);
+ if(!pushed){push();pushed=true;bag=[];snap=ctx.getImageData(0,0,64,64);seed=Math.random()*4294967296}
+ const brush=tool=='pencil'||tool=='eraser'||(tool=='tex'&&$('#tmode').value=='b');
+ if(brush){const c=tool=='eraser'?null:tool=='tex'?nextTex:color,f=(x,y)=>dot(x,y,c);
+  if(pl&&pl.k==h.k)line(pl.p,h.p,f);else f(h.p[0],h.p[1])}
+ else if(tool=='tex'||SH3.includes(tool)){
+  if(!st3)st3=h;
+  if(h.k==st3.k)shape(st3.p,h.p)} // formas: dentro de la misma cara del modelo
  pl=h;changed()}
-function setP3(on){p3=on;$('#p3b').textContent='Pintar en 3D: '+(on?'SÍ':'NO');$('#p3b').classList.toggle('on',on);c3.style.cursor=on?'crosshair':'grab';if(on){$('#anim').value='idle';if(!T3.includes(tool))msg('En 3D funcionan lápiz, borrador, balde, gotero y texturizar (como pincel). Las demás son del lienzo 2D.')}}
+function setP3(on){p3=on;$('#p3b').textContent='Pintar en 3D: '+(on?'SÍ':'NO');$('#p3b').classList.toggle('on',on);c3.style.cursor=on?'crosshair':'grab';if(on){$('#anim').value='idle';msg('Pintar en 3D activado: todas las herramientas funcionan sobre el modelo. Para rotar: Shift o clic derecho. Línea, rectángulo, degradado y texturizar (rectángulo) se aplican dentro de una misma cara.')}}
 $('#p3b').onclick=()=>setP3(!p3);
 c3.oncontextmenu=e=>e.preventDefault();
 c3.onpointerdown=e=>{c3.setPointerCapture(e.pointerId);
  if(p3&&e.button==0&&!e.shiftKey){
-  if(!T3.includes(tool)){msg('«'+tool+'» se usa en el lienzo 2D. En 3D: lápiz, borrador, balde, gotero o texturizar.');return}
+  if(!T3.includes(tool))return;
   const h=hit3(e.clientX,e.clientY);
   if(tool=='picker'){if(h)pickAt(h.p[0],h.p[1]);return}
-  if(tool=='bucket'){if(h){push();fill(h.p);changed()}return}
-  paint3=true;pushed=false;pl=null;lc=[e.clientX,e.clientY];stroke3(e.clientX,e.clientY);return}
+  if(tool=='bucket'){if(h){push();fill(h.p);changed();addHist(color)}return}
+  paint3=true;pushed=false;pl=null;st3=null;lc=[e.clientX,e.clientY];stroke3(e.clientX,e.clientY);return}
  drag=[e.clientX,e.clientY];c3.style.cursor='grabbing'};
 c3.onpointermove=e=>{
- if(paint3){const[x0,y0]=lc,n=Math.max(1,Math.ceil(Math.hypot(e.clientX-x0,e.clientY-y0)/3));for(let i=1;i<=n;i++)stroke3(x0+(e.clientX-x0)*i/n,y0+(e.clientY-y0)*i/n);lc=[e.clientX,e.clientY];return}
+ if(paint3){const[x0,y0]=lc,n=SH3.includes(tool)||tool=='tex'&&$('#tmode').value=='r'?1:Math.max(1,Math.ceil(Math.hypot(e.clientX-x0,e.clientY-y0)/3));for(let i=1;i<=n;i++)stroke3(x0+(e.clientX-x0)*i/n,y0+(e.clientY-y0)*i/n);lc=[e.clientX,e.clientY];return}
  if(!drag)return;yaw-=(e.clientX-drag[0])*.01;pit=Math.max(-1.2,Math.min(1.2,pit+(e.clientY-drag[1])*.01));drag=[e.clientX,e.clientY]};
-c3.onpointerup=c3.onpointercancel=()=>{if(paint3&&pushed&&tool!='eraser')addHist(color);paint3=false;drag=null;c3.style.cursor=p3?'crosshair':'grab'};
+c3.onpointerup=c3.onpointercancel=()=>{if(paint3&&pushed&&tool!='eraser')addHist(color);paint3=false;st3=null;drag=null;c3.style.cursor=p3?'crosshair':'grab'};
 c3.onwheel=e=>{e.preventDefault();dist=Math.max(35,Math.min(160,dist+e.deltaY*.05))};
 function anim(t){const m=$('#anim').value;Object.values(P).forEach(p=>p.rotation.set(0,0,0));const s=m=='walk'?Math.sin(t*5)*.8:m=='run'?Math.sin(t*9)*1.1:0;
  P.rA.rotation.x=s;P.lA.rotation.x=-s;P.rL.rotation.x=-s;P.lL.rotation.x=s;
@@ -739,7 +772,7 @@ else if(sv)getImg(sv.d).then(i=>{ctx.drawImage(i,0,0);setSlim(sv.s);changed()});
 
 (function(){const sync=()=>{document.querySelectorAll('#tools button').forEach(b=>b.setAttribute('aria-pressed',b.classList.contains('on')))};new MutationObserver(sync).observe(document.getElementById('tools'),{subtree:true,attributes:true,attributeFilter:['class']});const p=document.getElementById('p3b');new MutationObserver(()=>p.setAttribute('aria-pressed',p.classList.contains('on'))).observe(p,{attributes:true,attributeFilter:['class']});})();
 
-(function(){const c=document.getElementById('col'),h=document.getElementById('skhex'),sw=c.closest('.sk-swatchbtn');const up=()=>{sw.style.setProperty('--c',c.value);h.textContent=c.value.toUpperCase()};c.addEventListener('input',up);setInterval(up,150);up();const z=document.getElementById('zoom');let touched=false;z.addEventListener('input',e=>{if(e.isTrusted)touched=true});const w=document.querySelector('.sk .wrap');const fit=()=>{if(touched)return;const a=Math.floor((w.parentElement.getBoundingClientRect().width-34)/64*100)/100;const v=Math.max(4,Math.min(+z.max,a));if(Math.abs(+z.value-v)>.01){z.value=v;z.dispatchEvent(new Event('input'))}};fit();addEventListener('resize',fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(w.parentElement)})();
+(function(){const c=document.getElementById('col'),h=document.getElementById('skhex'),sw=c.closest('.sk-swatchbtn');const up=()=>{sw.style.setProperty('--c',c.value);h.textContent=c.value.toUpperCase()};c.addEventListener('input',up);setInterval(up,150);up();const z=document.getElementById('zoom');let touched=false;window.__zoomTouch=()=>{touched=true};z.addEventListener('input',e=>{if(e.isTrusted)touched=true});const w=document.querySelector('.sk .wrap');const fit=()=>{if(touched)return;const a=Math.floor((w.parentElement.getBoundingClientRect().width-34)/64*100)/100;const v=Math.max(4,Math.min(16,a));if(Math.abs(+z.value-v)>.01){z.value=v;z.dispatchEvent(new Event('input'))}};fit();addEventListener('resize',fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(w.parentElement)})();
 document.getElementById('bUp').addEventListener('click',function(){document.getElementById('file').click()});
 </script>
 <script>
