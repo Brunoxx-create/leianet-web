@@ -481,3 +481,13 @@ html,body{overflow-x:clip}
 /* Foro: tarjeta explicativa a todo el ancho, filas en grilla */
 section.game#foro .cafecito-card{grid-column:1/-1;width:100%;max-width:none}
 section.game#foro .perk-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+
+/* menú: que "CS 1.6" y el resto no se partan en dos líneas (ahora hay un enlace más: Foro) */
+@media (min-width:981px){
+  nav a{white-space:nowrap}
+  #main-nav{gap:0}
+  #main-nav a{padding-left:10px;padding-right:10px}
+}
+@media (min-width:981px) and (max-width:1160px){
+  #main-nav a{padding-left:6px;padding-right:6px;font-size:12px}
+}
