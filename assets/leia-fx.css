@@ -98,6 +98,7 @@ nav a:hover,nav a:focus-visible,nav a.active{color:#fff}
 section.game{--bay:199,199,204;--r-tl:34;--r-tr:34;--r-br:34;--r-bl:34;--sx:50;--sy:0;--lift:0;--bx:0;--by:0;
   position:relative;isolation:isolate;max-width:1240px;margin:clamp(20px,3vw,40px) auto;padding:clamp(28px,4vw,60px) clamp(18px,3.6vw,52px);border-top:none;scroll-margin-top:92px}
 section.game#utilidades{--bay:140,170,255;grid-column:1/-1}
+section.game#foro{--bay:255,140,170;grid-column:1/-1}
 section.game#minecraft{--bay:140,170,255}
 section.game#cs16{--bay:217,164,65}
 section.game#haxball{--bay:107,191,123}
@@ -476,3 +477,7 @@ section.game#cs16::after{background:rgba(255,42,42,.20)}
 /* evita scroll horizontal en celu (el orbe del hero se asoma por la derecha) */
 html,body{overflow-x:clip}
 @media (max-width:600px){.hero h1 .br-d{display:none}.hero h1{font-size:clamp(28px,8.4vw,36px);line-height:1.12}}
+
+/* Foro: tarjeta explicativa a todo el ancho, filas en grilla */
+section.game#foro .cafecito-card{grid-column:1/-1;width:100%;max-width:none}
+section.game#foro .perk-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}

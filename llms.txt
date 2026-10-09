@@ -25,6 +25,7 @@ LeiaNET surgió de la idea de administrar servidores propios de Minecraft y fue 
 
 ## Comunidad y soporte
 
+- [Foro](https://foro.leianet.ar): foro oficial de la comunidad (phpBB) con secciones de charla general, Minecraft, Counter-Strike 1.6, Haxball y Web; se puede leer sin cuenta y con cuenta gratis se abren temas y se responde. Más info en https://leianet.ar/#foro
 - [Discord oficial](https://discord.gg/3Hsy6JrSMH): reporte de bugs, novedades y recompensas para donantes
 - [Cafecito](https://cafecito.app/leianet): apoyo económico al dominio, hosting e infraestructura del proyecto (100% se reinvierte en la red)
 - [FAQ](https://leianet.ar/#faq): preguntas frecuentes sobre el proyecto, conexión a servidores y reportes
