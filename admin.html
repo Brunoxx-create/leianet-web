@@ -688,33 +688,60 @@ h1.admin-h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,
     }
   }
 
-  async function borrar(id){
+  function escaparHTML(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function borrar(id, btn){
     const token = document.getElementById('token').value;
+    const estado = document.getElementById('estado');
     if(!token){ alert('Necesitas el token para borrar.'); return; }
-    if(!confirm('¿Borrar esta novedad?')) return;
-    const res = await fetch(API_URL + '/' + id, { method: 'DELETE', headers: { 'x-auth-token': token } });
-    if(res.ok) cargarLista(); else alert('No se pudo borrar.');
+    if(!confirm('¿Borrar esta novedad?\nTambién se borra del foro y de Discord.')) return;
+    if(btn){ btn.disabled = true; btn.textContent = 'Borrando...'; }
+    try{
+      const res = await fetch(API_URL + '/' + encodeURIComponent(id), { method: 'DELETE', headers: { 'x-auth-token': token } });
+      let data = {};
+      try{ data = await res.json(); }catch(_){}
+      if(!res.ok) throw new Error(data.error || ('el servidor respondio ' + res.status));
+      const avisos = [];
+      if(data.foro === false) avisos.push('no se pudo borrar el tema del foro');
+      if(data.discord === false) avisos.push('no se pudo borrar el mensaje de Discord');
+      estado.textContent = avisos.length ? 'Novedad borrada de la web, pero ' + avisos.join(' y ') + '.' : 'Novedad borrada (web, foro y Discord).';
+      estado.className = avisos.length ? 'err' : 'ok';
+    }catch(e){
+      alert('No se pudo borrar: ' + e.message);
+      estado.textContent = 'Error al borrar: ' + e.message;
+      estado.className = 'err';
+    }
+    cargarLista(); // siempre recargamos para que la lista quede igual que el servidor
   }
 
   async function cargarLista(){
-    const res = await fetch(API_URL);
-    const lista = await res.json();
     const cont = document.getElementById('lista');
+    let lista;
+    try{
+      const res = await fetch(API_URL, { cache: 'no-store' });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      lista = await res.json();
+    }catch(e){
+      cont.textContent = 'No se pudo cargar la lista: ' + e.message;
+      return;
+    }
     cont.innerHTML = '';
     lista.forEach((n) => {
       const div = document.createElement('div');
       div.className = 'item';
       div.innerHTML = `
         <div class="info">
-          <div class="tipo">${n.tipo.toUpperCase()}</div>
-          <div class="titulo">${n.titulo}</div>
-          <div class="fecha">${n.fecha}</div>
+          <div class="tipo">${escaparHTML(String(n.tipo).toUpperCase())}</div>
+          <div class="titulo">${escaparHTML(n.titulo)}</div>
+          <div class="fecha">${escaparHTML(n.fecha)}</div>
         </div>
-        ${n.imagen ? `<img src="${n.imagen}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:7px;flex-shrink:0">` : ''}`;
+        ${n.imagen ? `<img src="${escaparHTML(n.imagen)}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:7px;flex-shrink:0">` : ''}`;
       const btn = document.createElement('button');
       btn.className = 'del';
       btn.textContent = 'Borrar';
-      btn.onclick = () => borrar(n.id);
+      btn.onclick = () => borrar(n.id, btn);
       div.appendChild(btn);
       cont.appendChild(div);
     });
